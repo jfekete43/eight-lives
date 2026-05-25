@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eight Lives</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #121213;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 15px;
+        }
+
+        .header-spacer {
+            flex: 1;
+        }
+
+        h1 { 
+            margin: 0; 
+            flex: 2;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .header-actions {
+            flex: 1;
+            text-align: right;
+        }
+
+        .text-btn {
+            background: transparent;
+            border: none;
+            color: #818384;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: color 0.2s;
+            padding: 0;
+        }
+
+        .text-btn:hover {
+            color: white;
+        }
+
+        /* Instructions Box Styling */
+        .instructions {
+            background-color: #272729;
+            border: 1px solid #3a3a3c;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+            color: #d7dadc;
+            font-size: 14px;
+        }
+
+        .instructions p {
+            color: white;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .instructions ul {
+            margin: 0;
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .instructions li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .lives-left {
+            margin-bottom: 20px;
+            font-size: 22px; /* Slightly larger for the emojis */
+            letter-spacing: 4px; /* Space the hearts out a bit */
+            text-align: center;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+        }
+
+        input {
+            flex-grow: 1;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #3a3a3c;
+            color: white;
+            border: 1px solid #565758;
+            border-radius: 4px;
+        }
+
+        button.guess-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #538d4e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button.guess-btn:hover { background-color: #43703e; }
+        button:disabled { background-color: #3a3a3c; cursor: not-allowed; color: #818384; }
+
+        /* Grid Styling */
+        .grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .header-row {
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 2px solid #3a3a3c;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .box {
+            background-color: #3a3a3c;
+            padding: 15px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .box.match { background-color: #538d4e; } /* Green */
+        .box.wrong { background-color: #3a3a3c; } /* Gray */
+
+        #message {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .success { color: #538d4e; }
+        .failure { color: #e23636; }
+
+        /* Stats Modal Styling */
+        .modal {
+            display: none; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .modal-content {
+            background-color: #121213;
+            border: 1px solid #3a3a3c;
+            border-radius: 8px;
+            padding: 20px 30px 30px;
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-num {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            line-height: 1.2;
+        }
+
+        /* Guess Distribution Graph */
+        .guess-distribution {
+            width: 100%;
+            text-align: left;
+        }
+
+        .guess-distribution h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .dist-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .dist-label {
+            width: 15px;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        .dist-bar-container {
+            flex-grow: 1;
+            background-color: transparent;
+        }
+
+        .dist-bar {
+            background-color: #3a3a3c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 2px;
+            text-align: right;
+            min-width: 10px;
+            box-sizing: border-box;
+            transition: width 0.3s ease;
+        }
+
+        .dist-bar.highlight {
+            background-color: #538d4e;
+        }
+
+        /* Overlay Screens Styling */
+        .overlay-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.92);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .overlay-text {
+            font-size: 15vw;
+            font-weight: 900;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .text-win { color: #538d4e; }
+        .text-lose { color: #e23636; }
+        
+        @media (min-width: 600px) {
+            .overlay-text { font-size: 80px; }
+        }
+
+        .overlay-subtext {
+            font-size: 20px;
+            color: white;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .game-over-answer {
+            color: #538d4e;
+            font-weight: bold;
+            font-size: 28px;
+            margin-top: 5px;
+        }
+
+        .arcade-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .arcade-btn:hover {
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="header-spacer"></div>
+        <h1>Eight Lives</h1>
+        <div class="header-actions">
+            <button class="text-btn" onclick="toggleModal('flex')">STATS</button>
+        </div>
+    </div>
+    
+    <!-- Instructions Box -->
+    <div class="instructions">
+        <p>Guess the classic video game!</p>
+        <ul>
+            <li>🟩 <strong>Green box</strong> means an exact match.</li>
+            <li>⬛ <strong>Gray box</strong> means incorrect.</li>
+            <li>⬆️ ⬇️ <strong>Arrows</strong> indicate if the target game's release year is newer or older.</li>
+        </ul>
+    </div>
+
+    <div class="lives-left" id="lives-display">
+        <!-- Hearts will be injected here via JavaScript -->
+    </div>
+
+    <div class="input-section">
+        <input list="game-list" id="guess-input" placeholder="Type a game name...">
+        <datalist id="game-list"></datalist>
+        <button id="guess-button" class="guess-btn" onclick="makeGuess()">Guess</button>
+    </div>
+
+    <div class="grid" id="guess-grid">
+        <div class="row header-row">
+            <div>Game</div>
+            <div>Console</div>
+            <div>Genre</div>
+            <div>Year</div>
+        </div>
+        <!-- Guesses will be inserted here -->
+    </div>
+
+    <div id="message"></div>
+
+    <!-- Stats Modal -->
+    <div id="stats-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="toggleModal('none')">&times;</button>
+            <h2>Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-played">0</div>
+                    <div class="stat-label">Played</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-winpct">0</div>
+                    <div class="stat-label">Win %</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-streak">0</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-maxstreak">0</div>
+                    <div class="stat-label">Max Streak</div>
+                </div>
+            </div>
+
+            <!-- Guess Distribution Section -->
+            <div class="guess-distribution">
+                <h3>Guess Distribution</h3>
+                <div id="distribution-container">
+                    <!-- Bars are injected here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BIG Victory Screen -->
+    <div id="victory-screen" class="overlay-screen">
+        <div class="overlay-text text-win">VICTORY</div>
+        <div class="overlay-subtext" id="victory-subtext">
+            You got it in X guesses!
+        </div>
+        <button class="arcade-btn" onclick="showStatsFromScreen('victory-screen')">Continue to Stats</button>
+    </div>
+
+    <!-- BIG Game Over Screen -->
+    <div id="game-over-screen" class="overlay-screen">
+        <div class="overlay-text text-lose">GAME OVER</div>
+        <div class="overlay-subtext">
+            The correct game was:
+            <div class="game-over-answer" id="game-over-answer">Game Name</div>
+        </div>
+        <button class="arcade-btn" onclick="showStatsFromScreen('game-over-screen')">Continue to Stats</button>
+    </div>
+
+    <script>
+        // 1. Game State Variables
+        let database = [];
+        let targetGame = null;
+        let gameOver = false;
+        const MAX_GUESSES = 8;
+        let currentGuesses = 0;
+        let emojiHistory = []; 
+
+        // 2. Fetch Database
+        fetch('database.json')
+            .then(response => response.json())
+            .then(data => {
+                database = data;
+                
+                // Pick a target game ONLY AFTER the data has loaded
+                targetGame = database[Math.floor(Math.random() * database.length)];
+                
+                // Populate datalist
+                const dataList = document.getElementById('game-list');
+                database.forEach(game => {
+                    let option = document.createElement('option');
+                    option.value = game.name;
+                    dataList.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error("Error loading database:", error);
+                document.getElementById('message').innerText = "Failed to load game data.";
+            });
+
+        // 3. Stats Management
+        let stats = JSON.parse(localStorage.getItem('gamedleStats')) || {
+            // ... (keep the rest of the code the exact same below this point)
+            played: 0,
+            wins: 0,
+            currentStreak: 0,
+            maxStreak: 0,
+            guessDistribution: [0, 0, 0, 0, 0, 0, 0, 0] // Track wins for 1 to 8 guesses
+        };
+
+        if (!stats.guessDistribution) {
+            stats.guessDistribution = [0, 0, 0, 0, 0, 0, 0, 0];
+        }
+
+        // Populate datalist on load
+        const dataList = document.getElementById('game-list');
+        database.forEach(game => {
+            let option = document.createElement('option');
+            option.value = game.name;
+            dataList.appendChild(option);
+        });
+
+        // Initialize UI
+        updateStatsUI();
+        updateLivesDisplay();
+
+        // New Helper: Update Hearts UI
+        function updateLivesDisplay() {
+            const livesRemaining = MAX_GUESSES - currentGuesses;
+            let heartsHTML = '';
+            
+            for (let i = 0; i < MAX_GUESSES; i++) {
+                if (i < livesRemaining) {
+                    heartsHTML += '❤️'; // Full heart
+                } else {
+                    heartsHTML += '🖤'; // Empty/Lost heart
+                }
+            }
+            
+            document.getElementById('lives-display').innerHTML = heartsHTML;
+        }
+
+        // 4. Main Guess Logic
+        function makeGuess() {
+            if (gameOver) return;
+
+            const inputElement = document.getElementById('guess-input');
+            const guessName = inputElement.value;
+            const guessedGame = database.find(g => g.name.toLowerCase() === guessName.toLowerCase());
+
+            if (!guessedGame) {
+                alert("Game not found in database! Try selecting from the dropdown.");
+                return;
+            }
+
+            // Increment guess count and update UI
+            currentGuesses++;
+            updateLivesDisplay();
+
+            // Create grid row
+            const grid = document.getElementById('guess-grid');
+            const row = document.createElement('div');
+            row.className = 'row';
+
+            row.appendChild(createBox(guessedGame.name, guessedGame.name === targetGame.name));
+            row.appendChild(createBox(guessedGame.console, guessedGame.console === targetGame.console));
+            row.appendChild(createBox(guessedGame.genre, guessedGame.genre === targetGame.genre));
+
+            let yearText = guessedGame.year;
+            let yearMatch = guessedGame.year === targetGame.year;
+            if (!yearMatch) {
+                yearText += guessedGame.year > targetGame.year ? ' ↓' : ' ↑';
+            }
+            row.appendChild(createBox(yearText, yearMatch));
+
+            grid.appendChild(row);
+            inputElement.value = '';
+
+            // Check for Win or Loss
+            if (guessedGame.name === targetGame.name) {
+                handleGameOver(true);
+            } else if (currentGuesses >= MAX_GUESSES) {
+                handleGameOver(false);
+            }
+        }
+
+        // Helper to create boxes
+        function createBox(text, isMatch) {
+            const box = document.createElement('div');
+            box.className = `box ${isMatch ? 'match' : 'wrong'}`;
+            box.innerText = text;
+            return box;
+        }
+
+        // 5. End Game Logic
+        function handleGameOver(isWin) {
+            gameOver = true;
+            document.getElementById('guess-input').disabled = true;
+            document.getElementById('guess-button').disabled = true;
+
+            const msgElement = document.getElementById('message');
+            stats.played++;
+            
+            let winningGuessIndex = null;
+
+            if (isWin) {
+                stats.wins++;
+                stats.currentStreak++;
+                if (stats.currentStreak > stats.maxStreak) {
+                    stats.maxStreak = stats.currentStreak;
+                }
+                
+                // Record the win in the distribution array
+                stats.guessDistribution[currentGuesses - 1]++;
+                winningGuessIndex = currentGuesses - 1;
+
+                msgElement.innerText = `You got it!`;
+                msgElement.className = 'success';
+                
+                // Update and show Victory Screen after 1 second delay
+                document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
+                setTimeout(() => {
+                    document.getElementById('victory-screen').style.display = 'flex';
+                }, 1000);
+
+            } else {
+                stats.currentStreak = 0;
+                msgElement.innerText = `Out of lives!`;
+                msgElement.className = 'failure';
+
+                // Update and trigger Game Over Screen immediately
+                document.getElementById('game-over-answer').innerText = targetGame.name;
+                document.getElementById('game-over-screen').style.display = 'flex';
+            }
+
+            // Save stats to browser and update modal
+            localStorage.setItem('gamedleStats', JSON.stringify(stats));
+            updateStatsUI(winningGuessIndex);
+        }
+
+        // 6. UI Helpers for Modals and Stats
+        function toggleModal(displayState) {
+            document.getElementById('stats-modal').style.display = displayState;
+        }
+
+        function showStatsFromScreen(screenId) {
+            document.getElementById(screenId).style.display = 'none';
+            toggleModal('flex');
+        }
+
+        function updateStatsUI(highlightIndex = null) {
+            // Update top stats numbers
+            document.getElementById('stat-played').innerText = stats.played;
+            
+            const winPct = stats.played === 0 ? 0 : Math.round((stats.wins / stats.played) * 100);
+            document.getElementById('stat-winpct').innerText = winPct;
+            
+            document.getElementById('stat-streak').innerText = stats.currentStreak;
+            document.getElementById('stat-maxstreak').innerText = stats.maxStreak;
+
+            // Render Guess Distribution Graph
+            const distContainer = document.getElementById('distribution-container');
+            distContainer.innerHTML = ''; // Clear existing bars
+
+            // Find the highest number of wins in any single guess bucket for scaling
+            const maxWinsInBucket = Math.max(...stats.guessDistribution, 1);
+
+            stats.guessDistribution.forEach((count, index) => {
+                const row = document.createElement('div');
+                row.className = 'dist-row';
+
+                // Number label (1-8)
+                const label = document.createElement('div');
+                label.className = 'dist-label';
+                label.innerText = index + 1;
+
+                // Container for the bar
+                const barContainer = document.createElement('div');
+                barContainer.className = 'dist-bar-container';
+
+                // The physical bar
+                const bar = document.createElement('div');
+                bar.className = 'dist-bar';
+                
+                // Calculate width percentage (minimum 7% so the text fits)
+                const widthPercent = Math.max((count / maxWinsInBucket) * 100, 7);
+                bar.style.width = `${widthPercent}%`;
+                bar.innerText = count;
+
+                // Highlight this game's winning guess in green
+                if (highlightIndex === index) {
+                    bar.classList.add('highlight');
+                } else if (count > 0) {
+                    bar.style.backgroundColor = '#565758'; 
+                }
+
+                barContainer.appendChild(bar);
+                row.appendChild(label);
+                row.appendChild(barContainer);
+                distContainer.appendChild(row);
+            });
+        }
+        
+        // Allow pressing 'Enter' to guess
+        document.getElementById("guess-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                makeGuess();
+            }
+        });
+    </script>
+</body>
+</html>
