@@ -25,9 +25,7 @@
             margin-bottom: 15px;
         }
 
-        .header-spacer {
-            flex: 1;
-        }
+        .header-spacer { flex: 1; }
 
         h1 { 
             margin: 0; 
@@ -54,11 +52,8 @@
             padding: 0;
         }
 
-        .text-btn:hover {
-            color: white;
-        }
+        .text-btn:hover { color: white; }
 
-        /* Instructions Box Styling */
         .instructions {
             background-color: #272729;
             border: 1px solid #3a3a3c;
@@ -91,14 +86,12 @@
             line-height: 1.4;
         }
 
-        .instructions li:last-child {
-            margin-bottom: 0;
-        }
+        .instructions li:last-child { margin-bottom: 0; }
         
         .lives-left {
             margin-bottom: 20px;
-            font-size: 22px; /* Slightly larger for the emojis */
-            letter-spacing: 4px; /* Space the hearts out a bit */
+            font-size: 22px; 
+            letter-spacing: 4px; 
             text-align: center;
         }
 
@@ -111,15 +104,68 @@
             box-sizing: border-box;
         }
 
-        input {
+        /* --- NEW: Autocomplete Dropdown Styling --- */
+        .autocomplete-container {
+            position: relative;
             flex-grow: 1;
+        }
+
+        input {
+            width: 100%;
             padding: 12px;
             font-size: 16px;
             background-color: #3a3a3c;
             color: white;
             border: 1px solid #565758;
             border-radius: 4px;
+            box-sizing: border-box;
         }
+
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: #272729;
+            border: 1px solid #565758;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+
+        .suggestion-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #3a3a3c;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover, .suggestion-item.active {
+            background-color: #3a3a3c;
+        }
+
+        .suggestion-name {
+            font-weight: bold;
+            font-size: 15px;
+            color: white;
+            margin-bottom: 3px;
+        }
+
+        .suggestion-meta {
+            font-size: 12px;
+            color: #a0a0a0;
+        }
+        /* ------------------------------------------ */
 
         button.guess-btn {
             padding: 12px 24px;
@@ -135,7 +181,6 @@
         button.guess-btn:hover { background-color: #43703e; }
         button:disabled { background-color: #3a3a3c; cursor: not-allowed; color: #818384; }
 
-        /* Grid Styling */
         .grid {
             display: flex;
             flex-direction: column;
@@ -171,8 +216,8 @@
             transition: background-color 0.3s;
         }
 
-        .box.match { background-color: #538d4e; } /* Green */
-        .box.wrong { background-color: #3a3a3c; } /* Gray */
+        .box.match { background-color: #538d4e; } 
+        .box.wrong { background-color: #3a3a3c; } 
 
         #message {
             margin-top: 20px;
@@ -184,7 +229,6 @@
         .success { color: #538d4e; }
         .failure { color: #e23636; }
 
-        /* Stats Modal Styling */
         .modal {
             display: none; 
             position: fixed;
@@ -246,10 +290,10 @@
             line-height: 1.2;
         }
 
-        /* Guess Distribution Graph */
         .guess-distribution {
             width: 100%;
             text-align: left;
+            margin-bottom: 20px;
         }
 
         .guess-distribution h3 {
@@ -289,11 +333,8 @@
             transition: width 0.3s ease;
         }
 
-        .dist-bar.highlight {
-            background-color: #538d4e;
-        }
+        .dist-bar.highlight { background-color: #538d4e; }
 
-        /* Overlay Screens Styling */
         .overlay-screen {
             display: none;
             position: fixed;
@@ -338,6 +379,13 @@
             margin-top: 5px;
         }
 
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
         .arcade-btn {
             padding: 15px 30px;
             font-size: 18px;
@@ -349,11 +397,25 @@
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .arcade-btn:hover {
             background-color: white;
             color: black;
+        }
+        
+        .share-btn {
+            background-color: #538d4e;
+            border-color: #538d4e;
+        }
+        
+        .share-btn:hover {
+            background-color: #43703e;
+            border-color: #43703e;
+            color: white;
         }
     </style>
 </head>
@@ -367,7 +429,6 @@
         </div>
     </div>
     
-    <!-- Instructions Box -->
     <div class="instructions">
         <p>Guess the classic video game!</p>
         <ul>
@@ -378,12 +439,15 @@
     </div>
 
     <div class="lives-left" id="lives-display">
-        <!-- Hearts will be injected here via JavaScript -->
+        <!-- Hearts injected by JS -->
     </div>
 
     <div class="input-section">
-        <input list="game-list" id="guess-input" placeholder="Type a game name...">
-        <datalist id="game-list"></datalist>
+        <!-- NEW: Custom Autocomplete HTML -->
+        <div class="autocomplete-container">
+            <input type="text" id="guess-input" placeholder="Type a game name..." autocomplete="off">
+            <div id="suggestions" class="suggestions-list"></div>
+        </div>
         <button id="guess-button" class="guess-btn" onclick="makeGuess()">Guess</button>
     </div>
 
@@ -394,7 +458,7 @@
             <div>Genre</div>
             <div>Year</div>
         </div>
-        <!-- Guesses will be inserted here -->
+        <!-- Guesses injected here -->
     </div>
 
     <div id="message"></div>
@@ -423,13 +487,14 @@
                 </div>
             </div>
 
-            <!-- Guess Distribution Section -->
             <div class="guess-distribution">
                 <h3>Guess Distribution</h3>
-                <div id="distribution-container">
-                    <!-- Bars are injected here by JavaScript -->
-                </div>
+                <div id="distribution-container"></div>
             </div>
+            
+            <button id="modal-share-btn" class="arcade-btn share-btn" style="margin: 0 auto; display: none;" onclick="shareResults()">
+                Share Results 📋
+            </button>
         </div>
     </div>
 
@@ -439,7 +504,10 @@
         <div class="overlay-subtext" id="victory-subtext">
             You got it in X guesses!
         </div>
-        <button class="arcade-btn" onclick="showStatsFromScreen('victory-screen')">Continue to Stats</button>
+        <div class="button-group">
+            <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
+            <button class="arcade-btn" onclick="showStatsFromScreen('victory-screen')">Stats</button>
+        </div>
     </div>
 
     <!-- BIG Game Over Screen -->
@@ -449,7 +517,10 @@
             The correct game was:
             <div class="game-over-answer" id="game-over-answer">Game Name</div>
         </div>
-        <button class="arcade-btn" onclick="showStatsFromScreen('game-over-screen')">Continue to Stats</button>
+        <div class="button-group">
+            <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
+            <button class="arcade-btn" onclick="showStatsFromScreen('game-over-screen')">Stats</button>
+        </div>
     </div>
 
     <script>
@@ -466,17 +537,7 @@
             .then(response => response.json())
             .then(data => {
                 database = data;
-                
-                // Pick a target game ONLY AFTER the data has loaded
                 targetGame = database[Math.floor(Math.random() * database.length)];
-                
-                // Populate datalist
-                const dataList = document.getElementById('game-list');
-                database.forEach(game => {
-                    let option = document.createElement('option');
-                    option.value = game.name;
-                    dataList.appendChild(option);
-                });
             })
             .catch(error => {
                 console.error("Error loading database:", error);
@@ -485,43 +546,21 @@
 
         // 3. Stats Management
         let stats = JSON.parse(localStorage.getItem('gamedleStats')) || {
-            // ... (keep the rest of the code the exact same below this point)
-            played: 0,
-            wins: 0,
-            currentStreak: 0,
-            maxStreak: 0,
-            guessDistribution: [0, 0, 0, 0, 0, 0, 0, 0] // Track wins for 1 to 8 guesses
+            played: 0, wins: 0, currentStreak: 0, maxStreak: 0,
+            guessDistribution: [0, 0, 0, 0, 0, 0, 0, 0] 
         };
 
-        if (!stats.guessDistribution) {
-            stats.guessDistribution = [0, 0, 0, 0, 0, 0, 0, 0];
-        }
+        if (!stats.guessDistribution) stats.guessDistribution = [0, 0, 0, 0, 0, 0, 0, 0];
 
-        // Populate datalist on load
-        const dataList = document.getElementById('game-list');
-        database.forEach(game => {
-            let option = document.createElement('option');
-            option.value = game.name;
-            dataList.appendChild(option);
-        });
-
-        // Initialize UI
         updateStatsUI();
         updateLivesDisplay();
 
-        // New Helper: Update Hearts UI
         function updateLivesDisplay() {
             const livesRemaining = MAX_GUESSES - currentGuesses;
             let heartsHTML = '';
-            
             for (let i = 0; i < MAX_GUESSES; i++) {
-                if (i < livesRemaining) {
-                    heartsHTML += '❤️'; // Full heart
-                } else {
-                    heartsHTML += '🖤'; // Empty/Lost heart
-                }
+                heartsHTML += (i < livesRemaining) ? '❤️' : '🖤';
             }
-            
             document.getElementById('lives-display').innerHTML = heartsHTML;
         }
 
@@ -538,30 +577,45 @@
                 return;
             }
 
-            // Increment guess count and update UI
             currentGuesses++;
             updateLivesDisplay();
 
-            // Create grid row
             const grid = document.getElementById('guess-grid');
             const row = document.createElement('div');
             row.className = 'row';
 
-            row.appendChild(createBox(guessedGame.name, guessedGame.name === targetGame.name));
-            row.appendChild(createBox(guessedGame.console, guessedGame.console === targetGame.console));
-            row.appendChild(createBox(guessedGame.genre, guessedGame.genre === targetGame.genre));
+            let currentEmojiRow = "";
+
+            const nameMatch = guessedGame.name === targetGame.name;
+            row.appendChild(createBox(guessedGame.name, nameMatch));
+            currentEmojiRow += nameMatch ? "🟩" : "⬛";
+
+            const consoleMatch = guessedGame.console === targetGame.console;
+            row.appendChild(createBox(guessedGame.console, consoleMatch));
+            currentEmojiRow += consoleMatch ? "🟩" : "⬛";
+
+            const genreMatch = guessedGame.genre === targetGame.genre;
+            row.appendChild(createBox(guessedGame.genre, genreMatch));
+            currentEmojiRow += genreMatch ? "🟩" : "⬛";
 
             let yearText = guessedGame.year;
             let yearMatch = guessedGame.year === targetGame.year;
             if (!yearMatch) {
-                yearText += guessedGame.year > targetGame.year ? ' ↓' : ' ↑';
+                const isNewer = guessedGame.year > targetGame.year;
+                yearText += isNewer ? ' ↓' : ' ↑';
+                currentEmojiRow += isNewer ? "⬇️" : "⬆️";
+            } else {
+                currentEmojiRow += "🟩";
             }
             row.appendChild(createBox(yearText, yearMatch));
-
+            
+            emojiHistory.push(currentEmojiRow);
             grid.appendChild(row);
+            
+            // Clear input and suggestions after guess
             inputElement.value = '';
+            document.getElementById('suggestions').style.display = 'none';
 
-            // Check for Win or Loss
             if (guessedGame.name === targetGame.name) {
                 handleGameOver(true);
             } else if (currentGuesses >= MAX_GUESSES) {
@@ -569,7 +623,6 @@
             }
         }
 
-        // Helper to create boxes
         function createBox(text, isMatch) {
             const box = document.createElement('div');
             box.className = `box ${isMatch ? 'match' : 'wrong'}`;
@@ -577,32 +630,24 @@
             return box;
         }
 
-        // 5. End Game Logic
+        // 5. End Game & Share Logic
         function handleGameOver(isWin) {
             gameOver = true;
             document.getElementById('guess-input').disabled = true;
             document.getElementById('guess-button').disabled = true;
+            document.getElementById('modal-share-btn').style.display = 'flex'; 
 
-            const msgElement = document.getElementById('message');
             stats.played++;
-            
             let winningGuessIndex = null;
 
             if (isWin) {
                 stats.wins++;
                 stats.currentStreak++;
-                if (stats.currentStreak > stats.maxStreak) {
-                    stats.maxStreak = stats.currentStreak;
-                }
+                if (stats.currentStreak > stats.maxStreak) stats.maxStreak = stats.currentStreak;
                 
-                // Record the win in the distribution array
                 stats.guessDistribution[currentGuesses - 1]++;
                 winningGuessIndex = currentGuesses - 1;
-
-                msgElement.innerText = `You got it!`;
-                msgElement.className = 'success';
                 
-                // Update and show Victory Screen after 1 second delay
                 document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
                 setTimeout(() => {
                     document.getElementById('victory-screen').style.display = 'flex';
@@ -610,20 +655,28 @@
 
             } else {
                 stats.currentStreak = 0;
-                msgElement.innerText = `Out of lives!`;
-                msgElement.className = 'failure';
-
-                // Update and trigger Game Over Screen immediately
                 document.getElementById('game-over-answer').innerText = targetGame.name;
                 document.getElementById('game-over-screen').style.display = 'flex';
             }
 
-            // Save stats to browser and update modal
             localStorage.setItem('gamedleStats', JSON.stringify(stats));
             updateStatsUI(winningGuessIndex);
         }
 
-        // 6. UI Helpers for Modals and Stats
+        function shareResults() {
+            const resultScore = gameOver && stats.currentStreak > 0 ? currentGuesses : 'X';
+            const header = `Eight Lives 🎮 ${resultScore}/${MAX_GUESSES}\n\n`;
+            const gridString = emojiHistory.join('\n');
+            const fullText = header + gridString;
+
+            navigator.clipboard.writeText(fullText).then(() => {
+                alert("Results copied to clipboard! Paste it anywhere to share.");
+            }).catch(err => {
+                alert("Failed to copy. Your browser might block clipboard access.");
+            });
+        }
+
+        // 6. UI Helpers
         function toggleModal(displayState) {
             document.getElementById('stats-modal').style.display = displayState;
         }
@@ -634,45 +687,33 @@
         }
 
         function updateStatsUI(highlightIndex = null) {
-            // Update top stats numbers
             document.getElementById('stat-played').innerText = stats.played;
-            
             const winPct = stats.played === 0 ? 0 : Math.round((stats.wins / stats.played) * 100);
             document.getElementById('stat-winpct').innerText = winPct;
-            
             document.getElementById('stat-streak').innerText = stats.currentStreak;
             document.getElementById('stat-maxstreak').innerText = stats.maxStreak;
 
-            // Render Guess Distribution Graph
             const distContainer = document.getElementById('distribution-container');
-            distContainer.innerHTML = ''; // Clear existing bars
-
-            // Find the highest number of wins in any single guess bucket for scaling
+            distContainer.innerHTML = ''; 
             const maxWinsInBucket = Math.max(...stats.guessDistribution, 1);
 
             stats.guessDistribution.forEach((count, index) => {
                 const row = document.createElement('div');
                 row.className = 'dist-row';
 
-                // Number label (1-8)
                 const label = document.createElement('div');
                 label.className = 'dist-label';
                 label.innerText = index + 1;
 
-                // Container for the bar
                 const barContainer = document.createElement('div');
                 barContainer.className = 'dist-bar-container';
 
-                // The physical bar
                 const bar = document.createElement('div');
                 bar.className = 'dist-bar';
-                
-                // Calculate width percentage (minimum 7% so the text fits)
                 const widthPercent = Math.max((count / maxWinsInBucket) * 100, 7);
                 bar.style.width = `${widthPercent}%`;
                 bar.innerText = count;
 
-                // Highlight this game's winning guess in green
                 if (highlightIndex === index) {
                     bar.classList.add('highlight');
                 } else if (count > 0) {
@@ -686,13 +727,97 @@
             });
         }
         
-        // Allow pressing 'Enter' to guess
-        document.getElementById("guess-input").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                makeGuess();
+        // --- NEW: Custom Autocomplete & Keyboard Logic ---
+        const inputElement = document.getElementById('guess-input');
+        const suggestionsBox = document.getElementById('suggestions');
+        let currentFocus = -1;
+
+        inputElement.addEventListener('input', function() {
+            const val = this.value;
+            suggestionsBox.innerHTML = '';
+            
+            if (!val) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+            
+            // Filter database and limit to top 15 results
+            const matches = database.filter(g => g.name.toLowerCase().includes(val.toLowerCase())).slice(0, 15);
+            
+            if (matches.length === 0) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            suggestionsBox.style.display = 'block';
+            currentFocus = -1;
+
+            matches.forEach((game) => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerHTML = `
+                    <div class="suggestion-name">${game.name}</div>
+                    <div class="suggestion-meta">${game.console} • ${game.genre} • ${game.year}</div>
+                `;
+                
+                div.addEventListener('click', function() {
+                    inputElement.value = game.name;
+                    suggestionsBox.style.display = 'none';
+                    inputElement.focus();
+                });
+                
+                suggestionsBox.appendChild(div);
+            });
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target !== inputElement && e.target !== suggestionsBox) {
+                suggestionsBox.style.display = 'none';
             }
         });
+
+        // Handle Keyboard Navigation
+        inputElement.addEventListener('keydown', function(e) {
+            let items = suggestionsBox.getElementsByClassName('suggestion-item');
+            
+            if (e.key === "ArrowDown") {
+                currentFocus++;
+                addActive(items);
+            } else if (e.key === "ArrowUp") {
+                currentFocus--;
+                addActive(items);
+            } else if (e.key === "Enter") {
+                e.preventDefault(); // Prevent form submission
+                
+                if (currentFocus > -1 && suggestionsBox.style.display === 'block') {
+                    // Enter confirms the highlighted dropdown option
+                    if (items.length > 0) items[currentFocus].click();
+                } else if (suggestionsBox.style.display === 'block' && items.length > 0) {
+                    // Enter confirms the top option if you haven't arrowed down
+                    items[0].click();
+                } else {
+                    // Enter triggers the actual guess if the dropdown is closed
+                    makeGuess();
+                }
+            }
+        });
+
+        function addActive(items) {
+            if (!items || items.length === 0) return;
+            removeActive(items);
+            if (currentFocus >= items.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = items.length - 1;
+            items[currentFocus].classList.add("active");
+            // Auto-scroll the dropdown menu to keep the highlighted item in view
+            items[currentFocus].scrollIntoView({ block: 'nearest' });
+        }
+
+        function removeActive(items) {
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.remove("active");
+            }
+        }
     </script>
 </body>
 </html>
