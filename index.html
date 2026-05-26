@@ -104,7 +104,6 @@
             box-sizing: border-box;
         }
 
-        /* --- NEW: Autocomplete Dropdown Styling --- */
         .autocomplete-container {
             position: relative;
             flex-grow: 1;
@@ -165,7 +164,6 @@
             font-size: 12px;
             color: #a0a0a0;
         }
-        /* ------------------------------------------ */
 
         button.guess-btn {
             padding: 12px 24px;
@@ -439,11 +437,9 @@
     </div>
 
     <div class="lives-left" id="lives-display">
-        <!-- Hearts injected by JS -->
-    </div>
+        </div>
 
     <div class="input-section">
-        <!-- NEW: Custom Autocomplete HTML -->
         <div class="autocomplete-container">
             <input type="text" id="guess-input" placeholder="Type a game name..." autocomplete="off">
             <div id="suggestions" class="suggestions-list"></div>
@@ -458,12 +454,10 @@
             <div>Genre</div>
             <div>Year</div>
         </div>
-        <!-- Guesses injected here -->
-    </div>
+        </div>
 
     <div id="message"></div>
 
-    <!-- Stats Modal -->
     <div id="stats-modal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="toggleModal('none')">&times;</button>
@@ -498,7 +492,6 @@
         </div>
     </div>
 
-    <!-- BIG Victory Screen -->
     <div id="victory-screen" class="overlay-screen">
         <div class="overlay-text text-win">VICTORY</div>
         <div class="overlay-subtext" id="victory-subtext">
@@ -510,7 +503,6 @@
         </div>
     </div>
 
-    <!-- BIG Game Over Screen -->
     <div id="game-over-screen" class="overlay-screen">
         <div class="overlay-text text-lose">GAME OVER</div>
         <div class="overlay-subtext">
@@ -524,13 +516,21 @@
     </div>
 
     <script>
-        // 1. Game State Variables
+        // 1. Game State & Tracking Variables
         let database = [];
         let targetGame = null;
         let gameOver = false;
         const MAX_GUESSES = 8;
         let currentGuesses = 0;
         let emojiHistory = []; 
+
+        // --- NEW: The Memory Bank for Smart Filtering ---
+        let knownConsole = null;
+        let knownGenre = null;
+        let eliminatedConsoles = new Set();
+        let eliminatedGenres = new Set();
+        let minYear = -Infinity;
+        let maxYear = Infinity;
 
         // 2. Fetch Database
         fetch('database.json')
@@ -586,26 +586,40 @@
 
             let currentEmojiRow = "";
 
+            // --- Check and update criteria ---
             const nameMatch = guessedGame.name === targetGame.name;
             row.appendChild(createBox(guessedGame.name, nameMatch));
             currentEmojiRow += nameMatch ? "🟩" : "⬛";
 
             const consoleMatch = guessedGame.console === targetGame.console;
+            if (consoleMatch) knownConsole = targetGame.console;
+            else eliminatedConsoles.add(guessedGame.console);
             row.appendChild(createBox(guessedGame.console, consoleMatch));
             currentEmojiRow += consoleMatch ? "🟩" : "⬛";
 
             const genreMatch = guessedGame.genre === targetGame.genre;
+            if (genreMatch) knownGenre = targetGame.genre;
+            else eliminatedGenres.add(guessedGame.genre);
             row.appendChild(createBox(guessedGame.genre, genreMatch));
             currentEmojiRow += genreMatch ? "🟩" : "⬛";
 
             let yearText = guessedGame.year;
             let yearMatch = guessedGame.year === targetGame.year;
-            if (!yearMatch) {
+            if (yearMatch) {
+                minYear = targetGame.year;
+                maxYear = targetGame.year;
+                currentEmojiRow += "🟩";
+            } else {
                 const isNewer = guessedGame.year > targetGame.year;
                 yearText += isNewer ? ' ↓' : ' ↑';
                 currentEmojiRow += isNewer ? "⬇️" : "⬆️";
-            } else {
-                currentEmojiRow += "🟩";
+                
+                // Update Year Bounds
+                if (isNewer) {
+                    maxYear = Math.min(maxYear, guessedGame.year - 1);
+                } else {
+                    minYear = Math.max(minYear, guessedGame.year + 1);
+                }
             }
             row.appendChild(createBox(yearText, yearMatch));
             
@@ -727,22 +741,32 @@
             });
         }
         
-        // --- NEW: Custom Autocomplete & Keyboard Logic ---
+        // --- Custom Autocomplete & Smart Filter Logic ---
         const inputElement = document.getElementById('guess-input');
         const suggestionsBox = document.getElementById('suggestions');
         let currentFocus = -1;
 
-        inputElement.addEventListener('input', function() {
-            const val = this.value;
+        function renderSuggestions() {
+            if (gameOver) return;
+            const val = inputElement.value;
             suggestionsBox.innerHTML = '';
             
-            if (!val) {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
+            // 1. Filter by Memory Bank (The Smart Filter)
+            let validGames = database.filter(g => {
+                if (knownConsole && g.console !== knownConsole) return false;
+                if (knownGenre && g.genre !== knownGenre) return false;
+                if (eliminatedConsoles.has(g.console)) return false;
+                if (eliminatedGenres.has(g.genre)) return false;
+                if (g.year < minYear || g.year > maxYear) return false;
+                
+                // Then filter by typed text if there is any
+                if (val && !g.name.toLowerCase().includes(val.toLowerCase())) return false;
+                
+                return true;
+            });
             
-            // Filter database and limit to top 15 results
-            const matches = database.filter(g => g.name.toLowerCase().includes(val.toLowerCase())).slice(0, 15);
+            // 2. Grab the top 15 remaining possibilities
+            const matches = validGames.slice(0, 15);
             
             if (matches.length === 0) {
                 suggestionsBox.style.display = 'none';
@@ -768,7 +792,11 @@
                 
                 suggestionsBox.appendChild(div);
             });
-        });
+        }
+
+        // Show suggestions on typing AND on clicking into the box
+        inputElement.addEventListener('input', renderSuggestions);
+        inputElement.addEventListener('focus', renderSuggestions);
 
         // Hide suggestions when clicking outside
         document.addEventListener('click', function(e) {
@@ -788,16 +816,13 @@
                 currentFocus--;
                 addActive(items);
             } else if (e.key === "Enter") {
-                e.preventDefault(); // Prevent form submission
+                e.preventDefault(); 
                 
                 if (currentFocus > -1 && suggestionsBox.style.display === 'block') {
-                    // Enter confirms the highlighted dropdown option
                     if (items.length > 0) items[currentFocus].click();
-                } else if (suggestionsBox.style.display === 'block' && items.length > 0) {
-                    // Enter confirms the top option if you haven't arrowed down
+                } else if (suggestionsBox.style.display === 'block' && items.length > 0 && inputElement.value !== "") {
                     items[0].click();
                 } else {
-                    // Enter triggers the actual guess if the dropdown is closed
                     makeGuess();
                 }
             }
@@ -809,7 +834,6 @@
             if (currentFocus >= items.length) currentFocus = 0;
             if (currentFocus < 0) currentFocus = items.length - 1;
             items[currentFocus].classList.add("active");
-            // Auto-scroll the dropdown menu to keep the highlighted item in view
             items[currentFocus].scrollIntoView({ block: 'nearest' });
         }
 
