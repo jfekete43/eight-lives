@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eight Lives</title>
     <style>
+        /* Import Google Fonts for the retro gaming aesthetic */
+        @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&display=swap');
+
         body {
             font-family: system-ui, -apple-system, sans-serif;
             background-color: #121213;
@@ -27,12 +30,16 @@
 
         .header-spacer { flex: 1; }
 
+        /* Fancier Header Font */
         h1 { 
             margin: 0; 
             flex: 2;
             text-align: center;
-            text-transform: uppercase;
+            font-family: 'Bungee', sans-serif;
+            font-size: 32px;
             letter-spacing: 2px;
+            color: #ffffff;
+            text-shadow: 2px 2px 0px #e23636, -2px -2px 0px #538d4e; /* Gives it a slight 3D retro pop */
         }
         
         .header-actions {
@@ -347,20 +354,20 @@
             z-index: 100;
         }
 
+        /* 8-bit Font for Overlays */
         .overlay-text {
-            font-size: 15vw;
-            font-weight: 900;
-            letter-spacing: 5px;
-            margin-bottom: 10px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8vw; /* Scales down so wide words don't break mobile */
             text-align: center;
-            text-transform: uppercase;
+            margin-bottom: 25px;
+            line-height: 1.2;
         }
 
         .text-win { color: #538d4e; }
         .text-lose { color: #e23636; }
         
         @media (min-width: 600px) {
-            .overlay-text { font-size: 80px; }
+            .overlay-text { font-size: 50px; }
         }
 
         .overlay-subtext {
@@ -433,11 +440,13 @@
             <li>🟩 <strong>Green box</strong> means an exact match.</li>
             <li>⬛ <strong>Gray box</strong> means incorrect.</li>
             <li>⬆️ ⬇️ <strong>Arrows</strong> indicate if the target game's release year is newer or older.</li>
+            <li>🧠 <strong>Smart Filter:</strong> Ineligible games will be automatically removed from the suggestion box as you play.</li>
         </ul>
     </div>
 
     <div class="lives-left" id="lives-display">
-        </div>
+        <!-- Hearts injected by JS -->
+    </div>
 
     <div class="input-section">
         <div class="autocomplete-container">
@@ -454,10 +463,12 @@
             <div>Genre</div>
             <div>Year</div>
         </div>
-        </div>
+        <!-- Guesses injected here -->
+    </div>
 
     <div id="message"></div>
 
+    <!-- Stats Modal -->
     <div id="stats-modal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="toggleModal('none')">&times;</button>
@@ -492,6 +503,7 @@
         </div>
     </div>
 
+    <!-- BIG Victory Screen -->
     <div id="victory-screen" class="overlay-screen">
         <div class="overlay-text text-win">VICTORY</div>
         <div class="overlay-subtext" id="victory-subtext">
@@ -503,6 +515,7 @@
         </div>
     </div>
 
+    <!-- BIG Game Over Screen -->
     <div id="game-over-screen" class="overlay-screen">
         <div class="overlay-text text-lose">GAME OVER</div>
         <div class="overlay-subtext">
@@ -524,7 +537,6 @@
         let currentGuesses = 0;
         let emojiHistory = []; 
 
-        // --- NEW: The Memory Bank for Smart Filtering ---
         let knownConsole = null;
         let knownGenre = null;
         let eliminatedConsoles = new Set();
@@ -586,7 +598,6 @@
 
             let currentEmojiRow = "";
 
-            // --- Check and update criteria ---
             const nameMatch = guessedGame.name === targetGame.name;
             row.appendChild(createBox(guessedGame.name, nameMatch));
             currentEmojiRow += nameMatch ? "🟩" : "⬛";
@@ -614,7 +625,6 @@
                 yearText += isNewer ? ' ↓' : ' ↑';
                 currentEmojiRow += isNewer ? "⬇️" : "⬆️";
                 
-                // Update Year Bounds
                 if (isNewer) {
                     maxYear = Math.min(maxYear, guessedGame.year - 1);
                 } else {
@@ -626,7 +636,6 @@
             emojiHistory.push(currentEmojiRow);
             grid.appendChild(row);
             
-            // Clear input and suggestions after guess
             inputElement.value = '';
             document.getElementById('suggestions').style.display = 'none';
 
@@ -759,13 +768,11 @@
                 if (eliminatedGenres.has(g.genre)) return false;
                 if (g.year < minYear || g.year > maxYear) return false;
                 
-                // Then filter by typed text if there is any
                 if (val && !g.name.toLowerCase().includes(val.toLowerCase())) return false;
                 
                 return true;
             });
             
-            // 2. Grab the top 15 remaining possibilities
             const matches = validGames.slice(0, 15);
             
             if (matches.length === 0) {
@@ -794,18 +801,15 @@
             });
         }
 
-        // Show suggestions on typing AND on clicking into the box
         inputElement.addEventListener('input', renderSuggestions);
         inputElement.addEventListener('focus', renderSuggestions);
 
-        // Hide suggestions when clicking outside
         document.addEventListener('click', function(e) {
             if (e.target !== inputElement && e.target !== suggestionsBox) {
                 suggestionsBox.style.display = 'none';
             }
         });
 
-        // Handle Keyboard Navigation
         inputElement.addEventListener('keydown', function(e) {
             let items = suggestionsBox.getElementsByClassName('suggestion-item');
             
