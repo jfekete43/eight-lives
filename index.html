@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eight Lives</title>
     <style>
-        /* Import Google Fonts for the retro gaming aesthetic */
         @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&display=swap');
 
         body {
@@ -28,9 +27,6 @@
             margin-bottom: 15px;
         }
 
-        .header-spacer { flex: 1; }
-
-        /* Fancier Header Font */
         h1 { 
             margin: 0; 
             flex: 2;
@@ -39,13 +35,16 @@
             font-size: 32px;
             letter-spacing: 2px;
             color: #ffffff;
-            text-shadow: 2px 2px 0px #e23636, -2px -2px 0px #538d4e; /* Gives it a slight 3D retro pop */
+            text-shadow: 2px 2px 0px #e23636, -2px -2px 0px #538d4e;
         }
         
         .header-actions {
             flex: 1;
-            text-align: right;
+            display: flex;
         }
+        
+        .header-actions.left { justify-content: flex-start; }
+        .header-actions.right { justify-content: flex-end; }
 
         .text-btn {
             background: transparent;
@@ -73,13 +72,34 @@
             color: #d7dadc;
             font-size: 14px;
         }
+        
+        .instructions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
 
-        .instructions p {
+        .instructions-header p {
             color: white;
-            margin-top: 0;
-            margin-bottom: 10px;
+            margin: 0;
             font-weight: bold;
             font-size: 16px;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: #818384;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .toggle-btn:hover { color: white; }
+
+        .instructions-content {
+            margin-top: 15px;
         }
 
         .instructions ul {
@@ -229,6 +249,7 @@
             font-size: 20px;
             font-weight: bold;
             text-align: center;
+            min-height: 24px;
         }
         
         .success { color: #538d4e; }
@@ -354,10 +375,9 @@
             z-index: 100;
         }
 
-        /* 8-bit Font for Overlays */
         .overlay-text {
             font-family: 'Press Start 2P', monospace;
-            font-size: 8vw; /* Scales down so wide words don't break mobile */
+            font-size: 8vw; 
             text-align: center;
             margin-bottom: 25px;
             line-height: 1.2;
@@ -427,26 +447,32 @@
 <body>
 
     <div class="header-container">
-        <div class="header-spacer"></div>
+        <div class="header-actions left">
+            <button class="text-btn" onclick="resetGame()">NEW</button>
+        </div>
         <h1>Eight Lives</h1>
-        <div class="header-actions">
+        <div class="header-actions right">
             <button class="text-btn" onclick="toggleModal('flex')">STATS</button>
         </div>
     </div>
     
     <div class="instructions">
-        <p>Guess the classic video game!</p>
-        <ul>
-            <li>🟩 <strong>Green box</strong> means an exact match.</li>
-            <li>⬛ <strong>Gray box</strong> means incorrect.</li>
-            <li>⬆️ ⬇️ <strong>Arrows</strong> indicate if the target game's release year is newer or older.</li>
-            <li>🧠 <strong>Smart Filter:</strong> Ineligible games will be automatically removed from the suggestion box as you play.</li>
-        </ul>
+        <div class="instructions-header" onclick="toggleInstructions()">
+            <p>Guess the classic video game!</p>
+            <button class="toggle-btn" id="instructions-btn">[ - ]</button>
+        </div>
+        <div class="instructions-content" id="instructions-content">
+            <ul>
+                <li>🟩 <strong>Green box</strong> means an exact match.</li>
+                <li>⬛ <strong>Gray box</strong> means incorrect.</li>
+                <li>⬆️ ⬇️ <strong>Arrows</strong> indicate if the target game's release year is newer or older.</li>
+                <li>🧠 <strong>Smart Filter:</strong> Ineligible games will be automatically removed from the suggestion box as you play.</li>
+            </ul>
+        </div>
     </div>
 
     <div class="lives-left" id="lives-display">
-        <!-- Hearts injected by JS -->
-    </div>
+        </div>
 
     <div class="input-section">
         <div class="autocomplete-container">
@@ -463,12 +489,10 @@
             <div>Genre</div>
             <div>Year</div>
         </div>
-        <!-- Guesses injected here -->
-    </div>
+        </div>
 
     <div id="message"></div>
 
-    <!-- Stats Modal -->
     <div id="stats-modal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="toggleModal('none')">&times;</button>
@@ -503,7 +527,6 @@
         </div>
     </div>
 
-    <!-- BIG Victory Screen -->
     <div id="victory-screen" class="overlay-screen">
         <div class="overlay-text text-win">VICTORY</div>
         <div class="overlay-subtext" id="victory-subtext">
@@ -515,7 +538,6 @@
         </div>
     </div>
 
-    <!-- BIG Game Over Screen -->
     <div id="game-over-screen" class="overlay-screen">
         <div class="overlay-text text-lose">GAME OVER</div>
         <div class="overlay-subtext">
@@ -574,6 +596,68 @@
                 heartsHTML += (i < livesRemaining) ? '❤️' : '🖤';
             }
             document.getElementById('lives-display').innerHTML = heartsHTML;
+        }
+
+        // --- NEW: Toggle Instructions Function ---
+        function toggleInstructions() {
+            const content = document.getElementById('instructions-content');
+            const btn = document.getElementById('instructions-btn');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                btn.innerText = '[ - ]';
+            } else {
+                content.style.display = 'none';
+                btn.innerText = '[ + ]';
+            }
+        }
+
+        // --- NEW: Reset Game Function ---
+        function resetGame() {
+            if (database.length === 0) return; // Prevent reset if DB failed to load
+            
+            gameOver = false;
+            currentGuesses = 0;
+            emojiHistory = [];
+            
+            // Reset Smart Filter
+            knownConsole = null;
+            knownGenre = null;
+            eliminatedConsoles.clear();
+            eliminatedGenres.clear();
+            minYear = -Infinity;
+            maxYear = Infinity;
+
+            // Pick a new target game
+            targetGame = database[Math.floor(Math.random() * database.length)];
+
+            // Reset UI elements
+            const inputEl = document.getElementById('guess-input');
+            inputEl.disabled = false;
+            inputEl.value = '';
+            
+            document.getElementById('guess-button').disabled = false;
+            document.getElementById('modal-share-btn').style.display = 'none';
+            document.getElementById('suggestions').style.display = 'none';
+            document.getElementById('message').innerText = '';
+            document.getElementById('message').className = '';
+            
+            // Hide Overlay Screens
+            document.getElementById('victory-screen').style.display = 'none';
+            document.getElementById('game-over-screen').style.display = 'none';
+
+            // Clear Grid (but keep the header row)
+            const grid = document.getElementById('guess-grid');
+            grid.innerHTML = `
+                <div class="row header-row">
+                    <div>Game</div>
+                    <div>Console</div>
+                    <div>Genre</div>
+                    <div>Year</div>
+                </div>
+            `;
+
+            updateLivesDisplay();
         }
 
         // 4. Main Guess Logic
@@ -760,7 +844,7 @@
             const val = inputElement.value;
             suggestionsBox.innerHTML = '';
             
-            // 1. Filter by Memory Bank (The Smart Filter)
+            // 1. Filter by Memory Bank
             let validGames = database.filter(g => {
                 if (knownConsole && g.console !== knownConsole) return false;
                 if (knownGenre && g.genre !== knownGenre) return false;
