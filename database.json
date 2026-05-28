@@ -1,52 +1,2540 @@
 [
-    { "name": "Super Mario 64", "console": "N64", "genre": "Platformer", "year": 1996 },
-    { "name": "Halo: Combat Evolved", "console": "Xbox", "genre": "Shooter", "year": 2001 },
-    { "name": "The Legend of Zelda: Ocarina of Time", "console": "N64", "genre": "Adventure", "year": 1998 },
-    { "name": "God of War", "console": "PS4", "genre": "Action", "year": 2018 },
-    { "name": "Bloodborne", "console": "PS4", "genre": "RPG", "year": 2015 },
-    { "name": "Super Metroid", "console": "SNES", "genre": "Metroidvania", "year": 1994 },
-    { "name": "Minecraft", "console": "PC", "genre": "Sandbox", "year": 2011 },
-    { "name": "Hollow Knight", "console": "PC", "genre": "Metroidvania", "year": 2017 },
-    { "name": "Tetris", "console": "Game Boy", "genre": "Puzzle", "year": 1989 },
-    { "name": "Final Fantasy VII", "console": "PS1", "genre": "RPG", "year": 1997 },
-    { "name": "Chrono Trigger", "console": "SNES", "genre": "RPG", "year": 1995 },
-    { "name": "Half-Life 2", "console": "PC", "genre": "Shooter", "year": 2004 },
-    { "name": "Portal", "console": "PC", "genre": "Puzzle", "year": 2007 },
-    { "name": "Castlevania: Symphony of the Night", "console": "PS1", "genre": "Metroidvania", "year": 1997 },
-    { "name": "Super Smash Bros. Melee", "console": "GameCube", "genre": "Fighting", "year": 2001 },
-    { "name": "Resident Evil 4", "console": "GameCube", "genre": "Action", "year": 2005 },
-    { "name": "Shadow of the Colossus", "console": "PS2", "genre": "Adventure", "year": 2005 },
-    { "name": "BioShock", "console": "Xbox 360", "genre": "Shooter", "year": 2007 },
-    { "name": "The Elder Scrolls V: Skyrim", "console": "Xbox 360", "genre": "RPG", "year": 2011 },
-    { "name": "Grand Theft Auto V", "console": "PS3", "genre": "Action", "year": 2013 },
-    { "name": "The Witcher 3: Wild Hunt", "console": "PS4", "genre": "RPG", "year": 2015 },
-    { "name": "The Legend of Zelda: Breath of the Wild", "console": "Switch", "genre": "Adventure", "year": 2017 },
-    { "name": "Pokémon Red", "console": "Game Boy", "genre": "RPG", "year": 1996 },
-    { "name": "Metal Gear Solid", "console": "PS1", "genre": "Stealth", "year": 1998 },
-    { "name": "Mass Effect 2", "console": "Xbox 360", "genre": "RPG", "year": 2010 },
-    { "name": "Dark Souls", "console": "PS3", "genre": "RPG", "year": 2011 },
-    { "name": "Red Dead Redemption 2", "console": "PS4", "genre": "Action", "year": 2018 },
-    { "name": "Super Mario World", "console": "SNES", "genre": "Platformer", "year": 1990 },
-    { "name": "Donkey Kong Country", "console": "SNES", "genre": "Platformer", "year": 1994 },
-    { "name": "EarthBound", "console": "SNES", "genre": "RPG", "year": 1994 },
-    { "name": "Mega Man X", "console": "SNES", "genre": "Platformer", "year": 1993 },
-    { "name": "Street Fighter II", "console": "SNES", "genre": "Fighting", "year": 1991 },
-    { "name": "Sonic the Hedgehog", "console": "Genesis", "genre": "Platformer", "year": 1991 },
-    { "name": "Doom", "console": "PC", "genre": "Shooter", "year": 1993 },
-    { "name": "Starcraft", "console": "PC", "genre": "Strategy", "year": 1998 },
-    { "name": "Diablo II", "console": "PC", "genre": "RPG", "year": 2000 },
-    { "name": "World of Warcraft", "console": "PC", "genre": "MMORPG", "year": 2004 },
-    { "name": "League of Legends", "console": "PC", "genre": "MOBA", "year": 2009 },
-    { "name": "Undertale", "console": "PC", "genre": "RPG", "year": 2015 },
-    { "name": "Stardew Valley", "console": "PC", "genre": "Simulation", "year": 2016 },
-    { "name": "Celeste", "console": "PC", "genre": "Platformer", "year": 2018 },
-    { "name": "Hades", "console": "PC", "genre": "Action", "year": 2020 },
-    { "name": "Elden Ring", "console": "PS5", "genre": "RPG", "year": 2022 },
-    { "name": "Persona 5", "console": "PS4", "genre": "RPG", "year": 2016 },
-    { "name": "Fallout: New Vegas", "console": "Xbox 360", "genre": "RPG", "year": 2010 },
-    { "name": "The Last of Us", "console": "PS3", "genre": "Action", "year": 2013 },
-    { "name": "Journey", "console": "PS3", "genre": "Adventure", "year": 2012 },
-    { "name": "GoldenEye 007", "console": "N64", "genre": "Shooter", "year": 1997 },
-    { "name": "Mario Kart 64", "console": "N64", "genre": "Racing", "year": 1996 },
-    { "name": "Super Mario Bros. 3", "console": "NES", "genre": "Platformer", "year": 1988 }
+    {
+        "name": "Adventure Island IV",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Nekketsu Kakutou Densetsu",
+        "console": "NES",
+        "genre": "Fighting",
+        "year": 1992
+    },
+    {
+        "name": "Gemfire",
+        "console": "NES",
+        "genre": "Strategy",
+        "year": 1991
+    },
+    {
+        "name": "Rockin' Kats",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1991
+    },
+    {
+        "name": "Shatterhand",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1991
+    },
+    {
+        "name": "Kick Master",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1992
+    },
+    {
+        "name": "Little Samson",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1992
+    },
+    {
+        "name": "Micro Mages",
+        "console": "NES",
+        "genre": "Indie",
+        "year": 2019
+    },
+    {
+        "name": "Samurai Pizza Cats",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1991
+    },
+    {
+        "name": "Chip 'n Dale Rescue Rangers 2",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1993
+    },
+    {
+        "name": "Zen: Intergalactic Ninja",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1993
+    },
+    {
+        "name": "Shadowgate (1987)",
+        "console": "NES",
+        "genre": "Adventure",
+        "year": 1987
+    },
+    {
+        "name": "New Ghostbusters II",
+        "console": "NES",
+        "genre": "Action",
+        "year": 1990
+    },
+    {
+        "name": "Battletoads & Double Dragon",
+        "console": "NES",
+        "genre": "Fighting",
+        "year": 1993
+    },
+    {
+        "name": "Kunio-kun no Nekketsu Soccer League",
+        "console": "NES",
+        "genre": "Fighting",
+        "year": 1993
+    },
+    {
+        "name": "Battle City",
+        "console": "NES",
+        "genre": "Action",
+        "year": 1985
+    },
+    {
+        "name": "Teenage Mutant Ninja Turtles III: The Manhattan Project",
+        "console": "NES",
+        "genre": "Action",
+        "year": 1991
+    },
+    {
+        "name": "Panic Restaurant",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1992
+    },
+    {
+        "name": "Tetris (1984)",
+        "console": "NES",
+        "genre": "Puzzle",
+        "year": 1984
+    },
+    {
+        "name": "Super Mario Bros. 3",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1988
+    },
+    {
+        "name": "Mike Tyson's Punch-Out!!",
+        "console": "NES",
+        "genre": "Action",
+        "year": 1987
+    },
+    {
+        "name": "Contra Force",
+        "console": "NES",
+        "genre": "Shooter",
+        "year": 1992
+    },
+    {
+        "name": "The Flintstones: Surprise at Dinosaur Peak",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Nigel Mansell's World Championship Challenge",
+        "console": "NES",
+        "genre": "Racing",
+        "year": 1993
+    },
+    {
+        "name": "Bucky O'Hare",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1992
+    },
+    {
+        "name": "Mega Man 2 (1988)",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1988
+    },
+    {
+        "name": "Shufflepuck Café",
+        "console": "NES",
+        "genre": "Sports",
+        "year": 1989
+    },
+    {
+        "name": "Vice: Project Doom",
+        "console": "NES",
+        "genre": "Shooter",
+        "year": 1991
+    },
+    {
+        "name": "Super Mario Bros.",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1985
+    },
+    {
+        "name": "Punch-Out!! Featuring Mr. Dream",
+        "console": "NES",
+        "genre": "Arcade",
+        "year": 2007
+    },
+    {
+        "name": "Contra (1987)",
+        "console": "NES",
+        "genre": "Shooter",
+        "year": 1987
+    },
+    {
+        "name": "Disney's DuckTales",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1989
+    },
+    {
+        "name": "Takahashi Meijin no Bugutte Honey",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1987
+    },
+    {
+        "name": "Punch-Out!! (1987)",
+        "console": "NES",
+        "genre": "Fighting",
+        "year": 1987
+    },
+    {
+        "name": "Snow Bros. Nick & Tom",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1993
+    },
+    {
+        "name": "Disney's Darkwing Duck",
+        "console": "NES",
+        "genre": "Platformer",
+        "year": 1992
+    },
+    {
+        "name": "Gemfire",
+        "console": "SNES",
+        "genre": "Strategy",
+        "year": 1991
+    },
+    {
+        "name": "Sensible Soccer",
+        "console": "SNES",
+        "genre": "Sports",
+        "year": 1992
+    },
+    {
+        "name": "Super Bomberman 4",
+        "console": "SNES",
+        "genre": "Action",
+        "year": 1996
+    },
+    {
+        "name": "Live A Live",
+        "console": "SNES",
+        "genre": "Adventure",
+        "year": 1994
+    },
+    {
+        "name": "Street Fighter II Turbo: Hyper Fighting",
+        "console": "SNES",
+        "genre": "Fighting",
+        "year": 1992
+    },
+    {
+        "name": "Ultimate Mortal Kombat 3",
+        "console": "SNES",
+        "genre": "Fighting",
+        "year": 1995
+    },
+    {
+        "name": "Secret of Mana (1993)",
+        "console": "SNES",
+        "genre": "Adventure",
+        "year": 1993
+    },
+    {
+        "name": "International Superstar Soccer Deluxe",
+        "console": "SNES",
+        "genre": "Sports",
+        "year": 1995
+    },
+    {
+        "name": "Disney's Magical Quest",
+        "console": "SNES",
+        "genre": "Platformer",
+        "year": 1992
+    },
+    {
+        "name": "Battletoads & Double Dragon",
+        "console": "SNES",
+        "genre": "Fighting",
+        "year": 1993
+    },
+    {
+        "name": "Teenage Mutant Ninja Turtles IV: Turtles in Time",
+        "console": "SNES",
+        "genre": "Arcade",
+        "year": 1992
+    },
+    {
+        "name": "DOOM",
+        "console": "SNES",
+        "genre": "Shooter",
+        "year": 1993
+    },
+    {
+        "name": "Donkey Kong Country",
+        "console": "SNES",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Super Mario RPG: Legend of the Seven Stars",
+        "console": "SNES",
+        "genre": "RPG",
+        "year": 1996
+    },
+    {
+        "name": "Secret of Evermore",
+        "console": "SNES",
+        "genre": "RPG",
+        "year": 1995
+    },
+    {
+        "name": "Top Gear 3000",
+        "console": "SNES",
+        "genre": "Racing",
+        "year": 1995
+    },
+    {
+        "name": "The King of Dragons",
+        "console": "SNES",
+        "genre": "Arcade",
+        "year": 1991
+    },
+    {
+        "name": "Tetris (1984)",
+        "console": "SNES",
+        "genre": "Puzzle",
+        "year": 1984
+    },
+    {
+        "name": "Super Mario Bros. 3",
+        "console": "SNES",
+        "genre": "Platformer",
+        "year": 1988
+    },
+    {
+        "name": "Rock n' Roll Racing",
+        "console": "SNES",
+        "genre": "Racing",
+        "year": 1993
+    },
+    {
+        "name": "Super Mario All-Stars (1993)",
+        "console": "SNES",
+        "genre": "Platformer",
+        "year": 1993
+    },
+    {
+        "name": "Donkey Kong Country 3: Dixie Kong's Double Trouble",
+        "console": "SNES",
+        "genre": "Platformer",
+        "year": 1996
+    },
+    {
+        "name": "FINAL FANTASY VI",
+        "console": "SNES",
+        "genre": "RPG",
+        "year": 1994
+    },
+    {
+        "name": "Donkey Kong Country 2: Diddy's Kong Quest",
+        "console": "SNES",
+        "genre": "Platformer",
+        "year": 1995
+    },
+    {
+        "name": "Super Mario World",
+        "console": "SNES",
+        "genre": "Platformer",
+        "year": 1990
+    },
+    {
+        "name": "Sunset Riders",
+        "console": "SNES",
+        "genre": "Shooter",
+        "year": 1991
+    },
+    {
+        "name": "Super Metroid",
+        "console": "SNES",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Cannon Fodder",
+        "console": "SNES",
+        "genre": "Strategy",
+        "year": 1993
+    },
+    {
+        "name": "EarthBound",
+        "console": "SNES",
+        "genre": "RPG",
+        "year": 1994
+    },
+    {
+        "name": "The Legend of Zelda: A Link to the Past",
+        "console": "SNES",
+        "genre": "Adventure",
+        "year": 1991
+    },
+    {
+        "name": "True Lies",
+        "console": "SNES",
+        "genre": "Action",
+        "year": 1994
+    },
+    {
+        "name": "Super Mario World 2: Yoshi's Island",
+        "console": "SNES",
+        "genre": "Platformer",
+        "year": 1995
+    },
+    {
+        "name": "Pocky & Rocky",
+        "console": "SNES",
+        "genre": "Shooter",
+        "year": 1992
+    },
+    {
+        "name": "Flashback: The Quest for Identity",
+        "console": "SNES",
+        "genre": "Arcade",
+        "year": 1992
+    },
+    {
+        "name": "Shin Megami Tensei II",
+        "console": "SNES",
+        "genre": "RPG",
+        "year": 1994
+    },
+    {
+        "name": "Super Street Fighter II: The New Challengers",
+        "console": "SNES",
+        "genre": "Fighting",
+        "year": 1993
+    },
+    {
+        "name": "Arkanoid: Doh It Again",
+        "console": "SNES",
+        "genre": "Action",
+        "year": 1997
+    },
+    {
+        "name": "The Lost Vikings",
+        "console": "SNES",
+        "genre": "Platformer",
+        "year": 1993
+    },
+    {
+        "name": "Gemfire",
+        "console": "Genesis",
+        "genre": "Strategy",
+        "year": 1991
+    },
+    {
+        "name": "Virtua Racing",
+        "console": "Genesis",
+        "genre": "Racing",
+        "year": 1992
+    },
+    {
+        "name": "Volfied (1989)",
+        "console": "Genesis",
+        "genre": "Action",
+        "year": 1989
+    },
+    {
+        "name": "Skitchin'",
+        "console": "Genesis",
+        "genre": "Action",
+        "year": 1994
+    },
+    {
+        "name": "Sensible Soccer",
+        "console": "Genesis",
+        "genre": "Sports",
+        "year": 1992
+    },
+    {
+        "name": "Sparkster: Rocket Knight Adventures 2",
+        "console": "Genesis",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Ultimate Mortal Kombat 3",
+        "console": "Genesis",
+        "genre": "Fighting",
+        "year": 1995
+    },
+    {
+        "name": "Monster World IV (1994)",
+        "console": "Genesis",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Road Rash 3",
+        "console": "Genesis",
+        "genre": "Racing",
+        "year": 1995
+    },
+    {
+        "name": "International Superstar Soccer Deluxe",
+        "console": "Genesis",
+        "genre": "Sports",
+        "year": 1995
+    },
+    {
+        "name": "Beyond Oasis",
+        "console": "Genesis",
+        "genre": "Action",
+        "year": 1994
+    },
+    {
+        "name": "FIFA '98: Road to World Cup",
+        "console": "Genesis",
+        "genre": "Sports",
+        "year": 1997
+    },
+    {
+        "name": "Sonic 3 and Knuckles",
+        "console": "Genesis",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Pirates! Gold",
+        "console": "Genesis",
+        "genre": "Strategy",
+        "year": 1993
+    },
+    {
+        "name": "Shining Force II: The Ancient Seal",
+        "console": "Genesis",
+        "genre": "RPG",
+        "year": 1993
+    },
+    {
+        "name": "Battletoads & Double Dragon",
+        "console": "Genesis",
+        "genre": "Fighting",
+        "year": 1993
+    },
+    {
+        "name": "Contra: Hard Corps",
+        "console": "Genesis",
+        "genre": "Shooter",
+        "year": 1994
+    },
+    {
+        "name": "Cave Story: Doukutsu Monogatari",
+        "console": "Genesis",
+        "genre": "Arcade",
+        "year": 2004
+    },
+    {
+        "name": "Tetris (1984)",
+        "console": "Genesis",
+        "genre": "Puzzle",
+        "year": 1984
+    },
+    {
+        "name": "Sonic the Hedgehog 3 (1994)",
+        "console": "Genesis",
+        "genre": "Arcade",
+        "year": 1994
+    },
+    {
+        "name": "Rock n' Roll Racing",
+        "console": "Genesis",
+        "genre": "Racing",
+        "year": 1993
+    },
+    {
+        "name": "Dune II: Battle For Arrakis",
+        "console": "Genesis",
+        "genre": "Strategy",
+        "year": 1992
+    },
+    {
+        "name": "The Lost World: Jurassic Park (1997)",
+        "console": "Genesis",
+        "genre": "Action",
+        "year": 1997
+    },
+    {
+        "name": "The Punisher (1993 video game)",
+        "console": "Genesis",
+        "genre": "Fighting",
+        "year": 1993
+    },
+    {
+        "name": "Ayrton Senna's Super Monaco GP II",
+        "console": "Genesis",
+        "genre": "Racing",
+        "year": 1992
+    },
+    {
+        "name": "Sunset Riders",
+        "console": "Genesis",
+        "genre": "Shooter",
+        "year": 1991
+    },
+    {
+        "name": "Cannon Fodder",
+        "console": "Genesis",
+        "genre": "Strategy",
+        "year": 1993
+    },
+    {
+        "name": "Rocket Knight Adventures",
+        "console": "Genesis",
+        "genre": "Platformer",
+        "year": 1993
+    },
+    {
+        "name": "True Lies",
+        "console": "Genesis",
+        "genre": "Action",
+        "year": 1994
+    },
+    {
+        "name": "Duke Nukem 3D",
+        "console": "Genesis",
+        "genre": "Shooter",
+        "year": 1996
+    },
+    {
+        "name": "Comix Zone",
+        "console": "Genesis",
+        "genre": "Action",
+        "year": 1995
+    },
+    {
+        "name": "Asterix and the Power of the Gods",
+        "console": "Genesis",
+        "genre": "Platformer",
+        "year": 1995
+    },
+    {
+        "name": "Flashback: The Quest for Identity",
+        "console": "Genesis",
+        "genre": "Arcade",
+        "year": 1992
+    },
+    {
+        "name": "Super Street Fighter II: The New Challengers",
+        "console": "Genesis",
+        "genre": "Fighting",
+        "year": 1993
+    },
+    {
+        "name": "Streets of Rage 3",
+        "console": "Genesis",
+        "genre": "Arcade",
+        "year": 1994
+    },
+    {
+        "name": "Street Fighter II: Champion Edition",
+        "console": "Genesis",
+        "genre": "Fighting",
+        "year": 1992
+    },
+    {
+        "name": "The Lost Vikings",
+        "console": "Genesis",
+        "genre": "Platformer",
+        "year": 1993
+    },
+    {
+        "name": "Sonic & Knuckles",
+        "console": "Genesis",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Lunar: Silver Star Story Complete",
+        "console": "PS1",
+        "genre": "RPG",
+        "year": 1996
+    },
+    {
+        "name": "Silent Bomber",
+        "console": "PS1",
+        "genre": "Action",
+        "year": 1999
+    },
+    {
+        "name": "Capcom vs. SNK: Millennium Fight 2000 Pro",
+        "console": "PS1",
+        "genre": "Fighting",
+        "year": 2000
+    },
+    {
+        "name": "Fear Effect 2: Retro Helix",
+        "console": "PS1",
+        "genre": "Adventure",
+        "year": 2001
+    },
+    {
+        "name": "International Superstar Soccer Deluxe",
+        "console": "PS1",
+        "genre": "Sports",
+        "year": 1995
+    },
+    {
+        "name": "Star Ocean: The Second Story",
+        "console": "PS1",
+        "genre": "RPG",
+        "year": 1998
+    },
+    {
+        "name": "FIFA '98: Road to World Cup",
+        "console": "PS1",
+        "genre": "Sports",
+        "year": 1997
+    },
+    {
+        "name": "ISS Pro Evolution",
+        "console": "PS1",
+        "genre": "Sports",
+        "year": 1999
+    },
+    {
+        "name": "Gran Turismo 2",
+        "console": "PS1",
+        "genre": "Racing",
+        "year": 1999
+    },
+    {
+        "name": "Diablo",
+        "console": "PS1",
+        "genre": "Action",
+        "year": 1996
+    },
+    {
+        "name": "Metal Gear Solid",
+        "console": "PS1",
+        "genre": "Action",
+        "year": 1998
+    },
+    {
+        "name": "Broken Sword 1 - The Shadow of the Templars",
+        "console": "PS1",
+        "genre": "Adventure",
+        "year": 1996
+    },
+    {
+        "name": "Chrono Cross",
+        "console": "PS1",
+        "genre": "RPG",
+        "year": 1999
+    },
+    {
+        "name": "Future Cop: LAPD",
+        "console": "PS1",
+        "genre": "Shooter",
+        "year": 1998
+    },
+    {
+        "name": "DOOM",
+        "console": "PS1",
+        "genre": "Shooter",
+        "year": 1993
+    },
+    {
+        "name": "Tenchu: Stealth Assassins",
+        "console": "PS1",
+        "genre": "Adventure",
+        "year": 1998
+    },
+    {
+        "name": "Spyro: Year of the Dragon",
+        "console": "PS1",
+        "genre": "Platformer",
+        "year": 2000
+    },
+    {
+        "name": "The Misadventures of Tron Bonne",
+        "console": "PS1",
+        "genre": "Adventure",
+        "year": 1999
+    },
+    {
+        "name": "Xenogears (1998)",
+        "console": "PS1",
+        "genre": "RPG",
+        "year": 1998
+    },
+    {
+        "name": "Tekken 3",
+        "console": "PS1",
+        "genre": "Fighting",
+        "year": 1997
+    },
+    {
+        "name": "Tony Hawk's Pro Skater",
+        "console": "PS1",
+        "genre": "Sports",
+        "year": 1999
+    },
+    {
+        "name": "The Neverhood",
+        "console": "PS1",
+        "genre": "Adventure",
+        "year": 1996
+    },
+    {
+        "name": "Final Fantasy VII (1997)",
+        "console": "PS1",
+        "genre": "Adventure",
+        "year": 1997
+    },
+    {
+        "name": "The Legend of Dragoon",
+        "console": "PS1",
+        "genre": "RPG",
+        "year": 1999
+    },
+    {
+        "name": "Parasite Eve",
+        "console": "PS1",
+        "genre": "RPG",
+        "year": 1998
+    },
+    {
+        "name": "Tenchu 2: Birth of the Stealth Assassins",
+        "console": "PS1",
+        "genre": "Adventure",
+        "year": 2000
+    },
+    {
+        "name": "Looney Tunes: Sheep Raider",
+        "console": "PS1",
+        "genre": "Platformer",
+        "year": 2001
+    },
+    {
+        "name": "Hogs of War",
+        "console": "PS1",
+        "genre": "Strategy",
+        "year": 2000
+    },
+    {
+        "name": "Breath of Fire III (1997)",
+        "console": "PS1",
+        "genre": "RPG",
+        "year": 1997
+    },
+    {
+        "name": "Rock n' Roll Racing",
+        "console": "PS1",
+        "genre": "Racing",
+        "year": 1993
+    },
+    {
+        "name": "Command & Conquer: Red Alert",
+        "console": "PS1",
+        "genre": "Strategy",
+        "year": 1996
+    },
+    {
+        "name": "Final Fantasy Tactics",
+        "console": "PS1",
+        "genre": "Adventure",
+        "year": 1997
+    },
+    {
+        "name": "Broken Sword 2 - The Smoking Mirror",
+        "console": "PS1",
+        "genre": "Adventure",
+        "year": 1997
+    },
+    {
+        "name": "Incredible Crisis",
+        "console": "PS1",
+        "genre": "Action",
+        "year": 1999
+    },
+    {
+        "name": "WWF SmackDown! 2: Know Your Role",
+        "console": "PS1",
+        "genre": "Fighting",
+        "year": 2000
+    },
+    {
+        "name": "Warcraft II: Tides of Darkness",
+        "console": "PS1",
+        "genre": "Strategy",
+        "year": 1995
+    },
+    {
+        "name": "Silent Hill",
+        "console": "PS1",
+        "genre": "Action",
+        "year": 1999
+    },
+    {
+        "name": "Tomba! 2: The Evil Swine Return",
+        "console": "PS1",
+        "genre": "Platformer",
+        "year": 1999
+    },
+    {
+        "name": "Beetle Adventure Racing",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 1999
+    },
+    {
+        "name": "Extreme-G 2",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 1998
+    },
+    {
+        "name": "FIFA '98: Road to World Cup",
+        "console": "N64",
+        "genre": "Sports",
+        "year": 1997
+    },
+    {
+        "name": "F-Zero X",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 1998
+    },
+    {
+        "name": "Paper Mario (2000)",
+        "console": "N64",
+        "genre": "RPG",
+        "year": 2000
+    },
+    {
+        "name": "The Legend of Zelda: Ocarina of Time",
+        "console": "N64",
+        "genre": "Adventure",
+        "year": 1998
+    },
+    {
+        "name": "Super Mario 64",
+        "console": "N64",
+        "genre": "Platformer",
+        "year": 1996
+    },
+    {
+        "name": "Tony Hawk's Pro Skater",
+        "console": "N64",
+        "genre": "Sports",
+        "year": 1999
+    },
+    {
+        "name": "GoldenEye 007 (1997)",
+        "console": "N64",
+        "genre": "Shooter",
+        "year": 1997
+    },
+    {
+        "name": "StarCraft",
+        "console": "N64",
+        "genre": "Action",
+        "year": 1998
+    },
+    {
+        "name": "Tony Hawk's Pro Skater 2",
+        "console": "N64",
+        "genre": "Arcade",
+        "year": 2000
+    },
+    {
+        "name": "Tony Hawk's Pro Skater 3",
+        "console": "N64",
+        "genre": "Arcade",
+        "year": 2001
+    },
+    {
+        "name": "Space Station Silicon Valley",
+        "console": "N64",
+        "genre": "Platformer",
+        "year": 1998
+    },
+    {
+        "name": "The Legend of Zelda: Majora's Mask",
+        "console": "N64",
+        "genre": "Adventure",
+        "year": 2000
+    },
+    {
+        "name": "Resident Evil 2 (1998)",
+        "console": "N64",
+        "genre": "Action",
+        "year": 1998
+    },
+    {
+        "name": "Mischief Makers",
+        "console": "N64",
+        "genre": "Platformer",
+        "year": 1997
+    },
+    {
+        "name": "Mario Kart 64 (1996)",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 1996
+    },
+    {
+        "name": "Worms Armageddon",
+        "console": "N64",
+        "genre": "Strategy",
+        "year": 1999
+    },
+    {
+        "name": "Star Fox 64 (1997)",
+        "console": "N64",
+        "genre": "Shooter",
+        "year": 1997
+    },
+    {
+        "name": "Spider-Man (2000)",
+        "console": "N64",
+        "genre": "Adventure",
+        "year": 2000
+    },
+    {
+        "name": "Quake",
+        "console": "N64",
+        "genre": "Shooter",
+        "year": 1996
+    },
+    {
+        "name": "Banjo-Kazooie",
+        "console": "N64",
+        "genre": "Platformer",
+        "year": 1998
+    },
+    {
+        "name": "Excitebike 64 (2000)",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 2000
+    },
+    {
+        "name": "Snowboard Kids",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 1998
+    },
+    {
+        "name": "Micro Machines V3",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 1997
+    },
+    {
+        "name": "Super Smash Bros. (1999)",
+        "console": "N64",
+        "genre": "Action",
+        "year": 1999
+    },
+    {
+        "name": "Vigilante 8",
+        "console": "N64",
+        "genre": "Action",
+        "year": 1998
+    },
+    {
+        "name": "International Superstar Soccer",
+        "console": "N64",
+        "genre": "Sports",
+        "year": 1994
+    },
+    {
+        "name": "Mortal Kombat Trilogy",
+        "console": "N64",
+        "genre": "Arcade",
+        "year": 1996
+    },
+    {
+        "name": "Diddy Kong Racing",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 1997
+    },
+    {
+        "name": "Conker's Bad Fur Day",
+        "console": "N64",
+        "genre": "Platformer",
+        "year": 2001
+    },
+    {
+        "name": "Re-Volt",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 1999
+    },
+    {
+        "name": "Vigilante 8: 2nd Offense",
+        "console": "N64",
+        "genre": "Action",
+        "year": 1999
+    },
+    {
+        "name": "Animal Crossing",
+        "console": "N64",
+        "genre": "RPG",
+        "year": 2001
+    },
+    {
+        "name": "Quake II",
+        "console": "N64",
+        "genre": "Shooter",
+        "year": 1997
+    },
+    {
+        "name": "Dr. Mario 64",
+        "console": "N64",
+        "genre": "Puzzle",
+        "year": 2001
+    },
+    {
+        "name": "Hot Wheels Turbo Racing",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 1999
+    },
+    {
+        "name": "Carmageddon",
+        "console": "N64",
+        "genre": "Racing",
+        "year": 1997
+    },
+    {
+        "name": "Rayman 2: The Great Escape",
+        "console": "N64",
+        "genre": "Platformer",
+        "year": 1999
+    },
+    {
+        "name": "Godzilla Save the Earth",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2004
+    },
+    {
+        "name": "Sengoku Basara 2",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2006
+    },
+    {
+        "name": "Princess Maker 2",
+        "console": "PS2",
+        "genre": "Simulation",
+        "year": 1993
+    },
+    {
+        "name": "Shinobido: Way of the Ninja",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2005
+    },
+    {
+        "name": "The Typing of the Dead",
+        "console": "PS2",
+        "genre": "Educational",
+        "year": 2000
+    },
+    {
+        "name": "Kingdom Hearts II Final Mix",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2007
+    },
+    {
+        "name": "Valkyrie Profile 2: Silmeria",
+        "console": "PS2",
+        "genre": "RPG",
+        "year": 2006
+    },
+    {
+        "name": "Midnight Club 3: DUB Edition Remix",
+        "console": "PS2",
+        "genre": "Racing",
+        "year": 2006
+    },
+    {
+        "name": "Gran Turismo 4",
+        "console": "PS2",
+        "genre": "Racing",
+        "year": 2004
+    },
+    {
+        "name": "Shin Megami Tensei: Persona 3 FES",
+        "console": "PS2",
+        "genre": "RPG",
+        "year": 2007
+    },
+    {
+        "name": "Stunt GP",
+        "console": "PS2",
+        "genre": "Racing",
+        "year": 2001
+    },
+    {
+        "name": "Devil Kings",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2005
+    },
+    {
+        "name": "Zone of the Enders 2: The Second Runner",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2003
+    },
+    {
+        "name": "Raw Danger!",
+        "console": "PS2",
+        "genre": "Adventure",
+        "year": 2007
+    },
+    {
+        "name": "Tom and Jerry in War of the Whiskers",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2002
+    },
+    {
+        "name": "Shadow of Rome",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2005
+    },
+    {
+        "name": "Grand Theft Auto: San Andreas",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2004
+    },
+    {
+        "name": "Capcom vs. SNK 2: Mark of the Millennium 2001",
+        "console": "PS2",
+        "genre": "Fighting",
+        "year": 2013
+    },
+    {
+        "name": "Disgaea: Hour of Darkness",
+        "console": "PS2",
+        "genre": "RPG",
+        "year": 2013
+    },
+    {
+        "name": "Metal Gear Solid 2: Substance",
+        "console": "PS2",
+        "genre": "Shooter",
+        "year": 2002
+    },
+    {
+        "name": "Pursuit Force: Extreme Justice",
+        "console": "PS2",
+        "genre": "Racing",
+        "year": 2007
+    },
+    {
+        "name": "Grand Theft Auto: Vice City",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2002
+    },
+    {
+        "name": "Max Payne",
+        "console": "PS2",
+        "genre": "Shooter",
+        "year": 2001
+    },
+    {
+        "name": "God Hand",
+        "console": "PS2",
+        "genre": "Action",
+        "year": 2006
+    },
+    {
+        "name": "Need For Speed: Most Wanted",
+        "console": "PS2",
+        "genre": "Racing",
+        "year": 2005
+    },
+    {
+        "name": "Ace Combat Zero: The Belkan War",
+        "console": "PS2",
+        "genre": "Simulation",
+        "year": 2006
+    },
+    {
+        "name": "Klonoa 2: Lunatea's Veil",
+        "console": "PS2",
+        "genre": "Platformer",
+        "year": 2001
+    },
+    {
+        "name": "Fate/Stay Night [Realta Nua]",
+        "console": "PS2",
+        "genre": "Adventure",
+        "year": 2007
+    },
+    {
+        "name": "Downhill Domination",
+        "console": "PS2",
+        "genre": "Racing",
+        "year": 2003
+    },
+    {
+        "name": "Shadow Hearts",
+        "console": "PS2",
+        "genre": "Adventure",
+        "year": 2001
+    },
+    {
+        "name": "Jurassic Park: Operation Genesis",
+        "console": "PS2",
+        "genre": "Strategy",
+        "year": 2003
+    },
+    {
+        "name": "BUZZ! Junior: Jungle Party",
+        "console": "PS2",
+        "genre": "Arcade",
+        "year": 2006
+    },
+    {
+        "name": "Haunting Ground",
+        "console": "PS2",
+        "genre": "Adventure",
+        "year": 2005
+    },
+    {
+        "name": "Max Payne 2: The Fall of Max Payne",
+        "console": "PS2",
+        "genre": "Shooter",
+        "year": 2003
+    },
+    {
+        "name": "Urban Chaos: Riot Response",
+        "console": "PS2",
+        "genre": "Shooter",
+        "year": 2006
+    },
+    {
+        "name": "Ratchet & Clank: Up Your Arsenal",
+        "console": "PS2",
+        "genre": "Platformer",
+        "year": 2004
+    },
+    {
+        "name": "Gran Turismo 3: A-Spec",
+        "console": "PS2",
+        "genre": "Racing",
+        "year": 2001
+    },
+    {
+        "name": "TimeSplitters: Future Perfect",
+        "console": "PS2",
+        "genre": "Shooter",
+        "year": 2005
+    },
+    {
+        "name": "Devil May Cry 3: Dante's Awakening Special Edition",
+        "console": "PS2",
+        "genre": "Adventure",
+        "year": 2006
+    },
+    {
+        "name": "Burnout 3: Takedown",
+        "console": "PS2",
+        "genre": "Racing",
+        "year": 2004
+    },
+    {
+        "name": "Godzilla Save the Earth",
+        "console": "Xbox",
+        "genre": "Action",
+        "year": 2004
+    },
+    {
+        "name": "Project Gotham Racing 2",
+        "console": "Xbox",
+        "genre": "Racing",
+        "year": 2003
+    },
+    {
+        "name": "Midnight Club 3: DUB Edition Remix",
+        "console": "Xbox",
+        "genre": "Racing",
+        "year": 2006
+    },
+    {
+        "name": "Ninja Gaiden Black",
+        "console": "Xbox",
+        "genre": "Adventure",
+        "year": 2005
+    },
+    {
+        "name": "Tom and Jerry in War of the Whiskers",
+        "console": "Xbox",
+        "genre": "Action",
+        "year": 2002
+    },
+    {
+        "name": "Grand Theft Auto: San Andreas",
+        "console": "Xbox",
+        "genre": "Action",
+        "year": 2004
+    },
+    {
+        "name": "Capcom vs. SNK 2: Mark of the Millennium 2001",
+        "console": "Xbox",
+        "genre": "Fighting",
+        "year": 2013
+    },
+    {
+        "name": "Half-Life 2",
+        "console": "Xbox",
+        "genre": "Shooter",
+        "year": 2004
+    },
+    {
+        "name": "Metal Gear Solid 2: Substance",
+        "console": "Xbox",
+        "genre": "Shooter",
+        "year": 2002
+    },
+    {
+        "name": "The Elder Scrolls 3: Tribunal",
+        "console": "Xbox",
+        "genre": "RPG",
+        "year": 2002
+    },
+    {
+        "name": "Grand Theft Auto: Vice City",
+        "console": "Xbox",
+        "genre": "Action",
+        "year": 2002
+    },
+    {
+        "name": "Max Payne",
+        "console": "Xbox",
+        "genre": "Shooter",
+        "year": 2001
+    },
+    {
+        "name": "Need For Speed: Most Wanted",
+        "console": "Xbox",
+        "genre": "Racing",
+        "year": 2005
+    },
+    {
+        "name": "Fable: The Lost Chapters",
+        "console": "Xbox",
+        "genre": "Adventure",
+        "year": 2005
+    },
+    {
+        "name": "Jurassic Park: Operation Genesis",
+        "console": "Xbox",
+        "genre": "Strategy",
+        "year": 2003
+    },
+    {
+        "name": "Max Payne 2: The Fall of Max Payne",
+        "console": "Xbox",
+        "genre": "Shooter",
+        "year": 2003
+    },
+    {
+        "name": "Urban Chaos: Riot Response",
+        "console": "Xbox",
+        "genre": "Shooter",
+        "year": 2006
+    },
+    {
+        "name": "TimeSplitters: Future Perfect",
+        "console": "Xbox",
+        "genre": "Shooter",
+        "year": 2005
+    },
+    {
+        "name": "Burnout 3: Takedown",
+        "console": "Xbox",
+        "genre": "Racing",
+        "year": 2004
+    },
+    {
+        "name": "Need for Speed: Underground 2",
+        "console": "Xbox",
+        "genre": "Racing",
+        "year": 2004
+    },
+    {
+        "name": "Prince of Persia: Warrior Within",
+        "console": "Xbox",
+        "genre": "Adventure",
+        "year": 2004
+    },
+    {
+        "name": "SSX Tricky",
+        "console": "Xbox",
+        "genre": "Racing",
+        "year": 2001
+    },
+    {
+        "name": "Marvel vs. Capcom 2: New Age of Heroes",
+        "console": "Xbox",
+        "genre": "Arcade",
+        "year": 2000
+    },
+    {
+        "name": "Def Jam: Fight for NY",
+        "console": "Xbox",
+        "genre": "Fighting",
+        "year": 2004
+    },
+    {
+        "name": "Silent Hill 2 (2001)",
+        "console": "Xbox",
+        "genre": "Adventure",
+        "year": 2001
+    },
+    {
+        "name": "Cave Story: Doukutsu Monogatari",
+        "console": "Xbox",
+        "genre": "Arcade",
+        "year": 2004
+    },
+    {
+        "name": "OutRun 2006: Coast 2 Coast",
+        "console": "Xbox",
+        "genre": "Racing",
+        "year": 2006
+    },
+    {
+        "name": "SSX 3",
+        "console": "Xbox",
+        "genre": "Racing",
+        "year": 2003
+    },
+    {
+        "name": "Jet Set Radio Future",
+        "console": "Xbox",
+        "genre": "Platformer",
+        "year": 2002
+    },
+    {
+        "name": "Need for Speed: Most Wanted Black Edition",
+        "console": "Xbox",
+        "genre": "Racing",
+        "year": 2015
+    },
+    {
+        "name": "Tom Clancy's Splinter Cell Chaos Theory",
+        "console": "Xbox",
+        "genre": "Adventure",
+        "year": 2005
+    },
+    {
+        "name": "Spartan: Total Warrior",
+        "console": "Xbox",
+        "genre": "Action",
+        "year": 2005
+    },
+    {
+        "name": "Halo 2",
+        "console": "Xbox",
+        "genre": "Shooter",
+        "year": 2004
+    },
+    {
+        "name": "The Elder Scrolls III: Morrowind",
+        "console": "Xbox",
+        "genre": "RPG",
+        "year": 2002
+    },
+    {
+        "name": "Beyond Good & Evil",
+        "console": "Xbox",
+        "genre": "Adventure",
+        "year": 2003
+    },
+    {
+        "name": "Ninja Gaiden (2004)",
+        "console": "Xbox",
+        "genre": "Action",
+        "year": 2004
+    },
+    {
+        "name": "Tony Hawk's Underground 2",
+        "console": "Xbox",
+        "genre": "Arcade",
+        "year": 2004
+    },
+    {
+        "name": "Mafia: The City of Lost Heaven",
+        "console": "Xbox",
+        "genre": "Action",
+        "year": 2002
+    },
+    {
+        "name": "Star Wars: Knights of the Old Republic II – The Sith Lords",
+        "console": "Xbox",
+        "genre": "Adventure",
+        "year": 2004
+    },
+    {
+        "name": "Tom Clancy's Rainbow Six 3: Raven Shield",
+        "console": "Xbox",
+        "genre": "Shooter",
+        "year": 2003
+    },
+    {
+        "name": "Baten Kaitos: Eternal Wings and the Lost Ocean",
+        "console": "GameCube",
+        "genre": "RPG",
+        "year": 2003
+    },
+    {
+        "name": "Tom and Jerry in War of the Whiskers",
+        "console": "GameCube",
+        "genre": "Action",
+        "year": 2002
+    },
+    {
+        "name": "Capcom vs. SNK 2: Mark of the Millennium 2001",
+        "console": "GameCube",
+        "genre": "Fighting",
+        "year": 2013
+    },
+    {
+        "name": "Need For Speed: Most Wanted",
+        "console": "GameCube",
+        "genre": "Racing",
+        "year": 2005
+    },
+    {
+        "name": "TimeSplitters: Future Perfect",
+        "console": "GameCube",
+        "genre": "Shooter",
+        "year": 2005
+    },
+    {
+        "name": "Metroid Prime 2: Echoes",
+        "console": "GameCube",
+        "genre": "Adventure",
+        "year": 2004
+    },
+    {
+        "name": "F-Zero GX",
+        "console": "GameCube",
+        "genre": "Racing",
+        "year": 2003
+    },
+    {
+        "name": "Need for Speed: Underground 2",
+        "console": "GameCube",
+        "genre": "Racing",
+        "year": 2004
+    },
+    {
+        "name": "Resident Evil 4 (2005)",
+        "console": "GameCube",
+        "genre": "Shooter",
+        "year": 2005
+    },
+    {
+        "name": "Prince of Persia: Warrior Within",
+        "console": "GameCube",
+        "genre": "Adventure",
+        "year": 2004
+    },
+    {
+        "name": "Sonic Mega Collection",
+        "console": "GameCube",
+        "genre": "Platformer",
+        "year": 2002
+    },
+    {
+        "name": "SSX Tricky",
+        "console": "GameCube",
+        "genre": "Racing",
+        "year": 2001
+    },
+    {
+        "name": "Def Jam: Fight for NY",
+        "console": "GameCube",
+        "genre": "Fighting",
+        "year": 2004
+    },
+    {
+        "name": "Pikmin 2",
+        "console": "GameCube",
+        "genre": "Strategy",
+        "year": 2004
+    },
+    {
+        "name": "Cave Story: Doukutsu Monogatari",
+        "console": "GameCube",
+        "genre": "Arcade",
+        "year": 2004
+    },
+    {
+        "name": "SSX 3",
+        "console": "GameCube",
+        "genre": "Racing",
+        "year": 2003
+    },
+    {
+        "name": "Bloody Roar 3",
+        "console": "GameCube",
+        "genre": "Fighting",
+        "year": 2001
+    },
+    {
+        "name": "Tom Clancy's Splinter Cell Chaos Theory",
+        "console": "GameCube",
+        "genre": "Adventure",
+        "year": 2005
+    },
+    {
+        "name": "The Legend of Zelda: Twilight Princess",
+        "console": "GameCube",
+        "genre": "Action",
+        "year": 2006
+    },
+    {
+        "name": "Spartan: Total Warrior",
+        "console": "GameCube",
+        "genre": "Action",
+        "year": 2005
+    },
+    {
+        "name": "Resident Evil (2002)",
+        "console": "GameCube",
+        "genre": "Action",
+        "year": 2002
+    },
+    {
+        "name": "Kirby Air Ride",
+        "console": "GameCube",
+        "genre": "Racing",
+        "year": 2003
+    },
+    {
+        "name": "Mario Kart: Double Dash",
+        "console": "GameCube",
+        "genre": "Racing",
+        "year": 2003
+    },
+    {
+        "name": "Sonic the Hedgehog 3 (1994)",
+        "console": "GameCube",
+        "genre": "Arcade",
+        "year": 1994
+    },
+    {
+        "name": "Beyond Good & Evil",
+        "console": "GameCube",
+        "genre": "Adventure",
+        "year": 2003
+    },
+    {
+        "name": "Metal Gear Solid: The Twin Snakes",
+        "console": "GameCube",
+        "genre": "Adventure",
+        "year": 2004
+    },
+    {
+        "name": "Super Smash Bros. Melee",
+        "console": "GameCube",
+        "genre": "Action",
+        "year": 2001
+    },
+    {
+        "name": "Viewtiful Joe 2",
+        "console": "GameCube",
+        "genre": "Action",
+        "year": 2004
+    },
+    {
+        "name": "Tony Hawk's Underground 2",
+        "console": "GameCube",
+        "genre": "Arcade",
+        "year": 2004
+    },
+    {
+        "name": "Fire Emblem: Path of Radiance",
+        "console": "GameCube",
+        "genre": "Strategy",
+        "year": 2005
+    },
+    {
+        "name": "Metroid Prime",
+        "console": "GameCube",
+        "genre": "Shooter",
+        "year": 2002
+    },
+    {
+        "name": "Tom Clancy's Rainbow Six 3: Raven Shield",
+        "console": "GameCube",
+        "genre": "Shooter",
+        "year": 2003
+    },
+    {
+        "name": "Chibi-Robo!",
+        "console": "GameCube",
+        "genre": "Adventure",
+        "year": 2005
+    },
+    {
+        "name": "Eternal Darkness: Sanity's Requiem",
+        "console": "GameCube",
+        "genre": "Adventure",
+        "year": 2002
+    },
+    {
+        "name": "Resident Evil 3: Nemesis",
+        "console": "GameCube",
+        "genre": "Action",
+        "year": 1999
+    },
+    {
+        "name": "Tony Hawk's Pro Skater 3",
+        "console": "GameCube",
+        "genre": "Arcade",
+        "year": 2001
+    },
+    {
+        "name": "The Legend of Zelda: The Wind Waker",
+        "console": "GameCube",
+        "genre": "Action",
+        "year": 2002
+    },
+    {
+        "name": "Need for Speed: Underground",
+        "console": "GameCube",
+        "genre": "Racing",
+        "year": 2003
+    },
+    {
+        "name": "Volfied (1989)",
+        "console": "Wii",
+        "genre": "Action",
+        "year": 1989
+    },
+    {
+        "name": "Fragile Dreams : Farewell Ruins of the Moon",
+        "console": "Wii",
+        "genre": "Action",
+        "year": 2009
+    },
+    {
+        "name": "Metroid Prime: Trilogy",
+        "console": "Wii",
+        "genre": "Adventure",
+        "year": 2009
+    },
+    {
+        "name": "Street Fighter II Turbo: Hyper Fighting",
+        "console": "Wii",
+        "genre": "Fighting",
+        "year": 1992
+    },
+    {
+        "name": "I Spy Spooky Mansion",
+        "console": "Wii",
+        "genre": "Casual",
+        "year": 2009
+    },
+    {
+        "name": "Monster World IV (1994)",
+        "console": "Wii",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Monster Hunter Tri",
+        "console": "Wii",
+        "genre": "Action",
+        "year": 2009
+    },
+    {
+        "name": "WarioWare: Smooth Moves",
+        "console": "Wii",
+        "genre": "Casual",
+        "year": 2007
+    },
+    {
+        "name": "Muramasa: The Demon Blade",
+        "console": "Wii",
+        "genre": "Arcade",
+        "year": 2009
+    },
+    {
+        "name": "Phoenix Wright: Ace Attorney − Justice for All",
+        "console": "Wii",
+        "genre": "Adventure",
+        "year": 2002
+    },
+    {
+        "name": "Metroid Prime 2: Echoes",
+        "console": "Wii",
+        "genre": "Adventure",
+        "year": 2004
+    },
+    {
+        "name": "Phineas and Ferb: Across the Second Dimension",
+        "console": "Wii",
+        "genre": "Adventure",
+        "year": 2011
+    },
+    {
+        "name": "Resident Evil 4 (2005)",
+        "console": "Wii",
+        "genre": "Shooter",
+        "year": 2005
+    },
+    {
+        "name": "Pandora's Tower",
+        "console": "Wii",
+        "genre": "Action",
+        "year": 2013
+    },
+    {
+        "name": "Shining Force II: The Ancient Seal",
+        "console": "Wii",
+        "genre": "RPG",
+        "year": 1993
+    },
+    {
+        "name": "Pikmin 2",
+        "console": "Wii",
+        "genre": "Strategy",
+        "year": 2004
+    },
+    {
+        "name": "Okami",
+        "console": "Wii",
+        "genre": "Adventure",
+        "year": 2006
+    },
+    {
+        "name": "Call of Duty 4: Modern Warfare",
+        "console": "Wii",
+        "genre": "Shooter",
+        "year": 2007
+    },
+    {
+        "name": "Battle City",
+        "console": "Wii",
+        "genre": "Action",
+        "year": 1985
+    },
+    {
+        "name": "Top Spin 4",
+        "console": "Wii",
+        "genre": "Sports",
+        "year": 2011
+    },
+    {
+        "name": "Donkey Kong Country",
+        "console": "Wii",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Dragon Ball Z: Budokai Tenkaichi 3",
+        "console": "Wii",
+        "genre": "Fighting",
+        "year": 2007
+    },
+    {
+        "name": "Metroid Prime 3: Corruption",
+        "console": "Wii",
+        "genre": "Adventure",
+        "year": 2007
+    },
+    {
+        "name": "The Legend of Zelda: Twilight Princess",
+        "console": "Wii",
+        "genre": "Action",
+        "year": 2006
+    },
+    {
+        "name": "Guitar Hero III: Legends of Rock",
+        "console": "Wii",
+        "genre": "Arcade",
+        "year": 2007
+    },
+    {
+        "name": "Resident Evil (2002)",
+        "console": "Wii",
+        "genre": "Action",
+        "year": 2002
+    },
+    {
+        "name": "Super Mario Bros. 3",
+        "console": "Wii",
+        "genre": "Platformer",
+        "year": 1988
+    },
+    {
+        "name": "Sonic the Hedgehog 3 (1994)",
+        "console": "Wii",
+        "genre": "Arcade",
+        "year": 1994
+    },
+    {
+        "name": "Xenoblade Chronicles",
+        "console": "Wii",
+        "genre": "Action",
+        "year": 2010
+    },
+    {
+        "name": "Super Mario All-Stars (1993)",
+        "console": "Wii",
+        "genre": "Platformer",
+        "year": 1993
+    },
+    {
+        "name": "Donkey Kong Country Returns",
+        "console": "Wii",
+        "genre": "Platformer",
+        "year": 2010
+    },
+    {
+        "name": "Donkey Kong Country 2: Diddy's Kong Quest",
+        "console": "Wii",
+        "genre": "Platformer",
+        "year": 1995
+    },
+    {
+        "name": "Phoenix Wright: Ace Attorney",
+        "console": "Wii",
+        "genre": "Adventure",
+        "year": 2001
+    },
+    {
+        "name": "Metroid Prime",
+        "console": "Wii",
+        "genre": "Shooter",
+        "year": 2002
+    },
+    {
+        "name": "Super Mario Galaxy",
+        "console": "Wii",
+        "genre": "Platformer",
+        "year": 2007
+    },
+    {
+        "name": "Super Metroid",
+        "console": "Wii",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "Mass Effect Trilogy",
+        "console": "PS3",
+        "genre": "Shooter",
+        "year": 2012
+    },
+    {
+        "name": "The Elder Scrolls V: Skyrim Legendary Edition",
+        "console": "PS3",
+        "genre": "Adventure",
+        "year": 2013
+    },
+    {
+        "name": "Grand Theft Auto IV: Complete Edition",
+        "console": "PS3",
+        "genre": "Adventure",
+        "year": 2010
+    },
+    {
+        "name": "Portal 2",
+        "console": "PS3",
+        "genre": "Shooter",
+        "year": 2011
+    },
+    {
+        "name": "Metal Gear Rising: Revengeance - Jetstream Sam",
+        "console": "PS3",
+        "genre": "Action",
+        "year": 2013
+    },
+    {
+        "name": "Kingdom Hearts II Final Mix",
+        "console": "PS3",
+        "genre": "Action",
+        "year": 2007
+    },
+    {
+        "name": "The Orange Box",
+        "console": "PS3",
+        "genre": "Shooter",
+        "year": 2008
+    },
+    {
+        "name": "Midnight Club 3: DUB Edition Remix",
+        "console": "PS3",
+        "genre": "Racing",
+        "year": 2006
+    },
+    {
+        "name": "The Last Of Us",
+        "console": "PS3",
+        "genre": "Adventure",
+        "year": 2013
+    },
+    {
+        "name": "Shovel Knight: Shovel of Hope",
+        "console": "PS3",
+        "genre": "Indie",
+        "year": 2014
+    },
+    {
+        "name": "Zone of the Enders 2: The Second Runner",
+        "console": "PS3",
+        "genre": "Action",
+        "year": 2003
+    },
+    {
+        "name": "Grand Theft Auto: San Andreas",
+        "console": "PS3",
+        "genre": "Action",
+        "year": 2004
+    },
+    {
+        "name": "Skylanders SuperChargers",
+        "console": "PS3",
+        "genre": "Adventure",
+        "year": 2015
+    },
+    {
+        "name": "Capcom vs. SNK 2: Mark of the Millennium 2001",
+        "console": "PS3",
+        "genre": "Fighting",
+        "year": 2013
+    },
+    {
+        "name": "DARKSTALKERS",
+        "console": "PS3",
+        "genre": "Fighting",
+        "year": 2011
+    },
+    {
+        "name": "Disgaea: Hour of Darkness",
+        "console": "PS3",
+        "genre": "RPG",
+        "year": 2013
+    },
+    {
+        "name": "Mass Effect 2: Lair of the Shadow Broker",
+        "console": "PS3",
+        "genre": "Shooter",
+        "year": 2010
+    },
+    {
+        "name": "Portal",
+        "console": "PS3",
+        "genre": "Action",
+        "year": 2007
+    },
+    {
+        "name": "Kingdom Hearts HD 2.5 ReMIX",
+        "console": "PS3",
+        "genre": "Action",
+        "year": 2014
+    },
+    {
+        "name": "Fallout: New Vegas - Ultimate Edition",
+        "console": "PS3",
+        "genre": "Shooter",
+        "year": 2012
+    },
+    {
+        "name": "Mass Effect 3: Citadel",
+        "console": "PS3",
+        "genre": "Shooter",
+        "year": 2013
+    },
+    {
+        "name": "Dragon Age: Origins Awakening",
+        "console": "PS3",
+        "genre": "RPG",
+        "year": 2010
+    },
+    {
+        "name": "Grand Theft Auto V",
+        "console": "PS3",
+        "genre": "Action",
+        "year": 2013
+    },
+    {
+        "name": "The Sly Collection",
+        "console": "PS3",
+        "genre": "Arcade",
+        "year": 2010
+    },
+    {
+        "name": "The Last of Us: Left Behind",
+        "console": "PS3",
+        "genre": "Shooter",
+        "year": 2014
+    },
+    {
+        "name": "XCOM: Enemy Within",
+        "console": "PS3",
+        "genre": "Strategy",
+        "year": 2013
+    },
+    {
+        "name": "Mass Effect 2",
+        "console": "PS3",
+        "genre": "Action",
+        "year": 2010
+    },
+    {
+        "name": "Max Payne",
+        "console": "PS3",
+        "genre": "Shooter",
+        "year": 2001
+    },
+    {
+        "name": "Need For Speed: Most Wanted",
+        "console": "PS3",
+        "genre": "Racing",
+        "year": 2005
+    },
+    {
+        "name": "Final Fantasy XIV: Heavensward",
+        "console": "PS3",
+        "genre": "Massively Multiplayer",
+        "year": 2015
+    },
+    {
+        "name": "Dragon Age: Origins - Ultimate Edition",
+        "console": "PS3",
+        "genre": "RPG",
+        "year": 2010
+    },
+    {
+        "name": "Prince of Persia Classic Trilogy HD",
+        "console": "PS3",
+        "genre": "Adventure",
+        "year": 2010
+    },
+    {
+        "name": "Minecraft",
+        "console": "PS3",
+        "genre": "Action",
+        "year": 2009
+    },
+    {
+        "name": "Assassin's Creed II",
+        "console": "PS3",
+        "genre": "Action",
+        "year": 2009
+    },
+    {
+        "name": "Monster World IV (1994)",
+        "console": "PS3",
+        "genre": "Platformer",
+        "year": 1994
+    },
+    {
+        "name": "BioShock Infinite: Burial at Sea - Episode Two",
+        "console": "PS3",
+        "genre": "Shooter",
+        "year": 2014
+    },
+    {
+        "name": "BUZZ! Junior: Jungle Party",
+        "console": "PS3",
+        "genre": "Arcade",
+        "year": 2006
+    },
+    {
+        "name": "Metal Gear Solid: The Legacy Collection",
+        "console": "PS3",
+        "genre": "Adventure",
+        "year": 2013
+    },
+    {
+        "name": "DOOM Classic Complete",
+        "console": "PS3",
+        "genre": "Shooter",
+        "year": 2012
+    },
+    {
+        "name": "EA SPORTS FIFA Street",
+        "console": "PS3",
+        "genre": "Sports",
+        "year": 2012
+    },
+    {
+        "name": "The Elder Scrolls V: Skyrim Legendary Edition",
+        "console": "Xbox 360",
+        "genre": "Adventure",
+        "year": 2013
+    },
+    {
+        "name": "Grand Theft Auto IV: Complete Edition",
+        "console": "Xbox 360",
+        "genre": "Adventure",
+        "year": 2010
+    },
+    {
+        "name": "Portal 2",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2011
+    },
+    {
+        "name": "Metal Gear Rising: Revengeance - Jetstream Sam",
+        "console": "Xbox 360",
+        "genre": "Action",
+        "year": 2013
+    },
+    {
+        "name": "The Orange Box",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2008
+    },
+    {
+        "name": "Ninja Gaiden Black",
+        "console": "Xbox 360",
+        "genre": "Adventure",
+        "year": 2005
+    },
+    {
+        "name": "Grand Theft Auto: San Andreas",
+        "console": "Xbox 360",
+        "genre": "Action",
+        "year": 2004
+    },
+    {
+        "name": "Skylanders SuperChargers",
+        "console": "Xbox 360",
+        "genre": "Adventure",
+        "year": 2015
+    },
+    {
+        "name": "Mass Effect 2: Lair of the Shadow Broker",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2010
+    },
+    {
+        "name": "Portal",
+        "console": "Xbox 360",
+        "genre": "Action",
+        "year": 2007
+    },
+    {
+        "name": "Half-Life 2",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2004
+    },
+    {
+        "name": "Fallout: New Vegas - Ultimate Edition",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2012
+    },
+    {
+        "name": "Mass Effect 3: Citadel",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2013
+    },
+    {
+        "name": "Dragon Age: Origins Awakening",
+        "console": "Xbox 360",
+        "genre": "RPG",
+        "year": 2010
+    },
+    {
+        "name": "The Elder Scrolls 3: Tribunal",
+        "console": "Xbox 360",
+        "genre": "RPG",
+        "year": 2002
+    },
+    {
+        "name": "Grand Theft Auto V",
+        "console": "Xbox 360",
+        "genre": "Action",
+        "year": 2013
+    },
+    {
+        "name": "XCOM: Enemy Within",
+        "console": "Xbox 360",
+        "genre": "Strategy",
+        "year": 2013
+    },
+    {
+        "name": "Half-Life 2: Episode Two",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2007
+    },
+    {
+        "name": "Mass Effect 2",
+        "console": "Xbox 360",
+        "genre": "Action",
+        "year": 2010
+    },
+    {
+        "name": "Max Payne",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2001
+    },
+    {
+        "name": "Street Fighter II Turbo: Hyper Fighting",
+        "console": "Xbox 360",
+        "genre": "Fighting",
+        "year": 1992
+    },
+    {
+        "name": "Need For Speed: Most Wanted",
+        "console": "Xbox 360",
+        "genre": "Racing",
+        "year": 2005
+    },
+    {
+        "name": "Ultimate Mortal Kombat 3",
+        "console": "Xbox 360",
+        "genre": "Fighting",
+        "year": 1995
+    },
+    {
+        "name": "Dragon Age: Origins - Ultimate Edition",
+        "console": "Xbox 360",
+        "genre": "RPG",
+        "year": 2010
+    },
+    {
+        "name": "Minecraft",
+        "console": "Xbox 360",
+        "genre": "Action",
+        "year": 2009
+    },
+    {
+        "name": "Ultimate Doom",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 1995
+    },
+    {
+        "name": "Assassin's Creed II",
+        "console": "Xbox 360",
+        "genre": "Action",
+        "year": 2009
+    },
+    {
+        "name": "BioShock Infinite: Burial at Sea - Episode Two",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2014
+    },
+    {
+        "name": "EA SPORTS FIFA Street",
+        "console": "Xbox 360",
+        "genre": "Sports",
+        "year": 2012
+    },
+    {
+        "name": "Fallout: New Vegas",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2010
+    },
+    {
+        "name": "The Elder Scrolls V: Skyrim",
+        "console": "Xbox 360",
+        "genre": "Action",
+        "year": 2011
+    },
+    {
+        "name": "Ori and the Blind Forest: Definitive Edition",
+        "console": "Xbox 360",
+        "genre": "Platformer",
+        "year": 2016
+    },
+    {
+        "name": "Red Dead Redemption",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2010
+    },
+    {
+        "name": "Batman: Arkham City",
+        "console": "Xbox 360",
+        "genre": "Action",
+        "year": 2011
+    },
+    {
+        "name": "Devil May Cry 3: Dante's Awakening Special Edition",
+        "console": "Xbox 360",
+        "genre": "Adventure",
+        "year": 2006
+    },
+    {
+        "name": "Burnout 3: Takedown",
+        "console": "Xbox 360",
+        "genre": "Racing",
+        "year": 2004
+    },
+    {
+        "name": "Portal: Still Alive",
+        "console": "Xbox 360",
+        "genre": "Platformer",
+        "year": 2008
+    },
+    {
+        "name": "American McGee's Alice",
+        "console": "Xbox 360",
+        "genre": "Shooter",
+        "year": 2000
+    },
+    {
+        "name": "Batman: Arkham City - Game of the Year Edition",
+        "console": "Xbox 360",
+        "genre": "Adventure",
+        "year": 2012
+    },
+    {
+        "name": "Mass Effect 3",
+        "console": "Xbox 360",
+        "genre": "Action",
+        "year": 2012
+    }
 ]
