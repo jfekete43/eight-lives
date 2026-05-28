@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eight Lives</title>
+    <title>Five Lives</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&display=swap');
 
@@ -294,8 +294,8 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px 10px;
             margin-top: 20px;
             margin-bottom: 30px;
         }
@@ -314,6 +314,7 @@
         .stat-label {
             font-size: 11px;
             line-height: 1.2;
+            text-transform: uppercase;
         }
 
         .guess-distribution {
@@ -450,7 +451,7 @@
         <div class="header-actions left">
             <button class="text-btn" onclick="resetGame()">NEW</button>
         </div>
-        <h1>Eight Lives</h1>
+        <h1>Five Lives</h1>
         <div class="header-actions right">
             <button class="text-btn" onclick="toggleModal('flex')">STATS</button>
         </div>
@@ -507,8 +508,16 @@
                     <div class="stat-label">Win %</div>
                 </div>
                 <div class="stat-item">
+                    <div class="stat-num" id="stat-losses">0</div>
+                    <div class="stat-label">Losses</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-avg">0</div>
+                    <div class="stat-label">Avg Guesses</div>
+                </div>
+                <div class="stat-item">
                     <div class="stat-num" id="stat-streak">0</div>
-                    <div class="stat-label">Current Streak</div>
+                    <div class="stat-label">Streak</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-num" id="stat-maxstreak">0</div>
@@ -555,7 +564,7 @@
         let database = [];
         let targetGame = null;
         let gameOver = false;
-        const MAX_GUESSES = 8;
+        const MAX_GUESSES = 5; // Updated to 5 Lives!
         let currentGuesses = 0;
         let emojiHistory = []; 
 
@@ -581,10 +590,16 @@
         // 3. Stats Management
         let stats = JSON.parse(localStorage.getItem('gamedleStats')) || {
             played: 0, wins: 0, currentStreak: 0, maxStreak: 0,
-            guessDistribution: [0, 0, 0, 0, 0, 0, 0, 0] 
+            guessDistribution: [0, 0, 0, 0, 0] 
         };
 
-        if (!stats.guessDistribution) stats.guessDistribution = [0, 0, 0, 0, 0, 0, 0, 0];
+        // If the user has old 8-guess stats saved, clip it down to 5 to prevent breaking the UI
+        if (stats.guessDistribution.length !== MAX_GUESSES) {
+            stats.guessDistribution = stats.guessDistribution.slice(0, MAX_GUESSES);
+            if (stats.guessDistribution.length < MAX_GUESSES) {
+                stats.guessDistribution = [0, 0, 0, 0, 0];
+            }
+        }
 
         updateStatsUI();
         updateLivesDisplay();
@@ -598,7 +613,6 @@
             document.getElementById('lives-display').innerHTML = heartsHTML;
         }
 
-        // --- NEW: Toggle Instructions Function ---
         function toggleInstructions() {
             const content = document.getElementById('instructions-content');
             const btn = document.getElementById('instructions-btn');
@@ -612,15 +626,13 @@
             }
         }
 
-        // --- NEW: Reset Game Function ---
         function resetGame() {
-            if (database.length === 0) return; // Prevent reset if DB failed to load
+            if (database.length === 0) return; 
             
             gameOver = false;
             currentGuesses = 0;
             emojiHistory = [];
             
-            // Reset Smart Filter
             knownConsole = null;
             knownGenre = null;
             eliminatedConsoles.clear();
@@ -628,10 +640,8 @@
             minYear = -Infinity;
             maxYear = Infinity;
 
-            // Pick a new target game
             targetGame = database[Math.floor(Math.random() * database.length)];
 
-            // Reset UI elements
             const inputEl = document.getElementById('guess-input');
             inputEl.disabled = false;
             inputEl.value = '';
@@ -642,11 +652,9 @@
             document.getElementById('message').innerText = '';
             document.getElementById('message').className = '';
             
-            // Hide Overlay Screens
             document.getElementById('victory-screen').style.display = 'none';
             document.getElementById('game-over-screen').style.display = 'none';
 
-            // Clear Grid (but keep the header row)
             const grid = document.getElementById('guess-grid');
             grid.innerHTML = `
                 <div class="row header-row">
@@ -772,7 +780,7 @@
 
         function shareResults() {
             const resultScore = gameOver && stats.currentStreak > 0 ? currentGuesses : 'X';
-            const header = `Eight Lives 🎮 ${resultScore}/${MAX_GUESSES}\n\n`;
+            const header = `Five Lives 🎮 ${resultScore}/${MAX_GUESSES}\n\n`;
             const gridString = emojiHistory.join('\n');
             const fullText = header + gridString;
 
@@ -794,12 +802,29 @@
         }
 
         function updateStatsUI(highlightIndex = null) {
+            // Core stats
             document.getElementById('stat-played').innerText = stats.played;
             const winPct = stats.played === 0 ? 0 : Math.round((stats.wins / stats.played) * 100);
             document.getElementById('stat-winpct').innerText = winPct;
+            
+            // New losses stat
+            const losses = stats.played - stats.wins;
+            document.getElementById('stat-losses').innerText = losses;
+
+            // New Average Logic (Wins * guess count, plus Losses * 6)
+            let totalScore = 0;
+            stats.guessDistribution.forEach((count, index) => {
+                totalScore += (count * (index + 1));
+            });
+            totalScore += (losses * 6);
+            
+            const avg = stats.played === 0 ? "0.0" : (totalScore / stats.played).toFixed(1);
+            document.getElementById('stat-avg').innerText = avg;
+
             document.getElementById('stat-streak').innerText = stats.currentStreak;
             document.getElementById('stat-maxstreak').innerText = stats.maxStreak;
 
+            // Update Distribution Graph
             const distContainer = document.getElementById('distribution-container');
             distContainer.innerHTML = ''; 
             const maxWinsInBucket = Math.max(...stats.guessDistribution, 1);
@@ -844,16 +869,13 @@
             const val = inputElement.value;
             suggestionsBox.innerHTML = '';
             
-            // 1. Filter by Memory Bank
             let validGames = database.filter(g => {
                 if (knownConsole && g.console !== knownConsole) return false;
                 if (knownGenre && g.genre !== knownGenre) return false;
                 if (eliminatedConsoles.has(g.console)) return false;
                 if (eliminatedGenres.has(g.genre)) return false;
                 if (g.year < minYear || g.year > maxYear) return false;
-                
                 if (val && !g.name.toLowerCase().includes(val.toLowerCase())) return false;
-                
                 return true;
             });
             
