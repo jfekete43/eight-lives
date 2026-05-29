@@ -9,300 +9,51 @@
 
         body {
             font-family: system-ui, -apple-system, sans-serif;
-            background-color: #121213;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            background-color: #121213; color: #ffffff;
+            margin: 0; padding: 20px; display: flex;
+            flex-direction: column; align-items: center; min-height: 100vh;
         }
 
-        /* CRT Effects */
-        .crt-scanlines {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 4px;
-            z-index: 9999; pointer-events: none;
-            animation: scanlines 10s linear infinite;
-        }
-        .crt-vignette {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
-            z-index: 9998; pointer-events: none;
-        }
-        @keyframes scanlines {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 400px; }
-        }
-
-        .header-container {
-            display: flex; justify-content: space-between; align-items: center;
-            width: 100%; max-width: 600px; margin-bottom: 15px;
-            position: relative; z-index: 10;
-        }
-
-        h1 { 
-            margin: 0; flex: 2; text-align: center;
-            font-family: 'Bungee', sans-serif; font-size: 32px; letter-spacing: 2px;
-            color: #ffffff; text-shadow: 2px 2px 0px #e23636, -2px -2px 0px #538d4e;
-            cursor: pointer;
-        }
-        
-        .header-actions { flex: 1; display: flex; }
-        .header-actions.left { justify-content: flex-start; }
-        .header-actions.right { justify-content: flex-end; }
-
-        .text-btn {
-            background: transparent; border: none; color: #818384;
-            font-size: 16px; font-weight: bold; cursor: pointer;
-            letter-spacing: 1px; transition: color 0.2s; padding: 0;
-        }
-        .text-btn:hover { color: white; }
-
-        /* MAIN MENU STYLES */
-        #main-menu {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; flex-grow: 1; position: relative; z-index: 10;
-            width: 100%; max-width: 600px; gap: 20px;
-        }
+        /* Essential UI Layering */
+        .game-wrapper { position: relative; z-index: 20; width: 100%; max-width: 600px; display: flex; flex-direction: column; align-items: center; }
 
         .menu-btn {
             background-color: transparent; border: 3px solid white; color: white;
-            padding: 20px 40px; font-size: 20px; font-family: 'Press Start 2P', monospace;
+            padding: 20px; font-size: 18px; font-family: 'Press Start 2P', monospace;
             cursor: pointer; transition: 0.2s; border-radius: 8px; width: 100%;
-            text-align: center; text-transform: uppercase;
+            text-align: center; text-transform: uppercase; margin-bottom: 20px;
         }
         .menu-btn:hover { background-color: white; color: #121213; }
-        .menu-btn:disabled { border-color: #565758; color: #565758; cursor: not-allowed; background: transparent; }
-
-        .score-display {
-            font-family: 'Press Start 2P', monospace; font-size: 14px;
-            text-align: center; color: #538d4e; margin-top: 10px; line-height: 1.5;
-        }
-
-        /* GAME UI (Hidden on load) */
-        #game-ui {
-            display: none; width: 100%; max-width: 600px;
-            flex-direction: column; align-items: center; position: relative; z-index: 10;
-        }
-
-        /* Arcade Score Header */
-        #arcade-score-header {
-            display: none; width: 100%; justify-content: space-between;
-            font-family: 'Press Start 2P', monospace; font-size: 12px;
-            color: #538d4e; margin-bottom: 15px; border-bottom: 1px solid #3a3a3c; padding-bottom: 10px;
-        }
-
-        .instructions {
-            background-color: #272729; border: 1px solid #3a3a3c; border-radius: 8px;
-            padding: 15px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; color: #d7dadc; font-size: 14px;
-        }
-        .instructions-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .instructions-header p { color: white; margin: 0; font-weight: bold; font-size: 16px; }
-        .toggle-btn { background: transparent; border: none; color: #818384; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .instructions-content { margin-top: 15px; display: none; }
-        .instructions ul { margin: 0; padding-left: 0; list-style-type: none; }
-        .instructions li { margin-bottom: 8px; line-height: 1.4; }
-
-        .lives-left { margin-bottom: 20px; font-size: 22px; letter-spacing: 4px; text-align: center; }
-
-        .input-section { display: flex; gap: 10px; margin-bottom: 30px; width: 100%; box-sizing: border-box; }
-        .autocomplete-container { position: relative; flex-grow: 1; }
-        input { width: 100%; padding: 12px; font-size: 16px; background-color: #3a3a3c; color: white; border: 1px solid #565758; border-radius: 4px; box-sizing: border-box; }
-        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background-color: #272729; border: 1px solid #565758; border-top: none; border-radius: 0 0 4px 4px; max-height: 250px; overflow-y: auto; z-index: 30; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
-        .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #3a3a3c; display: flex; flex-direction: column; text-align: left; }
-        .suggestion-item:hover, .suggestion-item.active { background-color: #3a3a3c; }
-        .suggestion-name { font-weight: bold; font-size: 15px; color: white; margin-bottom: 3px; }
-        .suggestion-meta { font-size: 12px; color: #a0a0a0; }
-
-        button.guess-btn { padding: 12px 24px; font-size: 16px; font-weight: bold; background-color: #538d4e; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button.guess-btn:hover { background-color: #43703e; }
-        button:disabled { background-color: #3a3a3c; cursor: not-allowed; color: #818384; }
-
-        .grid { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-        .row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; }
-        .header-row { font-weight: bold; text-align: center; border-bottom: 2px solid #3a3a3c; padding-bottom: 10px; margin-bottom: 10px; }
-        .box { background-color: #3a3a3c; padding: 15px 10px; display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 4px; font-weight: bold; font-size: 14px; transition: background-color 0.3s; }
-        .box.match { background-color: #538d4e; } 
-        .box.wrong { background-color: #3a3a3c; } 
-
-        #message { margin-top: 20px; font-size: 20px; font-weight: bold; text-align: center; min-height: 24px; }
         
-        .modal {
-            display: none; 
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            justify-content: center; align-items: center;
-            z-index: 10000;
-        }
-        .modal-content {
-            background-color: #121213; border: 1px solid #3a3a3c; border-radius: 8px;
-            padding: 20px 30px 30px; width: 90%; max-width: 350px;
-            text-align: center; position: relative; max-height: 90vh;
-            overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-        }
-        .close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 10px; margin-top: 20px; margin-bottom: 30px; }
-        .stat-item { display: flex; flex-direction: column; align-items: center; }
-        .stat-num { font-size: 28px; font-weight: bold; }
-        .stat-label { font-size: 11px; line-height: 1.2; text-transform: uppercase; }
-
-        .guess-distribution { width: 100%; text-align: left; margin-bottom: 20px; }
-        .guess-distribution h3 { margin: 0 0 15px 0; font-size: 16px; text-align: center; text-transform: uppercase; }
-        .dist-row { display: flex; align-items: center; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
-        .dist-label { width: 15px; text-align: right; margin-right: 10px; }
-        .dist-bar-container { flex-grow: 1; background-color: transparent; }
-        .dist-bar { background-color: #3a3a3c; color: white; padding: 2px 8px; border-radius: 2px; text-align: right; min-width: 10px; box-sizing: border-box; transition: width 0.3s ease; }
-        .dist-bar.highlight { background-color: #538d4e; }
-
-        .overlay-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.95); justify-content: center; align-items: center; flex-direction: column; z-index: 10000; }
-        .overlay-text { font-family: 'Press Start 2P', monospace; font-size: 8vw; text-align: center; margin-bottom: 25px; line-height: 1.2; }
-        .text-win { color: #538d4e; } .text-lose { color: #e23636; }
-        @media (min-width: 600px) { .overlay-text { font-size: 50px; } }
-        .overlay-subtext { font-size: 20px; color: white; margin-bottom: 20px; text-align: center; }
-        .overlay-points { font-family: 'Press Start 2P', monospace; font-size: 16px; color: #e2b714; margin-bottom: 40px; }
-        
-        .game-over-answer { color: #538d4e; font-weight: bold; font-size: 28px; margin-top: 5px; }
-
-        .button-group { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
-        .arcade-btn { padding: 15px 30px; font-size: 18px; font-weight: bold; text-transform: uppercase; background-color: transparent; color: white; border: 2px solid white; border-radius: 4px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
-        .arcade-btn:hover { background-color: white; color: black; }
-        .share-btn { background-color: #538d4e; border-color: #538d4e; }
-        .share-btn:hover { background-color: #43703e; border-color: #43703e; color: white; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); z-index: 30; }
+        .modal-content { background: #121213; margin: 15% auto; padding: 20px; border: 1px solid white; width: 80%; max-width: 400px; }
     </style>
 </head>
 <body>
 
-    <div class="crt-scanlines"></div>
-    <div class="crt-vignette"></div>
-
-    <div class="header-container">
-        <div class="header-actions left">
-            <button class="text-btn" id="home-btn" style="display:none;" onclick="returnToMenu()">MENU</button>
-        </div>
-        <h1 onclick="returnToMenu()">The Game Grid</h1>
-        <div class="header-actions right"></div>
+    <div class="game-wrapper" id="main-menu">
+        <h1 style="font-family: 'Bungee', sans-serif;">THE GAME GRID</h1>
+        <button class="menu-btn" onclick="console.log('Daily clicked'); startMode('daily')">DAILY RUN</button>
+        <button class="menu-btn" onclick="console.log('Arcade clicked'); startMode('arcade')">ARCADE MODE</button>
+        <button class="menu-btn" onclick="toggleModal(true)">STATS</button>
     </div>
 
-    <div id="main-menu">
-        <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-            <button id="daily-btn" class="menu-btn" onclick="startMode('daily')">DAILY RUN</button>
-            <p id="daily-status" style="margin-top: 10px; margin-bottom: 5px; color: #818384; font-size: 12px; display: none;">Come back tomorrow!</p>
-            <button class="text-btn" style="margin-top: 15px; margin-bottom: 10px;" onclick="toggleModal('flex')">STATS</button>
-        </div>
-        
-        <div style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 10px;">
-            <button class="menu-btn" onclick="startMode('arcade')">ARCADE MODE</button>
-            <div class="score-display">
-                HIGH SCORE: <span id="menu-high-score">0</span>
-            </div>
-        </div>
-    </div>
-    
-    <div id="game-ui">
-        
-        <div id="arcade-score-header">
-            <div>SCORE: <span id="current-score">0</span></div>
-            <div>HIGH: <span id="high-score">0</span></div>
-        </div>
-
-        <div class="instructions">
-            <div class="instructions-header" onclick="toggleInstructions()">
-                <p>How To Play</p>
-                <button class="toggle-btn" id="instructions-btn">[ + ]</button>
-            </div>
-            <div class="instructions-content" id="instructions-content">
-                <ul>
-                    <li>🟩 <strong>Green box</strong> means an exact match.</li>
-                    <li>⬛ <strong>Gray box</strong> means incorrect.</li>
-                    <li>⬆️ ⬇️ <strong>Arrows</strong> indicate if the target game's release year is newer or older.</li>
-                    <li>🧠 <strong>Smart Filter:</strong> Ineligible games will be automatically removed from the suggestion box as you play.</li>
-                    <li id="scoring-rules" style="display:none;">🏆 <strong>Arcade Scoring:</strong> Points decrease each guess (100, 50, 25, 10, 5, 1). A loss is -10 points!</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="lives-left" id="lives-display"></div>
-
-        <div class="input-section">
-            <div class="autocomplete-container">
-                <input type="text" id="guess-input" placeholder="Type a game name..." autocomplete="off">
-                <div id="suggestions" class="suggestions-list"></div>
-            </div>
-            <button id="guess-button" class="guess-btn" onclick="makeGuess()">Guess</button>
-        </div>
-
-        <div class="grid" id="guess-grid">
-            <div class="row header-row">
-                <div>Game</div><div>Console</div><div>Genre</div><div>Year</div>
-            </div>
-        </div>
-
-        <div id="message"></div>
-    </div>
-
-    <div id="stats-modal" class="modal">
+    <div id="stats-modal" class="modal" onclick="toggleModal(false)">
         <div class="modal-content">
-            <button class="close-btn" onclick="toggleModal('none')">&times;</button>
-            <h2>Statistics</h2>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-played">0</div>
-                    <div class="stat-label">Played</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-winpct">0</div>
-                    <div class="stat-label">Win %</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-losses">0</div>
-                    <div class="stat-label">Losses</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-avg">0</div>
-                    <div class="stat-label">Avg Guesses</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-streak">0</div>
-                    <div class="stat-label">Streak</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-maxstreak">0</div>
-                    <div class="stat-label">Max Streak</div>
-                </div>
-            </div>
-
-            <div class="guess-distribution">
-                <h3>Guess Distribution</h3>
-                <div id="distribution-container"></div>
-            </div>
-            
-            <button id="modal-share-btn" class="arcade-btn share-btn" style="margin: 0 auto; display: none;" onclick="shareResults()">
-                Share Results 📋
-            </button>
+            <h2>STATS</h2>
+            <p>If you see this, the modal works!</p>
         </div>
     </div>
 
-    <div id="victory-screen" class="overlay-screen">
-        <div class="overlay-text text-win">VICTORY</div>
-        <div class="overlay-subtext" id="victory-subtext">You got it in X guesses!</div>
-        <div class="overlay-points" id="victory-points" style="display:none;">+100 POINTS</div>
-        <div class="button-group">
-            <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
-            <button class="arcade-btn" id="next-arcade-btn" style="display:none;" onclick="startMode('arcade')">Next Round</button>
-            <button class="arcade-btn" onclick="returnToMenu()">Menu</button>
-        </div>
-    </div>
-
-    <div id="game-over-screen" class="overlay-screen">
-        <div class="overlay-text text-lose">GAME OVER</div>
-        <div class="overlay-subtext">The correct game was:<div class="game-over-answer" id="game-over-answer">Game Name</div></div>
-        <div class="overlay-points" id="lose-points" style="display:none; color: #e23636;">-10 POINTS</div>
-        <div class="button-group">
-            <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
+    <script>
+        function toggleModal(show) {
+            document.getElementById('stats-modal').style.display = show ? 'flex' : 'none';
+        }
+        
+        function startMode(mode) {
+            alert("Mode selected: " + mode);
+            // This confirms if the buttons are triggering the function
+        }
+    </script>
+</body>
+</html>
