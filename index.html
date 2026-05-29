@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Five Lives</title>
+    <title>The Game Grid</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&display=swap');
 
@@ -16,858 +16,498 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+        }
+
+        /* CRT Effects */
+        .crt-scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 9999; pointer-events: none;
+            animation: scanlines 10s linear infinite;
+        }
+        .crt-vignette {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+            z-index: 9998; pointer-events: none;
+        }
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 400px; }
         }
 
         .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 600px;
-            margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%; max-width: 600px; margin-bottom: 15px;
+            position: relative; z-index: 10;
         }
 
         h1 { 
-            margin: 0; 
-            flex: 2;
-            text-align: center;
-            font-family: 'Bungee', sans-serif;
-            font-size: 32px;
-            letter-spacing: 2px;
-            color: #ffffff;
-            text-shadow: 2px 2px 0px #e23636, -2px -2px 0px #538d4e;
+            margin: 0; flex: 2; text-align: center;
+            font-family: 'Bungee', sans-serif; font-size: 32px; letter-spacing: 2px;
+            color: #ffffff; text-shadow: 2px 2px 0px #e23636, -2px -2px 0px #538d4e;
+            cursor: pointer;
         }
         
-        .header-actions {
-            flex: 1;
-            display: flex;
-        }
-        
+        .header-actions { flex: 1; display: flex; }
         .header-actions.left { justify-content: flex-start; }
         .header-actions.right { justify-content: flex-end; }
 
         .text-btn {
-            background: transparent;
-            border: none;
-            color: #818384;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            letter-spacing: 1px;
-            transition: color 0.2s;
-            padding: 0;
+            background: transparent; border: none; color: #818384;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            letter-spacing: 1px; transition: color 0.2s; padding: 0;
         }
-
         .text-btn:hover { color: white; }
 
+        /* MAIN MENU STYLES */
+        #main-menu {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; flex-grow: 1; position: relative; z-index: 10;
+            width: 100%; max-width: 600px; gap: 20px;
+        }
+
+        .menu-btn {
+            background-color: transparent; border: 3px solid white; color: white;
+            padding: 20px 40px; font-size: 20px; font-family: 'Press Start 2P', monospace;
+            cursor: pointer; transition: 0.2s; border-radius: 8px; width: 100%;
+            text-align: center; text-transform: uppercase;
+        }
+        .menu-btn:hover { background-color: white; color: #121213; }
+        .menu-btn:disabled { border-color: #565758; color: #565758; cursor: not-allowed; background: transparent; }
+
+        .score-display {
+            font-family: 'Press Start 2P', monospace; font-size: 14px;
+            text-align: center; color: #538d4e; margin-top: 10px; line-height: 1.5;
+        }
+
+        /* GAME UI (Hidden on load) */
+        #game-ui {
+            display: none; width: 100%; max-width: 600px;
+            flex-direction: column; align-items: center; position: relative; z-index: 10;
+        }
+
+        /* Arcade Score Header */
+        #arcade-score-header {
+            display: none; width: 100%; justify-content: space-between;
+            font-family: 'Press Start 2P', monospace; font-size: 12px;
+            color: #538d4e; margin-bottom: 15px; border-bottom: 1px solid #3a3a3c; padding-bottom: 10px;
+        }
+
         .instructions {
-            background-color: #272729;
-            border: 1px solid #3a3a3c;
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 600px;
-            box-sizing: border-box;
-            color: #d7dadc;
-            font-size: 14px;
+            background-color: #272729; border: 1px solid #3a3a3c; border-radius: 8px;
+            padding: 15px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; color: #d7dadc; font-size: 14px;
         }
-        
-        .instructions-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
+        .instructions-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .instructions-header p { color: white; margin: 0; font-weight: bold; font-size: 16px; }
+        .toggle-btn { background: transparent; border: none; color: #818384; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .instructions-content { margin-top: 15px; display: none; }
+        .instructions ul { margin: 0; padding-left: 0; list-style-type: none; }
+        .instructions li { margin-bottom: 8px; line-height: 1.4; }
 
-        .instructions-header p {
-            color: white;
-            margin: 0;
-            font-weight: bold;
-            font-size: 16px;
-        }
+        .lives-left { margin-bottom: 20px; font-size: 22px; letter-spacing: 4px; text-align: center; }
 
-        .toggle-btn {
-            background: transparent;
-            border: none;
-            color: #818384;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .toggle-btn:hover { color: white; }
+        .input-section { display: flex; gap: 10px; margin-bottom: 30px; width: 100%; box-sizing: border-box; }
+        .autocomplete-container { position: relative; flex-grow: 1; }
+        input { width: 100%; padding: 12px; font-size: 16px; background-color: #3a3a3c; color: white; border: 1px solid #565758; border-radius: 4px; box-sizing: border-box; }
+        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background-color: #272729; border: 1px solid #565758; border-top: none; border-radius: 0 0 4px 4px; max-height: 250px; overflow-y: auto; z-index: 30; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #3a3a3c; display: flex; flex-direction: column; text-align: left; }
+        .suggestion-item:hover, .suggestion-item.active { background-color: #3a3a3c; }
+        .suggestion-name { font-weight: bold; font-size: 15px; color: white; margin-bottom: 3px; }
+        .suggestion-meta { font-size: 12px; color: #a0a0a0; }
 
-        .instructions-content {
-            margin-top: 15px;
-        }
-
-        .instructions ul {
-            margin: 0;
-            padding-left: 0;
-            list-style-type: none;
-        }
-
-        .instructions li {
-            margin-bottom: 8px;
-            line-height: 1.4;
-        }
-
-        .instructions li:last-child { margin-bottom: 0; }
-        
-        .lives-left {
-            margin-bottom: 20px;
-            font-size: 22px; 
-            letter-spacing: 4px; 
-            text-align: center;
-        }
-
-        .input-section {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            width: 100%;
-            max-width: 600px;
-            box-sizing: border-box;
-        }
-
-        .autocomplete-container {
-            position: relative;
-            flex-grow: 1;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            background-color: #3a3a3c;
-            color: white;
-            border: 1px solid #565758;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .suggestions-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background-color: #272729;
-            border: 1px solid #565758;
-            border-top: none;
-            border-radius: 0 0 4px 4px;
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 10;
-            display: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-        }
-
-        .suggestion-item {
-            padding: 10px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #3a3a3c;
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-        }
-
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
-
-        .suggestion-item:hover, .suggestion-item.active {
-            background-color: #3a3a3c;
-        }
-
-        .suggestion-name {
-            font-weight: bold;
-            font-size: 15px;
-            color: white;
-            margin-bottom: 3px;
-        }
-
-        .suggestion-meta {
-            font-size: 12px;
-            color: #a0a0a0;
-        }
-
-        button.guess-btn {
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: #538d4e;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
+        button.guess-btn { padding: 12px 24px; font-size: 16px; font-weight: bold; background-color: #538d4e; color: white; border: none; border-radius: 4px; cursor: pointer; }
         button.guess-btn:hover { background-color: #43703e; }
         button:disabled { background-color: #3a3a3c; cursor: not-allowed; color: #818384; }
 
-        .grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 10px;
-        }
-
-        .header-row {
-            font-weight: bold;
-            text-align: center;
-            border-bottom: 2px solid #3a3a3c;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-
-        .box {
-            background-color: #3a3a3c;
-            padding: 15px 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-
+        .grid { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; }
+        .header-row { font-weight: bold; text-align: center; border-bottom: 2px solid #3a3a3c; padding-bottom: 10px; margin-bottom: 10px; }
+        .box { background-color: #3a3a3c; padding: 15px 10px; display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 4px; font-weight: bold; font-size: 14px; transition: background-color 0.3s; }
         .box.match { background-color: #538d4e; } 
         .box.wrong { background-color: #3a3a3c; } 
 
-        #message {
-            margin-top: 20px;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            min-height: 24px;
-        }
+        #message { margin-top: 20px; font-size: 20px; font-weight: bold; text-align: center; min-height: 24px; }
         
-        .success { color: #538d4e; }
-        .failure { color: #e23636; }
-
-        .modal {
-            display: none; 
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-        }
-
-        .modal-content {
-            background-color: #121213;
-            border: 1px solid #3a3a3c;
-            border-radius: 8px;
-            padding: 20px 30px 30px;
-            width: 90%;
-            max-width: 350px;
-            text-align: center;
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px 10px;
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .stat-num {
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            line-height: 1.2;
-            text-transform: uppercase;
-        }
-
-        .guess-distribution {
-            width: 100%;
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
-        .guess-distribution h3 {
-            margin: 0 0 15px 0;
-            font-size: 16px;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        .dist-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .dist-label {
-            width: 15px;
-            text-align: right;
-            margin-right: 10px;
-        }
-
-        .dist-bar-container {
-            flex-grow: 1;
-            background-color: transparent;
-        }
-
-        .dist-bar {
-            background-color: #3a3a3c;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 2px;
-            text-align: right;
-            min-width: 10px;
-            box-sizing: border-box;
-            transition: width 0.3s ease;
-        }
-
-        .dist-bar.highlight { background-color: #538d4e; }
-
-        .overlay-screen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.92);
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 100;
-        }
-
-        .overlay-text {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 8vw; 
-            text-align: center;
-            margin-bottom: 25px;
-            line-height: 1.2;
-        }
-
-        .text-win { color: #538d4e; }
-        .text-lose { color: #e23636; }
+        .overlay-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.95); justify-content: center; align-items: center; flex-direction: column; z-index: 10000; }
+        .overlay-text { font-family: 'Press Start 2P', monospace; font-size: 8vw; text-align: center; margin-bottom: 25px; line-height: 1.2; }
+        .text-win { color: #538d4e; } .text-lose { color: #e23636; }
+        @media (min-width: 600px) { .overlay-text { font-size: 50px; } }
+        .overlay-subtext { font-size: 20px; color: white; margin-bottom: 20px; text-align: center; }
+        .overlay-points { font-family: 'Press Start 2P', monospace; font-size: 16px; color: #e2b714; margin-bottom: 40px; }
         
-        @media (min-width: 600px) {
-            .overlay-text { font-size: 50px; }
-        }
+        .game-over-answer { color: #538d4e; font-weight: bold; font-size: 28px; margin-top: 5px; }
 
-        .overlay-subtext {
-            font-size: 20px;
-            color: white;
-            margin-bottom: 40px;
-            text-align: center;
-        }
+        .button-group { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .arcade-btn { padding: 15px 30px; font-size: 18px; font-weight: bold; text-transform: uppercase; background-color: transparent; color: white; border: 2px solid white; border-radius: 4px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .arcade-btn:hover { background-color: white; color: black; }
+        .share-btn { background-color: #538d4e; border-color: #538d4e; }
+        .share-btn:hover { background-color: #43703e; border-color: #43703e; color: white; }
 
-        .game-over-answer {
-            color: #538d4e;
-            font-weight: bold;
-            font-size: 28px;
-            margin-top: 5px;
+        /* Footer */
+        .footer {
+            margin-top: auto; padding: 20px 0; text-align: center;
+            font-size: 12px; color: #565758; position: relative; z-index: 10;
         }
+        .footer a { color: #818384; text-decoration: none; font-weight: bold; transition: color 0.2s; }
+        .footer a:hover { color: white; }
 
-        .button-group {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .arcade-btn {
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            background-color: transparent;
-            color: white;
-            border: 2px solid white;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .arcade-btn:hover {
-            background-color: white;
-            color: black;
-        }
-        
-        .share-btn {
-            background-color: #538d4e;
-            border-color: #538d4e;
-        }
-        
-        .share-btn:hover {
-            background-color: #43703e;
-            border-color: #43703e;
-            color: white;
-        }
     </style>
 </head>
 <body>
 
+    <div class="crt-scanlines"></div>
+    <div class="crt-vignette"></div>
+
     <div class="header-container">
         <div class="header-actions left">
-            <button class="text-btn" onclick="resetGame()">NEW</button>
+            <button class="text-btn" id="home-btn" style="display:none;" onclick="returnToMenu()">MENU</button>
         </div>
-        <h1>Five Lives</h1>
-        <div class="header-actions right">
-            <button class="text-btn" onclick="toggleModal('flex')">STATS</button>
+        <h1 onclick="returnToMenu()">The Game Grid</h1>
+        <div class="header-actions right"></div>
+    </div>
+
+    <div id="main-menu">
+        <button id="daily-btn" class="menu-btn" onclick="startMode('daily')">DAILY RUN</button>
+        <p id="daily-status" style="margin-top: -10px; color: #818384; font-size: 12px; display: none;">Come back tomorrow!</p>
+        
+        <button class="menu-btn" onclick="startMode('arcade')">ARCADE MODE</button>
+        <div class="score-display">
+            HIGH SCORE: <span id="menu-high-score">0</span>
         </div>
     </div>
     
-    <div class="instructions">
-        <div class="instructions-header" onclick="toggleInstructions()">
-            <p>Guess the classic video game!</p>
-            <button class="toggle-btn" id="instructions-btn">[ - ]</button>
-        </div>
-        <div class="instructions-content" id="instructions-content">
-            <ul>
-                <li>🟩 <strong>Green box</strong> means an exact match.</li>
-                <li>⬛ <strong>Gray box</strong> means incorrect.</li>
-                <li>⬆️ ⬇️ <strong>Arrows</strong> indicate if the target game's release year is newer or older.</li>
-                <li>🧠 <strong>Smart Filter:</strong> Ineligible games will be automatically removed from the suggestion box as you play.</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="lives-left" id="lives-display">
+    <div id="game-ui">
+        
+        <div id="arcade-score-header">
+            <div>SCORE: <span id="current-score">0</span></div>
+            <div>HIGH: <span id="high-score">0</span></div>
         </div>
 
-    <div class="input-section">
-        <div class="autocomplete-container">
-            <input type="text" id="guess-input" placeholder="Type a game name..." autocomplete="off">
-            <div id="suggestions" class="suggestions-list"></div>
-        </div>
-        <button id="guess-button" class="guess-btn" onclick="makeGuess()">Guess</button>
-    </div>
-
-    <div class="grid" id="guess-grid">
-        <div class="row header-row">
-            <div>Game</div>
-            <div>Console</div>
-            <div>Genre</div>
-            <div>Year</div>
-        </div>
-        </div>
-
-    <div id="message"></div>
-
-    <div id="stats-modal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="toggleModal('none')">&times;</button>
-            <h2>Statistics</h2>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-played">0</div>
-                    <div class="stat-label">Played</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-winpct">0</div>
-                    <div class="stat-label">Win %</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-losses">0</div>
-                    <div class="stat-label">Losses</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-avg">0</div>
-                    <div class="stat-label">Avg Guesses</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-streak">0</div>
-                    <div class="stat-label">Streak</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-maxstreak">0</div>
-                    <div class="stat-label">Max Streak</div>
-                </div>
+        <div class="instructions">
+            <div class="instructions-header" onclick="toggleInstructions()">
+                <p>How To Play</p>
+                <button class="toggle-btn" id="instructions-btn">[ + ]</button>
             </div>
-
-            <div class="guess-distribution">
-                <h3>Guess Distribution</h3>
-                <div id="distribution-container"></div>
+            <div class="instructions-content" id="instructions-content">
+                <ul>
+                    <li>🟩 <strong>Green box</strong> means an exact match.</li>
+                    <li>⬛ <strong>Gray box</strong> means incorrect.</li>
+                    <li>⬆️ ⬇️ <strong>Arrows</strong> indicate if the target game's release year is newer or older.</li>
+                    <li>🧠 <strong>Smart Filter:</strong> Ineligible games will be automatically removed from the suggestion box as you play.</li>
+                    <li id="scoring-rules" style="display:none;">🏆 <strong>Arcade Scoring:</strong> Points decrease each guess (100, 50, 25, 10, 5, 1). A loss is -10 points!</li>
+                </ul>
             </div>
-            
-            <button id="modal-share-btn" class="arcade-btn share-btn" style="margin: 0 auto; display: none;" onclick="shareResults()">
-                Share Results 📋
-            </button>
         </div>
+
+        <div class="lives-left" id="lives-display"></div>
+
+        <div class="input-section">
+            <div class="autocomplete-container">
+                <input type="text" id="guess-input" placeholder="Type a game name..." autocomplete="off">
+                <div id="suggestions" class="suggestions-list"></div>
+            </div>
+            <button id="guess-button" class="guess-btn" onclick="makeGuess()">Guess</button>
+        </div>
+
+        <div class="grid" id="guess-grid">
+            <div class="row header-row">
+                <div>Game</div><div>Console</div><div>Genre</div><div>Year</div>
+            </div>
+        </div>
+
+        <div id="message"></div>
     </div>
 
     <div id="victory-screen" class="overlay-screen">
         <div class="overlay-text text-win">VICTORY</div>
-        <div class="overlay-subtext" id="victory-subtext">
-            You got it in X guesses!
-        </div>
+        <div class="overlay-subtext" id="victory-subtext">You got it in X guesses!</div>
+        <div class="overlay-points" id="victory-points" style="display:none;">+100 POINTS</div>
         <div class="button-group">
             <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
-            <button class="arcade-btn" onclick="showStatsFromScreen('victory-screen')">Stats</button>
+            <button class="arcade-btn" id="next-arcade-btn" style="display:none;" onclick="startMode('arcade')">Next Round</button>
+            <button class="arcade-btn" onclick="returnToMenu()">Menu</button>
         </div>
     </div>
 
     <div id="game-over-screen" class="overlay-screen">
         <div class="overlay-text text-lose">GAME OVER</div>
-        <div class="overlay-subtext">
-            The correct game was:
-            <div class="game-over-answer" id="game-over-answer">Game Name</div>
-        </div>
+        <div class="overlay-subtext">The correct game was:<div class="game-over-answer" id="game-over-answer">Game Name</div></div>
+        <div class="overlay-points" id="lose-points" style="display:none; color: #e23636;">-10 POINTS</div>
         <div class="button-group">
             <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
-            <button class="arcade-btn" onclick="showStatsFromScreen('game-over-screen')">Stats</button>
+            <button class="arcade-btn" id="retry-arcade-btn" style="display:none;" onclick="startMode('arcade')">Try Again</button>
+            <button class="arcade-btn" onclick="returnToMenu()">Menu</button>
         </div>
     </div>
 
+    <div class="footer">
+        Presented by <a href="#" target="_blank">Shore Sports Arena</a>
+    </div>
+
     <script>
-        // 1. Game State & Tracking Variables
-        let database = [];
-        let targetGame = null;
-        let gameOver = false;
-        const MAX_GUESSES = 5; // Updated to 5 Lives!
-        let currentGuesses = 0;
-        let emojiHistory = []; 
+        // Web Audio API
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
 
-        let knownConsole = null;
-        let knownGenre = null;
-        let eliminatedConsoles = new Set();
-        let eliminatedGenres = new Set();
-        let minYear = -Infinity;
-        let maxYear = Infinity;
-
-        // 2. Fetch Database
-        fetch('database.json')
-            .then(response => response.json())
-            .then(data => {
-                database = data;
-                targetGame = database[Math.floor(Math.random() * database.length)];
-            })
-            .catch(error => {
-                console.error("Error loading database:", error);
-                document.getElementById('message').innerText = "Failed to load game data.";
-            });
-
-        // 3. Stats Management
-        let stats = JSON.parse(localStorage.getItem('gamedleStats')) || {
-            played: 0, wins: 0, currentStreak: 0, maxStreak: 0,
-            guessDistribution: [0, 0, 0, 0, 0] 
-        };
-
-        // If the user has old 8-guess stats saved, clip it down to 5 to prevent breaking the UI
-        if (stats.guessDistribution.length !== MAX_GUESSES) {
-            stats.guessDistribution = stats.guessDistribution.slice(0, MAX_GUESSES);
-            if (stats.guessDistribution.length < MAX_GUESSES) {
-                stats.guessDistribution = [0, 0, 0, 0, 0];
+            if (type === 'guess') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+                gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'coin') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(987.77, now); osc.frequency.setValueAtTime(1318.51, now + 0.1);
+                gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(261.63, now); osc.frequency.setValueAtTime(329.63, now + 0.1); osc.frequency.setValueAtTime(392.00, now + 0.2); osc.frequency.setValueAtTime(523.25, now + 0.3);
+                gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
+                osc.start(now); osc.stop(now + 0.6);
+            } else if (type === 'lose') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.5);
+                gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
             }
         }
 
-        updateStatsUI();
-        updateLivesDisplay();
+        // Database & State
+        let database = [];
+        let targetGame = null;
+        let gameOver = false;
+        const MAX_GUESSES = 6; 
+        let currentGuesses = 0;
+        let emojiHistory = []; 
+        let activeMode = ''; // 'daily' or 'arcade'
 
-        function updateLivesDisplay() {
-            const livesRemaining = MAX_GUESSES - currentGuesses;
-            let heartsHTML = '';
-            for (let i = 0; i < MAX_GUESSES; i++) {
-                heartsHTML += (i < livesRemaining) ? '❤️' : '🖤';
+        // Scoring System Data
+        const POINTS_DISTRIBUTION = [100, 50, 25, 10, 5, 1];
+        const LOSS_PENALTY = -10;
+        
+        let localStats = JSON.parse(localStorage.getItem('gamedleStats')) || {
+            arcadeScore: 0,
+            highScore: 0,
+            lastDailyPlayed: null
+        };
+        document.getElementById('menu-high-score').innerText = localStats.highScore;
+
+        // Check if Daily is played today
+        const todayStr = new Date().toDateString();
+        if (localStats.lastDailyPlayed === todayStr) {
+            document.getElementById('daily-btn').disabled = true;
+            document.getElementById('daily-status').style.display = 'block';
+        }
+
+        let knownConsole = null, knownGenre = null, eliminatedConsoles = new Set(), eliminatedGenres = new Set(), minYear = -Infinity, maxYear = Infinity;
+
+        // Fetch DB
+        fetch('database.json')
+            .then(res => res.json())
+            .then(data => { database = data; })
+            .catch(err => console.error(err));
+
+        function returnToMenu() {
+            document.getElementById('game-ui').style.display = 'none';
+            document.getElementById('victory-screen').style.display = 'none';
+            document.getElementById('game-over-screen').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+            document.getElementById('home-btn').style.display = 'none';
+            document.getElementById('menu-high-score').innerText = localStats.highScore;
+        }
+
+        // Seeded RNG for Daily Mode
+        function getDailyTarget() {
+            let hash = 0;
+            for (let i = 0; i < todayStr.length; i++) {
+                hash = Math.imul(31, hash) + todayStr.charCodeAt(i) | 0;
             }
-            document.getElementById('lives-display').innerHTML = heartsHTML;
+            return database[Math.abs(hash) % database.length];
+        }
+
+        function startMode(mode) {
+            if (database.length === 0) return; 
+            playSound('coin');
+            
+            activeMode = mode;
+            gameOver = false;
+            currentGuesses = 0;
+            emojiHistory = [];
+            knownConsole = null; knownGenre = null; eliminatedConsoles.clear(); eliminatedGenres.clear(); minYear = -Infinity; maxYear = Infinity;
+
+            if (mode === 'daily') {
+                targetGame = getDailyTarget();
+                document.getElementById('arcade-score-header').style.display = 'none';
+                document.getElementById('scoring-rules').style.display = 'none';
+                document.getElementById('next-arcade-btn').style.display = 'none';
+                document.getElementById('retry-arcade-btn').style.display = 'none';
+            } else {
+                targetGame = database[Math.floor(Math.random() * database.length)];
+                document.getElementById('arcade-score-header').style.display = 'flex';
+                document.getElementById('scoring-rules').style.display = 'block';
+                document.getElementById('current-score').innerText = localStats.arcadeScore;
+                document.getElementById('high-score').innerText = localStats.highScore;
+                document.getElementById('next-arcade-btn').style.display = 'flex';
+                document.getElementById('retry-arcade-btn').style.display = 'flex';
+            }
+
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'flex';
+            document.getElementById('home-btn').style.display = 'block';
+            document.getElementById('victory-screen').style.display = 'none';
+            document.getElementById('game-over-screen').style.display = 'none';
+            
+            const inputEl = document.getElementById('guess-input');
+            inputEl.disabled = false; inputEl.value = '';
+            document.getElementById('guess-button').disabled = false;
+            document.getElementById('suggestions').style.display = 'none';
+            document.getElementById('guess-grid').innerHTML = `<div class="row header-row"><div>Game</div><div>Console</div><div>Genre</div><div>Year</div></div>`;
+            
+            updateLivesDisplay();
         }
 
         function toggleInstructions() {
             const content = document.getElementById('instructions-content');
             const btn = document.getElementById('instructions-btn');
-            
-            if (content.style.display === 'none') {
-                content.style.display = 'block';
-                btn.innerText = '[ - ]';
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block'; btn.innerText = '[ - ]';
             } else {
-                content.style.display = 'none';
-                btn.innerText = '[ + ]';
+                content.style.display = 'none'; btn.innerText = '[ + ]';
             }
         }
 
-        function resetGame() {
-            if (database.length === 0) return; 
-            
-            gameOver = false;
-            currentGuesses = 0;
-            emojiHistory = [];
-            
-            knownConsole = null;
-            knownGenre = null;
-            eliminatedConsoles.clear();
-            eliminatedGenres.clear();
-            minYear = -Infinity;
-            maxYear = Infinity;
-
-            targetGame = database[Math.floor(Math.random() * database.length)];
-
-            const inputEl = document.getElementById('guess-input');
-            inputEl.disabled = false;
-            inputEl.value = '';
-            
-            document.getElementById('guess-button').disabled = false;
-            document.getElementById('modal-share-btn').style.display = 'none';
-            document.getElementById('suggestions').style.display = 'none';
-            document.getElementById('message').innerText = '';
-            document.getElementById('message').className = '';
-            
-            document.getElementById('victory-screen').style.display = 'none';
-            document.getElementById('game-over-screen').style.display = 'none';
-
-            const grid = document.getElementById('guess-grid');
-            grid.innerHTML = `
-                <div class="row header-row">
-                    <div>Game</div>
-                    <div>Console</div>
-                    <div>Genre</div>
-                    <div>Year</div>
-                </div>
-            `;
-
-            updateLivesDisplay();
+        function updateLivesDisplay() {
+            const livesRemaining = MAX_GUESSES - currentGuesses;
+            let heartsHTML = '';
+            for (let i = 0; i < MAX_GUESSES; i++) heartsHTML += (i < livesRemaining) ? '❤️' : '🖤';
+            document.getElementById('lives-display').innerHTML = heartsHTML;
         }
 
-        // 4. Main Guess Logic
         function makeGuess() {
             if (gameOver) return;
-
-            const inputElement = document.getElementById('guess-input');
-            const guessName = inputElement.value;
+            const inputEl = document.getElementById('guess-input');
+            const guessName = inputEl.value;
             const guessedGame = database.find(g => g.name.toLowerCase() === guessName.toLowerCase());
+            if (!guessedGame) { alert("Game not found in database! Use the dropdown."); return; }
 
-            if (!guessedGame) {
-                alert("Game not found in database! Try selecting from the dropdown.");
-                return;
-            }
-
+            playSound('guess');
             currentGuesses++;
             updateLivesDisplay();
 
             const grid = document.getElementById('guess-grid');
-            const row = document.createElement('div');
-            row.className = 'row';
-
+            const row = document.createElement('div'); row.className = 'row';
             let currentEmojiRow = "";
 
             const nameMatch = guessedGame.name === targetGame.name;
-            row.appendChild(createBox(guessedGame.name, nameMatch));
-            currentEmojiRow += nameMatch ? "🟩" : "⬛";
+            row.appendChild(createBox(guessedGame.name, nameMatch)); currentEmojiRow += nameMatch ? "🟩" : "⬛";
 
             const consoleMatch = guessedGame.console === targetGame.console;
-            if (consoleMatch) knownConsole = targetGame.console;
-            else eliminatedConsoles.add(guessedGame.console);
-            row.appendChild(createBox(guessedGame.console, consoleMatch));
-            currentEmojiRow += consoleMatch ? "🟩" : "⬛";
+            if (consoleMatch) knownConsole = targetGame.console; else eliminatedConsoles.add(guessedGame.console);
+            row.appendChild(createBox(guessedGame.console, consoleMatch)); currentEmojiRow += consoleMatch ? "🟩" : "⬛";
 
             const genreMatch = guessedGame.genre === targetGame.genre;
-            if (genreMatch) knownGenre = targetGame.genre;
-            else eliminatedGenres.add(guessedGame.genre);
-            row.appendChild(createBox(guessedGame.genre, genreMatch));
-            currentEmojiRow += genreMatch ? "🟩" : "⬛";
+            if (genreMatch) knownGenre = targetGame.genre; else eliminatedGenres.add(guessedGame.genre);
+            row.appendChild(createBox(guessedGame.genre, genreMatch)); currentEmojiRow += genreMatch ? "🟩" : "⬛";
 
             let yearText = guessedGame.year;
             let yearMatch = guessedGame.year === targetGame.year;
             if (yearMatch) {
-                minYear = targetGame.year;
-                maxYear = targetGame.year;
-                currentEmojiRow += "🟩";
+                minYear = targetGame.year; maxYear = targetGame.year; currentEmojiRow += "🟩";
             } else {
                 const isNewer = guessedGame.year > targetGame.year;
-                yearText += isNewer ? ' ↓' : ' ↑';
-                currentEmojiRow += isNewer ? "⬇️" : "⬆️";
-                
-                if (isNewer) {
-                    maxYear = Math.min(maxYear, guessedGame.year - 1);
-                } else {
-                    minYear = Math.max(minYear, guessedGame.year + 1);
-                }
+                yearText += isNewer ? ' ↓' : ' ↑'; currentEmojiRow += isNewer ? "⬇️" : "⬆️";
+                if (isNewer) maxYear = Math.min(maxYear, guessedGame.year - 1);
+                else minYear = Math.max(minYear, guessedGame.year + 1);
             }
             row.appendChild(createBox(yearText, yearMatch));
             
             emojiHistory.push(currentEmojiRow);
             grid.appendChild(row);
             
-            inputElement.value = '';
-            document.getElementById('suggestions').style.display = 'none';
+            inputEl.value = ''; document.getElementById('suggestions').style.display = 'none';
 
-            if (guessedGame.name === targetGame.name) {
-                handleGameOver(true);
-            } else if (currentGuesses >= MAX_GUESSES) {
-                handleGameOver(false);
-            }
+            if (guessedGame.name === targetGame.name) handleGameOver(true);
+            else if (currentGuesses >= MAX_GUESSES) handleGameOver(false);
         }
 
         function createBox(text, isMatch) {
-            const box = document.createElement('div');
-            box.className = `box ${isMatch ? 'match' : 'wrong'}`;
-            box.innerText = text;
-            return box;
+            const box = document.createElement('div'); box.className = `box ${isMatch ? 'match' : 'wrong'}`; box.innerText = text; return box;
         }
 
-        // 5. End Game & Share Logic
         function handleGameOver(isWin) {
             gameOver = true;
             document.getElementById('guess-input').disabled = true;
             document.getElementById('guess-button').disabled = true;
-            document.getElementById('modal-share-btn').style.display = 'flex'; 
 
-            stats.played++;
-            let winningGuessIndex = null;
-
-            if (isWin) {
-                stats.wins++;
-                stats.currentStreak++;
-                if (stats.currentStreak > stats.maxStreak) stats.maxStreak = stats.currentStreak;
-                
-                stats.guessDistribution[currentGuesses - 1]++;
-                winningGuessIndex = currentGuesses - 1;
-                
-                document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
-                setTimeout(() => {
-                    document.getElementById('victory-screen').style.display = 'flex';
-                }, 1000);
-
-            } else {
-                stats.currentStreak = 0;
-                document.getElementById('game-over-answer').innerText = targetGame.name;
-                document.getElementById('game-over-screen').style.display = 'flex';
+            // Handle Daily Lockout
+            if (activeMode === 'daily') {
+                localStats.lastDailyPlayed = todayStr;
+                document.getElementById('daily-btn').disabled = true;
+                document.getElementById('daily-status').style.display = 'block';
+                document.getElementById('victory-points').style.display = 'none';
+                document.getElementById('lose-points').style.display = 'none';
             }
 
-            localStorage.setItem('gamedleStats', JSON.stringify(stats));
-            updateStatsUI(winningGuessIndex);
+            // Handle Arcade Scoring
+            if (activeMode === 'arcade') {
+                if (isWin) {
+                    const pointsWon = POINTS_DISTRIBUTION[currentGuesses - 1];
+                    localStats.arcadeScore += pointsWon;
+                    if (localStats.arcadeScore > localStats.highScore) localStats.highScore = localStats.arcadeScore;
+                    document.getElementById('victory-points').innerText = `+${pointsWon} POINTS`;
+                    document.getElementById('victory-points').style.display = 'block';
+                } else {
+                    localStats.arcadeScore += LOSS_PENALTY;
+                    if (localStats.arcadeScore < 0) localStats.arcadeScore = 0; // Floor at zero
+                    document.getElementById('lose-points').innerText = `${LOSS_PENALTY} POINTS`;
+                    document.getElementById('lose-points').style.display = 'block';
+                }
+            }
+            
+            localStorage.setItem('gamedleStats', JSON.stringify(localStats));
+            document.getElementById('current-score').innerText = localStats.arcadeScore;
+            document.getElementById('high-score').innerText = localStats.highScore;
+
+            if (isWin) {
+                playSound('win');
+                document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
+                setTimeout(() => { document.getElementById('victory-screen').style.display = 'flex'; }, 800);
+            } else {
+                playSound('lose');
+                document.getElementById('game-over-answer').innerText = targetGame.name;
+                setTimeout(() => { document.getElementById('game-over-screen').style.display = 'flex'; }, 800);
+            }
         }
 
         function shareResults() {
-            const resultScore = gameOver && stats.currentStreak > 0 ? currentGuesses : 'X';
-            const header = `Five Lives 🎮 ${resultScore}/${MAX_GUESSES}\n\n`;
-            const gridString = emojiHistory.join('\n');
-            const fullText = header + gridString;
-
-            navigator.clipboard.writeText(fullText).then(() => {
-                alert("Results copied to clipboard! Paste it anywhere to share.");
-            }).catch(err => {
-                alert("Failed to copy. Your browser might block clipboard access.");
-            });
+            const resultScore = gameOver && isWinCheck() ? currentGuesses : 'X';
+            const modeText = activeMode === 'daily' ? 'Daily Run' : `Arcade Mode (Score: ${localStats.arcadeScore})`;
+            const header = `The Game Grid 🎮 ${modeText} ${resultScore}/${MAX_GUESSES}\n\n`;
+            navigator.clipboard.writeText(header + emojiHistory.join('\n')).then(() => alert("Results copied!")).catch(e => alert("Failed to copy."));
         }
+        function isWinCheck() { return emojiHistory.length > 0 && emojiHistory[emojiHistory.length-1].includes('🟩🟩🟩🟩'); }
 
-        // 6. UI Helpers
-        function toggleModal(displayState) {
-            document.getElementById('stats-modal').style.display = displayState;
-        }
-
-        function showStatsFromScreen(screenId) {
-            document.getElementById(screenId).style.display = 'none';
-            toggleModal('flex');
-        }
-
-        function updateStatsUI(highlightIndex = null) {
-            // Core stats
-            document.getElementById('stat-played').innerText = stats.played;
-            const winPct = stats.played === 0 ? 0 : Math.round((stats.wins / stats.played) * 100);
-            document.getElementById('stat-winpct').innerText = winPct;
-            
-            // New losses stat
-            const losses = stats.played - stats.wins;
-            document.getElementById('stat-losses').innerText = losses;
-
-            // New Average Logic (Wins * guess count, plus Losses * 6)
-            let totalScore = 0;
-            stats.guessDistribution.forEach((count, index) => {
-                totalScore += (count * (index + 1));
-            });
-            totalScore += (losses * 6);
-            
-            const avg = stats.played === 0 ? "0.0" : (totalScore / stats.played).toFixed(1);
-            document.getElementById('stat-avg').innerText = avg;
-
-            document.getElementById('stat-streak').innerText = stats.currentStreak;
-            document.getElementById('stat-maxstreak').innerText = stats.maxStreak;
-
-            // Update Distribution Graph
-            const distContainer = document.getElementById('distribution-container');
-            distContainer.innerHTML = ''; 
-            const maxWinsInBucket = Math.max(...stats.guessDistribution, 1);
-
-            stats.guessDistribution.forEach((count, index) => {
-                const row = document.createElement('div');
-                row.className = 'dist-row';
-
-                const label = document.createElement('div');
-                label.className = 'dist-label';
-                label.innerText = index + 1;
-
-                const barContainer = document.createElement('div');
-                barContainer.className = 'dist-bar-container';
-
-                const bar = document.createElement('div');
-                bar.className = 'dist-bar';
-                const widthPercent = Math.max((count / maxWinsInBucket) * 100, 7);
-                bar.style.width = `${widthPercent}%`;
-                bar.innerText = count;
-
-                if (highlightIndex === index) {
-                    bar.classList.add('highlight');
-                } else if (count > 0) {
-                    bar.style.backgroundColor = '#565758'; 
-                }
-
-                barContainer.appendChild(bar);
-                row.appendChild(label);
-                row.appendChild(barContainer);
-                distContainer.appendChild(row);
-            });
-        }
-        
-        // --- Custom Autocomplete & Smart Filter Logic ---
+        // Autocomplete
         const inputElement = document.getElementById('guess-input');
         const suggestionsBox = document.getElementById('suggestions');
         let currentFocus = -1;
 
         function renderSuggestions() {
             if (gameOver) return;
-            const val = inputElement.value;
-            suggestionsBox.innerHTML = '';
+            initAudio(); 
+            const val = inputElement.value; suggestionsBox.innerHTML = '';
             
             let validGames = database.filter(g => {
                 if (knownConsole && g.console !== knownConsole) return false;
@@ -878,79 +518,41 @@
                 if (val && !g.name.toLowerCase().includes(val.toLowerCase())) return false;
                 return true;
             });
-            
             const matches = validGames.slice(0, 15);
-            
-            if (matches.length === 0) {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
+            if (matches.length === 0) { suggestionsBox.style.display = 'none'; return; }
 
-            suggestionsBox.style.display = 'block';
-            currentFocus = -1;
-
+            suggestionsBox.style.display = 'block'; currentFocus = -1;
             matches.forEach((game) => {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.innerHTML = `
-                    <div class="suggestion-name">${game.name}</div>
-                    <div class="suggestion-meta">${game.console} • ${game.genre} • ${game.year}</div>
-                `;
-                
-                div.addEventListener('click', function() {
-                    inputElement.value = game.name;
-                    suggestionsBox.style.display = 'none';
-                    inputElement.focus();
-                });
-                
+                const div = document.createElement('div'); div.className = 'suggestion-item';
+                div.innerHTML = `<div class="suggestion-name">${game.name}</div><div class="suggestion-meta">${game.console} • ${game.genre} • ${game.year}</div>`;
+                div.addEventListener('click', function() { inputElement.value = game.name; suggestionsBox.style.display = 'none'; inputElement.focus(); });
                 suggestionsBox.appendChild(div);
             });
         }
 
         inputElement.addEventListener('input', renderSuggestions);
         inputElement.addEventListener('focus', renderSuggestions);
+        document.addEventListener('click', e => { if (e.target !== inputElement && e.target !== suggestionsBox) suggestionsBox.style.display = 'none'; });
 
-        document.addEventListener('click', function(e) {
-            if (e.target !== inputElement && e.target !== suggestionsBox) {
-                suggestionsBox.style.display = 'none';
-            }
-        });
-
-        inputElement.addEventListener('keydown', function(e) {
+        inputElement.addEventListener('keydown', e => {
             let items = suggestionsBox.getElementsByClassName('suggestion-item');
-            
-            if (e.key === "ArrowDown") {
-                currentFocus++;
-                addActive(items);
-            } else if (e.key === "ArrowUp") {
-                currentFocus--;
-                addActive(items);
-            } else if (e.key === "Enter") {
+            if (e.key === "ArrowDown") { currentFocus++; addActive(items); } 
+            else if (e.key === "ArrowUp") { currentFocus--; addActive(items); } 
+            else if (e.key === "Enter") {
                 e.preventDefault(); 
-                
-                if (currentFocus > -1 && suggestionsBox.style.display === 'block') {
-                    if (items.length > 0) items[currentFocus].click();
-                } else if (suggestionsBox.style.display === 'block' && items.length > 0 && inputElement.value !== "") {
-                    items[0].click();
-                } else {
-                    makeGuess();
-                }
+                if (currentFocus > -1 && suggestionsBox.style.display === 'block') { if (items.length > 0) items[currentFocus].click(); } 
+                else if (suggestionsBox.style.display === 'block' && items.length > 0 && inputElement.value !== "") { items[0].click(); } 
+                else { makeGuess(); }
             }
         });
 
         function addActive(items) {
             if (!items || items.length === 0) return;
-            removeActive(items);
+            for (let i = 0; i < items.length; i++) items[i].classList.remove("active");
             if (currentFocus >= items.length) currentFocus = 0;
             if (currentFocus < 0) currentFocus = items.length - 1;
             items[currentFocus].classList.add("active");
             items[currentFocus].scrollIntoView({ block: 'nearest' });
-        }
-
-        function removeActive(items) {
-            for (let i = 0; i < items.length; i++) {
-                items[i].classList.remove("active");
-            }
         }
     </script>
 </body>
