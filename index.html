@@ -50,12 +50,11 @@
             margin: 0; flex: 2; text-align: center;
             font-family: 'Bungee', sans-serif; font-size: 32px; letter-spacing: 2px;
             color: #ffffff; text-shadow: 2px 2px 0px #e23636, -2px -2px 0px #538d4e;
-            cursor: pointer;
         }
         
         .header-actions { flex: 1; display: flex; }
         .header-actions.left { justify-content: flex-start; }
-        .header-actions.right { justify-content: flex-end; }
+        .header-actions.right { justify-content: flex-end; gap: 15px; }
 
         .text-btn {
             background: transparent; border: none; color: #818384;
@@ -64,43 +63,18 @@
         }
         .text-btn:hover { color: white; }
 
-        /* MAIN MENU STYLES */
-        #main-menu {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; flex-grow: 1; position: relative; z-index: 10;
-            width: 100%; max-width: 600px; gap: 20px;
-        }
-
-        .menu-btn {
-            background-color: transparent; border: 3px solid white; color: white;
-            padding: 20px 40px; font-size: 20px; font-family: 'Press Start 2P', monospace;
-            cursor: pointer; transition: 0.2s; border-radius: 8px; width: 100%;
-            text-align: center; text-transform: uppercase;
-        }
-        .menu-btn:hover { background-color: white; color: #121213; }
-        .menu-btn:disabled { border-color: #565758; color: #565758; cursor: not-allowed; background: transparent; }
-
-        .score-display {
-            font-family: 'Press Start 2P', monospace; font-size: 14px;
-            text-align: center; color: #538d4e; margin-top: 10px; line-height: 1.5;
-        }
-
-        /* GAME UI (Hidden on load) */
-        #game-ui {
-            display: none; width: 100%; max-width: 600px;
-            flex-direction: column; align-items: center; position: relative; z-index: 10;
-        }
-
         /* Arcade Score Header */
         #arcade-score-header {
-            display: none; width: 100%; justify-content: space-between;
+            display: flex; width: 100%; max-width: 600px; justify-content: space-between;
             font-family: 'Press Start 2P', monospace; font-size: 12px;
             color: #538d4e; margin-bottom: 15px; border-bottom: 1px solid #3a3a3c; padding-bottom: 10px;
+            position: relative; z-index: 10;
         }
 
         .instructions {
             background-color: #272729; border: 1px solid #3a3a3c; border-radius: 8px;
-            padding: 15px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; color: #d7dadc; font-size: 14px;
+            padding: 15px 20px; margin-bottom: 20px; width: 100%; max-width: 600px; box-sizing: border-box; color: #d7dadc; font-size: 14px;
+            position: relative; z-index: 10;
         }
         .instructions-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .instructions-header p { color: white; margin: 0; font-weight: bold; font-size: 16px; }
@@ -109,12 +83,12 @@
         .instructions ul { margin: 0; padding-left: 0; list-style-type: none; }
         .instructions li { margin-bottom: 8px; line-height: 1.4; }
 
-        .lives-left { margin-bottom: 20px; font-size: 22px; letter-spacing: 4px; text-align: center; }
+        .lives-left { margin-bottom: 20px; font-size: 22px; letter-spacing: 4px; text-align: center; position: relative; z-index: 10;}
 
-        .input-section { display: flex; gap: 10px; margin-bottom: 30px; width: 100%; box-sizing: border-box; }
+        .input-section { display: flex; gap: 10px; margin-bottom: 30px; width: 100%; max-width: 600px; box-sizing: border-box; position: relative; z-index: 30; }
         .autocomplete-container { position: relative; flex-grow: 1; }
         input { width: 100%; padding: 12px; font-size: 16px; background-color: #3a3a3c; color: white; border: 1px solid #565758; border-radius: 4px; box-sizing: border-box; }
-        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background-color: #272729; border: 1px solid #565758; border-top: none; border-radius: 0 0 4px 4px; max-height: 250px; overflow-y: auto; z-index: 30; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background-color: #272729; border: 1px solid #565758; border-top: none; border-radius: 0 0 4px 4px; max-height: 250px; overflow-y: auto; z-index: 40; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
         .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #3a3a3c; display: flex; flex-direction: column; text-align: left; }
         .suggestion-item:hover, .suggestion-item.active { background-color: #3a3a3c; }
         .suggestion-name { font-weight: bold; font-size: 15px; color: white; margin-bottom: 3px; }
@@ -124,15 +98,41 @@
         button.guess-btn:hover { background-color: #43703e; }
         button:disabled { background-color: #3a3a3c; cursor: not-allowed; color: #818384; }
 
-        .grid { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .grid { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 600px; position: relative; z-index: 10;}
         .row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; }
         .header-row { font-weight: bold; text-align: center; border-bottom: 2px solid #3a3a3c; padding-bottom: 10px; margin-bottom: 10px; }
         .box { background-color: #3a3a3c; padding: 15px 10px; display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 4px; font-weight: bold; font-size: 14px; transition: background-color 0.3s; }
         .box.match { background-color: #538d4e; } 
         .box.wrong { background-color: #3a3a3c; } 
-
-        #message { margin-top: 20px; font-size: 20px; font-weight: bold; text-align: center; min-height: 24px; }
         
+        .modal {
+            display: none; 
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center; align-items: center;
+            z-index: 10000;
+        }
+        .modal-content {
+            background-color: #121213; border: 1px solid #3a3a3c; border-radius: 8px;
+            padding: 20px 30px 30px; width: 90%; max-width: 350px;
+            text-align: center; position: relative; max-height: 90vh;
+            overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+        .close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 10px; margin-top: 20px; margin-bottom: 30px; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-num { font-size: 28px; font-weight: bold; }
+        .stat-label { font-size: 11px; line-height: 1.2; text-transform: uppercase; }
+
+        .guess-distribution { width: 100%; text-align: left; margin-bottom: 20px; }
+        .guess-distribution h3 { margin: 0 0 15px 0; font-size: 16px; text-align: center; text-transform: uppercase; }
+        .dist-row { display: flex; align-items: center; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
+        .dist-label { width: 15px; text-align: right; margin-right: 10px; }
+        .dist-bar-container { flex-grow: 1; background-color: transparent; }
+        .dist-bar { background-color: #3a3a3c; color: white; padding: 2px 8px; border-radius: 2px; text-align: right; min-width: 10px; box-sizing: border-box; transition: width 0.3s ease; }
+        .dist-bar.highlight { background-color: #538d4e; }
+
         .overlay-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.95); justify-content: center; align-items: center; flex-direction: column; z-index: 10000; }
         .overlay-text { font-family: 'Press Start 2P', monospace; font-size: 8vw; text-align: center; margin-bottom: 25px; line-height: 1.2; }
         .text-win { color: #538d4e; } .text-lose { color: #e23636; }
@@ -147,15 +147,6 @@
         .arcade-btn:hover { background-color: white; color: black; }
         .share-btn { background-color: #538d4e; border-color: #538d4e; }
         .share-btn:hover { background-color: #43703e; border-color: #43703e; color: white; }
-
-        /* Footer */
-        .footer {
-            margin-top: auto; padding: 20px 0; text-align: center;
-            font-size: 12px; color: #565758; position: relative; z-index: 10;
-        }
-        .footer a { color: #818384; text-decoration: none; font-weight: bold; transition: color 0.2s; }
-        .footer a:hover { color: white; }
-
     </style>
 </head>
 <body>
@@ -165,64 +156,88 @@
 
     <div class="header-container">
         <div class="header-actions left">
-            <button class="text-btn" id="home-btn" style="display:none;" onclick="returnToMenu()">MENU</button>
+            <button class="text-btn" onclick="resetGame(true)">NEW</button>
         </div>
-        <h1 onclick="returnToMenu()">The Game Grid</h1>
-        <div class="header-actions right"></div>
-    </div>
-
-    <div id="main-menu">
-        <button id="daily-btn" class="menu-btn" onclick="startMode('daily')">DAILY RUN</button>
-        <p id="daily-status" style="margin-top: -10px; color: #818384; font-size: 12px; display: none;">Come back tomorrow!</p>
-
-        <button class="text-btn" style="margin-top: 15px; margin-bottom: 10px;" onclick="toggleModal('flex')">STATS</button>
-        
-        <button class="menu-btn" onclick="startMode('arcade')">ARCADE MODE</button>
-        <div class="score-display">
-            HIGH SCORE: <span id="menu-high-score">0</span>
+        <h1>The Game Grid</h1>
+        <div class="header-actions right">
+            <button class="text-btn" onclick="alert('Leaderboard integration coming up next!')">LEADERS</button>
+            <button class="text-btn" onclick="toggleModal('flex')">STATS</button>
         </div>
     </div>
-    
-    <div id="game-ui">
         
-        <div id="arcade-score-header">
-            <div>SCORE: <span id="current-score">0</span></div>
-            <div>HIGH: <span id="high-score">0</span></div>
+    <div id="arcade-score-header">
+        <div>SCORE: <span id="current-score">0</span></div>
+        <div>HIGH: <span id="high-score">0</span></div>
+    </div>
+
+    <div class="instructions">
+        <div class="instructions-header" onclick="toggleInstructions()">
+            <p>How To Play</p>
+            <button class="toggle-btn" id="instructions-btn">[ + ]</button>
         </div>
+        <div class="instructions-content" id="instructions-content">
+            <ul>
+                <li>🟩 <strong>Green box</strong> means an exact match.</li>
+                <li>⬛ <strong>Gray box</strong> means incorrect.</li>
+                <li>⬆️ ⬇️ <strong>Arrows</strong> indicate if the target game's release year is newer or older.</li>
+                <li>🧠 <strong>Smart Filter:</strong> Ineligible games will be automatically removed from the suggestion box as you play.</li>
+                <li>🏆 <strong>Arcade Scoring:</strong> Points decrease each guess (100, 50, 25, 10, 5, 1). A loss is -10 points!</li>
+            </ul>
+        </div>
+    </div>
 
-        <div class="instructions">
-            <div class="instructions-header" onclick="toggleInstructions()">
-                <p>How To Play</p>
-                <button class="toggle-btn" id="instructions-btn">[ + ]</button>
+    <div class="lives-left" id="lives-display"></div>
+
+    <div class="input-section">
+        <div class="autocomplete-container">
+            <input type="text" id="guess-input" placeholder="Type a game name..." autocomplete="off">
+            <div id="suggestions" class="suggestions-list"></div>
+        </div>
+        <button id="guess-button" class="guess-btn" onclick="makeGuess()">Guess</button>
+    </div>
+
+    <div class="grid" id="guess-grid">
+        <div class="row header-row">
+            <div>Game</div><div>Console</div><div>Genre</div><div>Year</div>
+        </div>
+    </div>
+
+    <div id="stats-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="toggleModal('none')">&times;</button>
+            <h2>Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-played">0</div>
+                    <div class="stat-label">Played</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-winpct">0</div>
+                    <div class="stat-label">Win %</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-losses">0</div>
+                    <div class="stat-label">Losses</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-avg">0</div>
+                    <div class="stat-label">Avg Guesses</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-streak">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-maxstreak">0</div>
+                    <div class="stat-label">Max Streak</div>
+                </div>
             </div>
-            <div class="instructions-content" id="instructions-content">
-                <ul>
-                    <li>🟩 <strong>Green box</strong> means an exact match.</li>
-                    <li>⬛ <strong>Gray box</strong> means incorrect.</li>
-                    <li>⬆️ ⬇️ <strong>Arrows</strong> indicate if the target game's release year is newer or older.</li>
-                    <li>🧠 <strong>Smart Filter:</strong> Ineligible games will be automatically removed from the suggestion box as you play.</li>
-                    <li id="scoring-rules" style="display:none;">🏆 <strong>Arcade Scoring:</strong> Points decrease each guess (100, 50, 25, 10, 5, 1). A loss is -10 points!</li>
-                </ul>
+
+            <div class="guess-distribution">
+                <h3>Guess Distribution</h3>
+                <div id="distribution-container"></div>
             </div>
         </div>
-
-        <div class="lives-left" id="lives-display"></div>
-
-        <div class="input-section">
-            <div class="autocomplete-container">
-                <input type="text" id="guess-input" placeholder="Type a game name..." autocomplete="off">
-                <div id="suggestions" class="suggestions-list"></div>
-            </div>
-            <button id="guess-button" class="guess-btn" onclick="makeGuess()">Guess</button>
-        </div>
-
-        <div class="grid" id="guess-grid">
-            <div class="row header-row">
-                <div>Game</div><div>Console</div><div>Genre</div><div>Year</div>
-            </div>
-        </div>
-
-        <div id="message"></div>
     </div>
 
     <div id="victory-screen" class="overlay-screen">
@@ -231,8 +246,7 @@
         <div class="overlay-points" id="victory-points" style="display:none;">+100 POINTS</div>
         <div class="button-group">
             <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
-            <button class="arcade-btn" id="next-arcade-btn" style="display:none;" onclick="startMode('arcade')">Next Round</button>
-            <button class="arcade-btn" onclick="returnToMenu()">Menu</button>
+            <button class="arcade-btn" onclick="resetGame(true)">Next Round</button>
         </div>
     </div>
 
@@ -242,13 +256,8 @@
         <div class="overlay-points" id="lose-points" style="display:none; color: #e23636;">-10 POINTS</div>
         <div class="button-group">
             <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
-            <button class="arcade-btn" id="retry-arcade-btn" style="display:none;" onclick="startMode('arcade')">Try Again</button>
-            <button class="arcade-btn" onclick="returnToMenu()">Menu</button>
+            <button class="arcade-btn" onclick="resetGame(true)">Try Again</button>
         </div>
-    </div>
-
-    <div class="footer">
-        Presented by <a href="#" target="_blank">Shore Sports Arena</a>
     </div>
 
     <script>
@@ -293,81 +302,61 @@
         const MAX_GUESSES = 6; 
         let currentGuesses = 0;
         let emojiHistory = []; 
-        let activeMode = ''; // 'daily' or 'arcade'
 
         // Scoring System Data
         const POINTS_DISTRIBUTION = [100, 50, 25, 10, 5, 1];
         const LOSS_PENALTY = -10;
         
-        let localStats = JSON.parse(localStorage.getItem('gamedleStats')) || {
-            arcadeScore: 0,
-            highScore: 0,
-            lastDailyPlayed: null
-        };
-        document.getElementById('menu-high-score').innerText = localStats.highScore;
-
-        // Check if Daily is played today
-        const todayStr = new Date().toDateString();
-        if (localStats.lastDailyPlayed === todayStr) {
-            document.getElementById('daily-btn').disabled = true;
-            document.getElementById('daily-status').style.display = 'block';
+        // Bulletproof localStorage loading
+        function loadStats() {
+            try {
+                let saved = localStorage.getItem('gamedleStats');
+                if (saved) {
+                    let parsed = JSON.parse(saved);
+                    if (!parsed.guessDistribution || parsed.guessDistribution.length !== MAX_GUESSES) {
+                        parsed.guessDistribution = parsed.guessDistribution ? parsed.guessDistribution.slice(0, MAX_GUESSES) : [0,0,0,0,0,0];
+                        while (parsed.guessDistribution.length < MAX_GUESSES) parsed.guessDistribution.push(0);
+                    }
+                    if (parsed.arcadeScore === undefined) parsed.arcadeScore = 0;
+                    if (parsed.highScore === undefined) parsed.highScore = 0;
+                    return parsed;
+                }
+            } catch (e) {
+                console.error("Local storage was corrupted. Resetting data.");
+            }
+            return {
+                played: 0, wins: 0, currentStreak: 0, maxStreak: 0,
+                guessDistribution: [0, 0, 0, 0, 0, 0],
+                arcadeScore: 0, highScore: 0
+            };
         }
-
+        
+        let localStats = loadStats();
         let knownConsole = null, knownGenre = null, eliminatedConsoles = new Set(), eliminatedGenres = new Set(), minYear = -Infinity, maxYear = Infinity;
 
         // Fetch DB
         fetch('database.json')
             .then(res => res.json())
-            .then(data => { database = data; })
+            .then(data => { 
+                database = data; 
+                resetGame(false); // Initialize silently on first load
+            })
             .catch(err => console.error(err));
 
-        function returnToMenu() {
-            document.getElementById('game-ui').style.display = 'none';
-            document.getElementById('victory-screen').style.display = 'none';
-            document.getElementById('game-over-screen').style.display = 'none';
-            document.getElementById('main-menu').style.display = 'flex';
-            document.getElementById('home-btn').style.display = 'none';
-            document.getElementById('menu-high-score').innerText = localStats.highScore;
-        }
-
-        // Seeded RNG for Daily Mode
-        function getDailyTarget() {
-            let hash = 0;
-            for (let i = 0; i < todayStr.length; i++) {
-                hash = Math.imul(31, hash) + todayStr.charCodeAt(i) | 0;
-            }
-            return database[Math.abs(hash) % database.length];
-        }
-
-        function startMode(mode) {
+        function resetGame(playAudio) {
             if (database.length === 0) return; 
-            playSound('coin');
+            if (playAudio) playSound('coin');
             
-            activeMode = mode;
             gameOver = false;
             currentGuesses = 0;
             emojiHistory = [];
             knownConsole = null; knownGenre = null; eliminatedConsoles.clear(); eliminatedGenres.clear(); minYear = -Infinity; maxYear = Infinity;
 
-            if (mode === 'daily') {
-                targetGame = getDailyTarget();
-                document.getElementById('arcade-score-header').style.display = 'none';
-                document.getElementById('scoring-rules').style.display = 'none';
-                document.getElementById('next-arcade-btn').style.display = 'none';
-                document.getElementById('retry-arcade-btn').style.display = 'none';
-            } else {
-                targetGame = database[Math.floor(Math.random() * database.length)];
-                document.getElementById('arcade-score-header').style.display = 'flex';
-                document.getElementById('scoring-rules').style.display = 'block';
-                document.getElementById('current-score').innerText = localStats.arcadeScore;
-                document.getElementById('high-score').innerText = localStats.highScore;
-                document.getElementById('next-arcade-btn').style.display = 'flex';
-                document.getElementById('retry-arcade-btn').style.display = 'flex';
-            }
+            targetGame = database[Math.floor(Math.random() * database.length)];
 
-            document.getElementById('main-menu').style.display = 'none';
-            document.getElementById('game-ui').style.display = 'flex';
-            document.getElementById('home-btn').style.display = 'block';
+            document.getElementById('current-score').innerText = localStats.arcadeScore;
+            document.getElementById('high-score').innerText = localStats.highScore;
+
             document.getElementById('victory-screen').style.display = 'none';
             document.getElementById('game-over-screen').style.display = 'none';
             
@@ -388,6 +377,11 @@
             } else {
                 content.style.display = 'none'; btn.innerText = '[ + ]';
             }
+        }
+        
+        function toggleModal(displayState) {
+            if (displayState === 'flex') updateStatsUI();
+            document.getElementById('stats-modal').style.display = displayState;
         }
 
         function updateLivesDisplay() {
@@ -453,53 +447,86 @@
             document.getElementById('guess-input').disabled = true;
             document.getElementById('guess-button').disabled = true;
 
-            // Handle Daily Lockout
-            if (activeMode === 'daily') {
-                localStats.lastDailyPlayed = todayStr;
-                document.getElementById('daily-btn').disabled = true;
-                document.getElementById('daily-status').style.display = 'block';
-                document.getElementById('victory-points').style.display = 'none';
-                document.getElementById('lose-points').style.display = 'none';
-            }
+            // Track standard overall stats
+            localStats.played++;
 
-            // Handle Arcade Scoring
-            if (activeMode === 'arcade') {
-                if (isWin) {
-                    const pointsWon = POINTS_DISTRIBUTION[currentGuesses - 1];
-                    localStats.arcadeScore += pointsWon;
-                    if (localStats.arcadeScore > localStats.highScore) localStats.highScore = localStats.arcadeScore;
-                    document.getElementById('victory-points').innerText = `+${pointsWon} POINTS`;
-                    document.getElementById('victory-points').style.display = 'block';
-                } else {
-                    localStats.arcadeScore += LOSS_PENALTY;
-                    if (localStats.arcadeScore < 0) localStats.arcadeScore = 0; // Floor at zero
-                    document.getElementById('lose-points').innerText = `${LOSS_PENALTY} POINTS`;
-                    document.getElementById('lose-points').style.display = 'block';
-                }
+            if (isWin) {
+                localStats.wins++;
+                localStats.currentStreak++;
+                if (localStats.currentStreak > localStats.maxStreak) localStats.maxStreak = localStats.currentStreak;
+                localStats.guessDistribution[currentGuesses - 1]++;
+                
+                const pointsWon = POINTS_DISTRIBUTION[currentGuesses - 1];
+                localStats.arcadeScore += pointsWon;
+                if (localStats.arcadeScore > localStats.highScore) localStats.highScore = localStats.arcadeScore;
+                
+                document.getElementById('victory-points').innerText = `+${pointsWon} POINTS`;
+                document.getElementById('victory-points').style.display = 'block';
+                playSound('win');
+                document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
+                setTimeout(() => { document.getElementById('victory-screen').style.display = 'flex'; }, 800);
+            } else {
+                localStats.currentStreak = 0;
+                localStats.arcadeScore += LOSS_PENALTY;
+                if (localStats.arcadeScore < 0) localStats.arcadeScore = 0; 
+                
+                document.getElementById('lose-points').innerText = `${LOSS_PENALTY} POINTS`;
+                document.getElementById('lose-points').style.display = 'block';
+                playSound('lose');
+                document.getElementById('game-over-answer').innerText = targetGame.name;
+                setTimeout(() => { document.getElementById('game-over-screen').style.display = 'flex'; }, 800);
             }
             
             localStorage.setItem('gamedleStats', JSON.stringify(localStats));
             document.getElementById('current-score').innerText = localStats.arcadeScore;
             document.getElementById('high-score').innerText = localStats.highScore;
-
-            if (isWin) {
-                playSound('win');
-                document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
-                setTimeout(() => { document.getElementById('victory-screen').style.display = 'flex'; }, 800);
-            } else {
-                playSound('lose');
-                document.getElementById('game-over-answer').innerText = targetGame.name;
-                setTimeout(() => { document.getElementById('game-over-screen').style.display = 'flex'; }, 800);
-            }
         }
 
         function shareResults() {
             const resultScore = gameOver && isWinCheck() ? currentGuesses : 'X';
-            const modeText = activeMode === 'daily' ? 'Daily Run' : `Arcade Mode (Score: ${localStats.arcadeScore})`;
-            const header = `The Game Grid 🎮 ${modeText} ${resultScore}/${MAX_GUESSES}\n\n`;
+            const header = `The Game Grid 🎮 Score: ${localStats.arcadeScore} | ${resultScore}/${MAX_GUESSES}\n\n`;
             navigator.clipboard.writeText(header + emojiHistory.join('\n')).then(() => alert("Results copied!")).catch(e => alert("Failed to copy."));
         }
         function isWinCheck() { return emojiHistory.length > 0 && emojiHistory[emojiHistory.length-1].includes('🟩🟩🟩🟩'); }
+
+        function updateStatsUI(highlightIndex = null) {
+            document.getElementById('stat-played').innerText = localStats.played;
+            const winPct = localStats.played === 0 ? 0 : Math.round((localStats.wins / localStats.played) * 100);
+            document.getElementById('stat-winpct').innerText = winPct;
+            
+            const losses = localStats.played - localStats.wins;
+            document.getElementById('stat-losses').innerText = losses;
+
+            let totalScore = 0;
+            localStats.guessDistribution.forEach((count, index) => {
+                totalScore += (count * (index + 1));
+            });
+            totalScore += (losses * 7);
+            
+            const avg = localStats.played === 0 ? "0.0" : (totalScore / localStats.played).toFixed(1);
+            document.getElementById('stat-avg').innerText = avg;
+
+            document.getElementById('stat-streak').innerText = localStats.currentStreak;
+            document.getElementById('stat-maxstreak').innerText = localStats.maxStreak;
+
+            const distContainer = document.getElementById('distribution-container');
+            distContainer.innerHTML = ''; 
+            const maxWinsInBucket = Math.max(...localStats.guessDistribution, 1);
+
+            localStats.guessDistribution.forEach((count, index) => {
+                const row = document.createElement('div'); row.className = 'dist-row';
+                const label = document.createElement('div'); label.className = 'dist-label'; label.innerText = index + 1;
+                const barContainer = document.createElement('div'); barContainer.className = 'dist-bar-container';
+                const bar = document.createElement('div'); bar.className = 'dist-bar';
+                const widthPercent = Math.max((count / maxWinsInBucket) * 100, 7);
+                bar.style.width = `${widthPercent}%`; bar.innerText = count;
+
+                if (highlightIndex === index) bar.classList.add('highlight');
+                else if (count > 0) bar.style.backgroundColor = '#565758'; 
+
+                barContainer.appendChild(bar); row.appendChild(label); row.appendChild(barContainer); distContainer.appendChild(row);
+            });
+        }
 
         // Autocomplete
         const inputElement = document.getElementById('guess-input');
