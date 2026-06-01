@@ -63,7 +63,6 @@
         }
         .text-btn:hover { color: white; }
 
-        /* Arcade Score Header */
         #arcade-score-header {
             display: flex; width: 100%; max-width: 600px; justify-content: space-between;
             font-family: 'Press Start 2P', monospace; font-size: 12px;
@@ -143,11 +142,17 @@
         .game-over-answer { color: #538d4e; font-weight: bold; font-size: 28px; margin-top: 5px; }
 
         .button-group { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
-        .arcade-btn { padding: 15px 30px; font-size: 18px; font-weight: bold; text-transform: uppercase; background-color: transparent; color: white; border: 2px solid white; border-radius: 4px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .arcade-btn { padding: 15px 30px; font-size: 16px; font-weight: bold; text-transform: uppercase; background-color: transparent; color: white; border: 2px solid white; border-radius: 4px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
         .arcade-btn:hover { background-color: white; color: black; }
         .share-btn { background-color: #538d4e; border-color: #538d4e; }
         .share-btn:hover { background-color: #43703e; border-color: #43703e; color: white; }
+        .submit-btn { border-color: #e2b714; color: #e2b714; }
+        .submit-btn:hover { background-color: #e2b714; color: black; }
     </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
 </head>
 <body>
 
@@ -160,7 +165,7 @@
         </div>
         <h1>The Game Grid</h1>
         <div class="header-actions right">
-            <button class="text-btn" onclick="alert('Leaderboard integration coming up next!')">LEADERS</button>
+            <button class="text-btn" onclick="toggleLeaderboard('flex')">LEADERS</button>
             <button class="text-btn" onclick="toggleModal('flex')">STATS</button>
         </div>
     </div>
@@ -202,37 +207,28 @@
         </div>
     </div>
 
+    <div id="leaderboard-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="toggleLeaderboard('none')">&times;</button>
+            <h2>HALL OF FAME</h2>
+            <div id="leaderboard-loading" style="color: #e2b714; font-size: 14px; margin-top: 15px;">Connecting to database...</div>
+            <div id="leaderboard-list" style="text-align: left; margin-top: 20px; font-family: 'Press Start 2P', monospace; font-size: 12px; line-height: 2;">
+                </div>
+        </div>
+    </div>
+
     <div id="stats-modal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="toggleModal('none')">&times;</button>
             <h2>Statistics</h2>
             <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-played">0</div>
-                    <div class="stat-label">Played</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-winpct">0</div>
-                    <div class="stat-label">Win %</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-losses">0</div>
-                    <div class="stat-label">Losses</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-avg">0</div>
-                    <div class="stat-label">Avg Guesses</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-streak">0</div>
-                    <div class="stat-label">Streak</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-maxstreak">0</div>
-                    <div class="stat-label">Max Streak</div>
-                </div>
+                <div class="stat-item"><div class="stat-num" id="stat-played">0</div><div class="stat-label">Played</div></div>
+                <div class="stat-item"><div class="stat-num" id="stat-winpct">0</div><div class="stat-label">Win %</div></div>
+                <div class="stat-item"><div class="stat-num" id="stat-losses">0</div><div class="stat-label">Losses</div></div>
+                <div class="stat-item"><div class="stat-num" id="stat-avg">0</div><div class="stat-label">Avg Guesses</div></div>
+                <div class="stat-item"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-num" id="stat-maxstreak">0</div><div class="stat-label">Max Streak</div></div>
             </div>
-
             <div class="guess-distribution">
                 <h3>Guess Distribution</h3>
                 <div id="distribution-container"></div>
@@ -247,6 +243,7 @@
         <div class="button-group">
             <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
             <button class="arcade-btn" onclick="resetGame(true)">Next Round</button>
+            <button class="arcade-btn submit-btn" id="btn-submit-win" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
     </div>
 
@@ -257,10 +254,24 @@
         <div class="button-group">
             <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
             <button class="arcade-btn" onclick="resetGame(true)">Try Again</button>
+            <button class="arcade-btn submit-btn" id="btn-submit-lose" onclick="submitToLeaderboard()">Submit Score</button>
         </div>
     </div>
 
     <script>
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAlHufV0t0VthvCMvQBI1iX6vuicO6HKH8",
+            authDomain: "the-game-grid.firebaseapp.com",
+            projectId: "the-game-grid",
+            storageBucket: "the-game-grid.firebasestorage.app",
+            messagingSenderId: "980286023905",
+            appId: "1:980286023905:web:f0317fd000ad2aa75eefa0"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        // -------------------------------
+
         // Web Audio API
         let audioCtx = null;
         function initAudio() {
@@ -270,11 +281,8 @@
         function playSound(type) {
             initAudio();
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination); const now = audioCtx.currentTime;
 
             if (type === 'guess') {
                 osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
@@ -303,11 +311,9 @@
         let currentGuesses = 0;
         let emojiHistory = []; 
 
-        // Scoring System Data
         const POINTS_DISTRIBUTION = [100, 50, 25, 10, 5, 1];
         const LOSS_PENALTY = -10;
         
-        // Bulletproof localStorage loading
         function loadStats() {
             try {
                 let saved = localStorage.getItem('gamedleStats');
@@ -321,35 +327,23 @@
                     if (parsed.highScore === undefined) parsed.highScore = 0;
                     return parsed;
                 }
-            } catch (e) {
-                console.error("Local storage was corrupted. Resetting data.");
-            }
-            return {
-                played: 0, wins: 0, currentStreak: 0, maxStreak: 0,
-                guessDistribution: [0, 0, 0, 0, 0, 0],
-                arcadeScore: 0, highScore: 0
-            };
+            } catch (e) { console.error("Local storage reset due to error."); }
+            return { played: 0, wins: 0, currentStreak: 0, maxStreak: 0, guessDistribution: [0, 0, 0, 0, 0, 0], arcadeScore: 0, highScore: 0 };
         }
         
         let localStats = loadStats();
         let knownConsole = null, knownGenre = null, eliminatedConsoles = new Set(), eliminatedGenres = new Set(), minYear = -Infinity, maxYear = Infinity;
 
-        // Fetch DB
         fetch('database.json')
             .then(res => res.json())
-            .then(data => { 
-                database = data; 
-                resetGame(false); // Initialize silently on first load
-            })
+            .then(data => { database = data; resetGame(false); })
             .catch(err => console.error(err));
 
         function resetGame(playAudio) {
             if (database.length === 0) return; 
             if (playAudio) playSound('coin');
             
-            gameOver = false;
-            currentGuesses = 0;
-            emojiHistory = [];
+            gameOver = false; currentGuesses = 0; emojiHistory = [];
             knownConsole = null; knownGenre = null; eliminatedConsoles.clear(); eliminatedGenres.clear(); minYear = -Infinity; maxYear = Infinity;
 
             targetGame = database[Math.floor(Math.random() * database.length)];
@@ -359,24 +353,103 @@
 
             document.getElementById('victory-screen').style.display = 'none';
             document.getElementById('game-over-screen').style.display = 'none';
+            document.getElementById('btn-submit-win').style.display = localStats.arcadeScore > 0 ? 'block' : 'none';
+            document.getElementById('btn-submit-lose').style.display = localStats.arcadeScore > 0 ? 'block' : 'none';
             
             const inputEl = document.getElementById('guess-input');
-            inputEl.disabled = false; inputEl.value = '';
-            document.getElementById('guess-button').disabled = false;
+            inputEl.disabled = false; inputEl.value = ''; document.getElementById('guess-button').disabled = false;
             document.getElementById('suggestions').style.display = 'none';
             document.getElementById('guess-grid').innerHTML = `<div class="row header-row"><div>Game</div><div>Console</div><div>Genre</div><div>Year</div></div>`;
             
             updateLivesDisplay();
         }
 
+        // --- FIREBASE LEADERBOARD LOGIC ---
+        function toggleLeaderboard(displayState) {
+            const modal = document.getElementById('leaderboard-modal');
+            modal.style.display = displayState;
+            
+            if (displayState === 'flex') {
+                const list = document.getElementById('leaderboard-list');
+                const loading = document.getElementById('leaderboard-loading');
+                list.innerHTML = '';
+                loading.style.display = 'block';
+                
+                db.collection("leaderboard").orderBy("score", "desc").limit(10).get()
+                .then((querySnapshot) => {
+                    loading.style.display = 'none';
+                    let rank = 1;
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const row = document.createElement('div');
+                        row.style.display = 'flex';
+                        row.style.justifyContent = 'space-between';
+                        row.style.marginBottom = '10px';
+                        row.style.borderBottom = '1px solid #3a3a3c';
+                        row.style.paddingBottom = '5px';
+                        
+                        let nameSpan = `<span>${rank}. ${data.name}</span>`;
+                        if (rank === 1) nameSpan = `<span style="color:#e2b714;">${rank}. ${data.name} 👑</span>`;
+                        if (rank === 2) nameSpan = `<span style="color:#c0c0c0;">${rank}. ${data.name}</span>`;
+                        if (rank === 3) nameSpan = `<span style="color:#cd7f32;">${rank}. ${data.name}</span>`;
+
+                        row.innerHTML = `${nameSpan}<span>${data.score}</span>`;
+                        list.appendChild(row);
+                        rank++;
+                    });
+                    if (rank === 1) list.innerHTML = "<p>No scores yet! Go set the record.</p>";
+                })
+                .catch((error) => {
+                    loading.innerText = "Error loading database.";
+                    console.error("Error getting documents: ", error);
+                });
+            }
+        }
+
+        function submitToLeaderboard() {
+            if (localStats.arcadeScore <= 0) {
+                alert("You need a score above 0 to enter the Hall of Fame!");
+                return;
+            }
+            
+            const initials = prompt("Enter your initials (3 letters max):", "AAA");
+            if (!initials) return; 
+            
+            const cleanInitials = initials.substring(0, 3).toUpperCase();
+            document.getElementById('btn-submit-win').style.display = 'none';
+            document.getElementById('btn-submit-lose').style.display = 'none';
+            
+            db.collection("leaderboard").add({
+                name: cleanInitials,
+                score: localStats.arcadeScore,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                alert("Score Locked In! Your points have been cashed out.");
+                // Cash out mechanic: Reset score after saving it
+                localStats.arcadeScore = 0;
+                localStorage.setItem('gamedleStats', JSON.stringify(localStats));
+                document.getElementById('current-score').innerText = localStats.arcadeScore;
+                
+                document.getElementById('victory-screen').style.display = 'none';
+                document.getElementById('game-over-screen').style.display = 'none';
+                toggleLeaderboard('flex');
+            })
+            .catch((error) => {
+                console.error("Error writing document: ", error);
+                alert("Failed to connect to the database. Are your security rules active?");
+                document.getElementById('btn-submit-win').style.display = 'block';
+                document.getElementById('btn-submit-lose').style.display = 'block';
+            });
+        }
+        // ----------------------------------
+
         function toggleInstructions() {
             const content = document.getElementById('instructions-content');
             const btn = document.getElementById('instructions-btn');
             if (content.style.display === 'none' || content.style.display === '') {
                 content.style.display = 'block'; btn.innerText = '[ - ]';
-            } else {
-                content.style.display = 'none'; btn.innerText = '[ + ]';
-            }
+            } else { content.style.display = 'none'; btn.innerText = '[ + ]'; }
         }
         
         function toggleModal(displayState) {
@@ -385,25 +458,20 @@
         }
 
         function updateLivesDisplay() {
-            const livesRemaining = MAX_GUESSES - currentGuesses;
-            let heartsHTML = '';
+            const livesRemaining = MAX_GUESSES - currentGuesses; let heartsHTML = '';
             for (let i = 0; i < MAX_GUESSES; i++) heartsHTML += (i < livesRemaining) ? '❤️' : '🖤';
             document.getElementById('lives-display').innerHTML = heartsHTML;
         }
 
         function makeGuess() {
             if (gameOver) return;
-            const inputEl = document.getElementById('guess-input');
-            const guessName = inputEl.value;
+            const inputEl = document.getElementById('guess-input'); const guessName = inputEl.value;
             const guessedGame = database.find(g => g.name.toLowerCase() === guessName.toLowerCase());
             if (!guessedGame) { alert("Game not found in database! Use the dropdown."); return; }
 
-            playSound('guess');
-            currentGuesses++;
-            updateLivesDisplay();
+            playSound('guess'); currentGuesses++; updateLivesDisplay();
 
-            const grid = document.getElementById('guess-grid');
-            const row = document.createElement('div'); row.className = 'row';
+            const grid = document.getElementById('guess-grid'); const row = document.createElement('div'); row.className = 'row';
             let currentEmojiRow = "";
 
             const nameMatch = guessedGame.name === targetGame.name;
@@ -417,21 +485,17 @@
             if (genreMatch) knownGenre = targetGame.genre; else eliminatedGenres.add(guessedGame.genre);
             row.appendChild(createBox(guessedGame.genre, genreMatch)); currentEmojiRow += genreMatch ? "🟩" : "⬛";
 
-            let yearText = guessedGame.year;
-            let yearMatch = guessedGame.year === targetGame.year;
+            let yearText = guessedGame.year; let yearMatch = guessedGame.year === targetGame.year;
             if (yearMatch) {
                 minYear = targetGame.year; maxYear = targetGame.year; currentEmojiRow += "🟩";
             } else {
                 const isNewer = guessedGame.year > targetGame.year;
                 yearText += isNewer ? ' ↓' : ' ↑'; currentEmojiRow += isNewer ? "⬇️" : "⬆️";
-                if (isNewer) maxYear = Math.min(maxYear, guessedGame.year - 1);
-                else minYear = Math.max(minYear, guessedGame.year + 1);
+                if (isNewer) maxYear = Math.min(maxYear, guessedGame.year - 1); else minYear = Math.max(minYear, guessedGame.year + 1);
             }
             row.appendChild(createBox(yearText, yearMatch));
             
-            emojiHistory.push(currentEmojiRow);
-            grid.appendChild(row);
-            
+            emojiHistory.push(currentEmojiRow); grid.appendChild(row);
             inputEl.value = ''; document.getElementById('suggestions').style.display = 'none';
 
             if (guessedGame.name === targetGame.name) handleGameOver(true);
@@ -444,15 +508,11 @@
 
         function handleGameOver(isWin) {
             gameOver = true;
-            document.getElementById('guess-input').disabled = true;
-            document.getElementById('guess-button').disabled = true;
-
-            // Track standard overall stats
+            document.getElementById('guess-input').disabled = true; document.getElementById('guess-button').disabled = true;
             localStats.played++;
 
             if (isWin) {
-                localStats.wins++;
-                localStats.currentStreak++;
+                localStats.wins++; localStats.currentStreak++;
                 if (localStats.currentStreak > localStats.maxStreak) localStats.maxStreak = localStats.currentStreak;
                 localStats.guessDistribution[currentGuesses - 1]++;
                 
@@ -464,16 +524,19 @@
                 document.getElementById('victory-points').style.display = 'block';
                 playSound('win');
                 document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
+                
+                document.getElementById('btn-submit-win').style.display = localStats.arcadeScore > 0 ? 'block' : 'none';
                 setTimeout(() => { document.getElementById('victory-screen').style.display = 'flex'; }, 800);
             } else {
-                localStats.currentStreak = 0;
-                localStats.arcadeScore += LOSS_PENALTY;
+                localStats.currentStreak = 0; localStats.arcadeScore += LOSS_PENALTY;
                 if (localStats.arcadeScore < 0) localStats.arcadeScore = 0; 
                 
                 document.getElementById('lose-points').innerText = `${LOSS_PENALTY} POINTS`;
                 document.getElementById('lose-points').style.display = 'block';
                 playSound('lose');
                 document.getElementById('game-over-answer').innerText = targetGame.name;
+                
+                document.getElementById('btn-submit-lose').style.display = localStats.arcadeScore > 0 ? 'block' : 'none';
                 setTimeout(() => { document.getElementById('game-over-screen').style.display = 'flex'; }, 800);
             }
             
@@ -489,28 +552,23 @@
         }
         function isWinCheck() { return emojiHistory.length > 0 && emojiHistory[emojiHistory.length-1].includes('🟩🟩🟩🟩'); }
 
-        function updateStatsUI(highlightIndex = null) {
+        function updateStatsUI() {
             document.getElementById('stat-played').innerText = localStats.played;
             const winPct = localStats.played === 0 ? 0 : Math.round((localStats.wins / localStats.played) * 100);
             document.getElementById('stat-winpct').innerText = winPct;
             
-            const losses = localStats.played - localStats.wins;
-            document.getElementById('stat-losses').innerText = losses;
+            const losses = localStats.played - localStats.wins; document.getElementById('stat-losses').innerText = losses;
 
             let totalScore = 0;
-            localStats.guessDistribution.forEach((count, index) => {
-                totalScore += (count * (index + 1));
-            });
+            localStats.guessDistribution.forEach((count, index) => { totalScore += (count * (index + 1)); });
             totalScore += (losses * 7);
             
             const avg = localStats.played === 0 ? "0.0" : (totalScore / localStats.played).toFixed(1);
             document.getElementById('stat-avg').innerText = avg;
-
             document.getElementById('stat-streak').innerText = localStats.currentStreak;
             document.getElementById('stat-maxstreak').innerText = localStats.maxStreak;
 
-            const distContainer = document.getElementById('distribution-container');
-            distContainer.innerHTML = ''; 
+            const distContainer = document.getElementById('distribution-container'); distContainer.innerHTML = ''; 
             const maxWinsInBucket = Math.max(...localStats.guessDistribution, 1);
 
             localStats.guessDistribution.forEach((count, index) => {
@@ -521,16 +579,13 @@
                 const widthPercent = Math.max((count / maxWinsInBucket) * 100, 7);
                 bar.style.width = `${widthPercent}%`; bar.innerText = count;
 
-                if (highlightIndex === index) bar.classList.add('highlight');
-                else if (count > 0) bar.style.backgroundColor = '#565758'; 
-
+                if (count > 0) bar.style.backgroundColor = '#565758'; 
                 barContainer.appendChild(bar); row.appendChild(label); row.appendChild(barContainer); distContainer.appendChild(row);
             });
         }
 
         // Autocomplete
-        const inputElement = document.getElementById('guess-input');
-        const suggestionsBox = document.getElementById('suggestions');
+        const inputElement = document.getElementById('guess-input'); const suggestionsBox = document.getElementById('suggestions');
         let currentFocus = -1;
 
         function renderSuggestions() {
@@ -559,8 +614,7 @@
             });
         }
 
-        inputElement.addEventListener('input', renderSuggestions);
-        inputElement.addEventListener('focus', renderSuggestions);
+        inputElement.addEventListener('input', renderSuggestions); inputElement.addEventListener('focus', renderSuggestions);
         document.addEventListener('click', e => { if (e.target !== inputElement && e.target !== suggestionsBox) suggestionsBox.style.display = 'none'; });
 
         inputElement.addEventListener('keydown', e => {
@@ -580,8 +634,7 @@
             for (let i = 0; i < items.length; i++) items[i].classList.remove("active");
             if (currentFocus >= items.length) currentFocus = 0;
             if (currentFocus < 0) currentFocus = items.length - 1;
-            items[currentFocus].classList.add("active");
-            items[currentFocus].scrollIntoView({ block: 'nearest' });
+            items[currentFocus].classList.add("active"); items[currentFocus].scrollIntoView({ block: 'nearest' });
         }
     </script>
 </body>
