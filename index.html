@@ -412,10 +412,10 @@
                 return;
             }
             
-            const initials = prompt("Enter your initials (3 letters max):", "AAA");
+            const initials = prompt("Enter your name (10 letters max):", "PLAYER");
             if (!initials) return; 
             
-            const cleanInitials = initials.substring(0, 3).toUpperCase();
+            const cleanInitials = initials.substring(0, 10).toUpperCase();
             document.getElementById('btn-submit-win').style.display = 'none';
             document.getElementById('btn-submit-lose').style.display = 'none';
             
