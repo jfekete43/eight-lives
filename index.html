@@ -339,6 +339,7 @@
                 let saved = localStorage.getItem('gamedleStats');
                 if (saved) {
                     let parsed = JSON.parse(saved);
+                    // Safe fallbacks for older save files
                     if (!parsed.guessDistribution || parsed.guessDistribution.length !== MAX_GUESSES) {
                         parsed.guessDistribution = parsed.guessDistribution ? parsed.guessDistribution.slice(0, MAX_GUESSES) : [0,0,0,0,0,0];
                         while (parsed.guessDistribution.length < MAX_GUESSES) parsed.guessDistribution.push(0);
@@ -346,6 +347,13 @@
                     if (parsed.arcadeScore === undefined) parsed.arcadeScore = 0;
                     if (parsed.highScore === undefined) parsed.highScore = 0;
                     if (parsed.continues === undefined) parsed.continues = 2;
+                    
+                    // Patch for missing stats in old saves
+                    if (parsed.maxStreak === undefined) parsed.maxStreak = 0;
+                    if (parsed.currentStreak === undefined) parsed.currentStreak = 0;
+                    if (parsed.played === undefined) parsed.played = 0;
+                    if (parsed.wins === undefined) parsed.wins = 0;
+                    
                     return parsed;
                 }
             } catch (e) {
