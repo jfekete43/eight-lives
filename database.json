@@ -2897,4 +2897,28 @@
    "genre": "Adventure",
    "year": 1988
  }
+ {
+   "name": "Rocket League",
+   "console": "PS4",
+   "genre": "Arcade",
+   "year": 2015
+ }
+ {
+   "name": "Socom: U.S. Navy SEALs",
+   "console": "PS2",
+   "genre": "Shooter",
+   "year": 2002
+ }
+ {
+   "name": "Socom II: U.S. Navy SEALs",
+   "console": "PS2",
+   "genre": "Shooter",
+   "year": 2003
+ }
+ {
+   "name": "Socom: U.S. Navy SEALs Confrontation",
+   "console": "PS3",
+   "genre": "Shooter",
+   "year": 2008
+ }
 ]
