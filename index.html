@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Game Grid</title>
+    <title>Game Grid</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&display=swap');
 
@@ -175,7 +175,7 @@
             <button class="text-btn" onclick="resetGame(true, true)">NEW</button>
             <button class="text-btn" onclick="toggleModal('flex')">STATS</button>
         </div>
-        <h1>The Game Grid</h1>
+        <h1>Game Grid</h1>
         <div class="header-actions right">
             <button class="text-btn" onclick="toggleLeaderboard('flex')">LEADERS</button>
         </div>
@@ -696,7 +696,7 @@
 
         function shareResults() {
             const resultScore = gameOver && isWinCheck() ? currentGuesses : 'X';
-            const header = `The Game Grid 🎮 Score: ${localStats.arcadeScore} | ${resultScore}/${MAX_GUESSES}\n\n`;
+            const header = `Game Grid 🎮 Score: ${localStats.arcadeScore} | ${resultScore}/${MAX_GUESSES}\n\n`;
             navigator.clipboard.writeText(header + emojiHistory.join('\n')).then(() => alert("Results copied!")).catch(e => alert("Failed to copy."));
         }
         function isWinCheck() { return emojiHistory.length > 0 && emojiHistory[emojiHistory.length-1].includes('🟩🟩🟩🟩'); }
