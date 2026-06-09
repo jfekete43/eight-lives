@@ -247,6 +247,11 @@
             <div id="leaderboard-loading" style="color: #e2b714; font-size: 14px; margin-top: 15px;">Connecting to database...</div>
             <div id="leaderboard-list" style="text-align: left; margin-top: 20px; font-family: 'Press Start 2P', monospace; font-size: 12px; line-height: 2;">
                 </div>
+            
+            <button id="share-btn" onclick="shareResults()" style="display: none; width: 100%; background-color: #e2b714; color: black; padding: 15px; margin-top: 25px; border: none; font-family: 'Press Start 2P', monospace; font-weight: bold; cursor: pointer; border-radius: 4px;">
+                SHARE SCORE 📋
+            </button>
+            
         </div>
     </div>
 
@@ -274,7 +279,6 @@
         <div class="overlay-subtext" id="victory-subtext">You got it in X guesses!</div>
         <div class="overlay-points" id="victory-points" style="display:none;">+100 POINTS</div>
         <div class="button-group">
-            <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
             <button class="arcade-btn" onclick="resetGame(true, false)">Next Round</button>
             <button class="arcade-btn submit-btn" id="btn-submit-win" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
@@ -285,7 +289,6 @@
         <div class="overlay-subtext">The correct game was:<div class="game-over-answer" id="game-over-answer">Game Name</div></div>
         <div class="overlay-points" id="lose-points" style="display:none; color: #e2b714;">X CONTINUES LEFT</div>
         <div class="button-group">
-            <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
             <button class="arcade-btn" id="btn-retry-lose" onclick="resetGame(true, false)">Continue</button>
             <button class="arcade-btn submit-btn" id="btn-submit-lose" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
@@ -551,6 +554,7 @@
                 
                 document.getElementById('victory-screen').style.display = 'none';
                 document.getElementById('game-over-screen').style.display = 'none';
+                document.getElementById('share-btn').style.display = 'block';
                 toggleLeaderboard('flex');
             })
             .catch((error) => {
@@ -703,10 +707,21 @@
         }
 
         function shareResults() {
-            const resultScore = gameOver && isWinCheck() ? currentGuesses : 'X';
-            const header = `Game Grid 🎮 Score: ${localStats.arcadeScore} | ${resultScore}/${MAX_GUESSES}\n\n`;
-            navigator.clipboard.writeText(header + emojiHistory.join('\n')).then(() => alert("Results copied!")).catch(e => alert("Failed to copy."));
-        }
+    // Grab the final score they just cashed out with
+    const finalScore = localStats.arcadeScore; 
+    
+    const shareText = `Game Grid 🎮\nI cashed out with: ${finalScore} PTS!\n\nCan you beat my high score?\nplaygamegrid.io`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareText).then(() => {
+            alert("Score copied to clipboard! Paste it to your friends.");
+        }).catch(err => {
+            console.error("Could not copy text: ", err);
+        });
+    } else {
+        alert("Clipboard not supported. Here is your text:\n\n" + shareText);
+    }
+}
         function isWinCheck() { return emojiHistory.length > 0 && emojiHistory[emojiHistory.length-1].includes('🟩🟩🟩🟩'); }
 
         function updateStatsUI() {
