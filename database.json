@@ -782,7 +782,7 @@
  {
    "name": "Final Fantasy Tactics",
    "console": "PS1",
-   "genre": "RPG",
+   "genre": "Strategy",
    "year": 1997
  },
  {
@@ -1544,7 +1544,7 @@
  {
    "name": "Metroid Prime 3: Corruption",
    "console": "Wii",
-   "genre": "Action",
+   "genre": "Adventure",
    "year": 2007
  },
  {
@@ -1782,10 +1782,10 @@
    "year": 2000
  },
  {
-   "name": "Persona 5 Royal",
+   "name": "Persona 5",
    "console": "PS4",
    "genre": "RPG",
-   "year": 2020
+   "year": 2016
  },
  {
    "name": "Phantasy Star Online",
@@ -2394,7 +2394,7 @@
    "year": 2001
  },
  {
-   "name": "Super Smash Bros/ Brawl",
+   "name": "Super Smash Bros. Brawl",
    "console": "Wii",
    "genre": "Fighting",
    "year": 2008
@@ -2939,6 +2939,150 @@
    "genre": "Arcade",
    "year": 2008
  },  
+ {
+   "name": "Kirby's Return to Dream Land",
+   "console": "Wii",
+   "genre": "Platformer",
+   "year": 2011
+ },  
+ {
+   "name": "World of Goo",
+   "console": "Wii",
+   "genre": "Puzzle",
+   "year": 2018
+ },   
+ {
+   "name": "Life is Strange",
+   "console": "Xbox One",
+   "genre": "Adventure",
+   "year": 2015
+ },   
+ {
+   "name": "Columns",
+   "console": "Sega Genesis",
+   "genre": "Puzzle",
+   "year": 1990
+ },    
+ {
+   "name": "Golden Axe II",
+   "console": "Sega Genesis",
+   "genre": "Fighting",
+   "year": 1992
+ },    
+ {
+   "name": "Golden Axe",
+   "console": "Sega Genesis",
+   "genre": "Fighting",
+   "year": 1989
+ },     
+ {
+   "name": "Altered Beast",
+   "console": "Sega Genesis",
+   "genre": "Action",
+   "year": 1989
+ },     
+ {
+   "name": "Ghouls 'n Ghosts",
+   "console": "Sega Genesis",
+   "genre": "Action",
+   "year": 1989
+ },      
+ {
+   "name": "Super Ghouls 'n Ghosts",
+   "console": "SNES",
+   "genre": "Platformer",
+   "year": 1991
+ },       
+ {
+   "name": "X-COM: Enemy Unknown",
+   "console": "PS3",
+   "genre": "Strategy",
+   "year": 2012
+ },      
+ {
+   "name": "Frostpunk",
+   "console": "PC",
+   "genre": "Strategy",
+   "year": 2018
+ },       
+ {
+   "name": "Tropico 6",
+   "console": "Xbox One",
+   "genre": "Strategy",
+   "year": 2019
+ },        
+ {
+   "name": "Transistor",
+   "console": "PS4",
+   "genre": "Strategy",
+   "year": 2014
+ },        
+ {
+   "name": "Valkyria Chronicles",
+   "console": "PS3",
+   "genre": "Strategy",
+   "year": 2008
+ },         
+ {
+   "name": "Halo Wars",
+   "console": "Xbox 360",
+   "genre": "Strategy",
+   "year": 2009
+ },        
+ {
+   "name": "Sid Meier's Civilization Revolution",
+   "console": "Xbox 360",
+   "genre": "Strategy",
+   "year": 2008
+ },         
+ {
+   "name": "N+",
+   "console": "Xbox 360",
+   "genre": "Arcade",
+   "year": 2008
+ },          
+ {
+   "name": "Maximo: Ghosts to Glory",
+   "console": "PS2",
+   "genre": "Adventure",
+   "year": 2001
+ },          
+ {
+   "name": "Super Meat Boy",
+   "console": "Xbox 360",
+   "genre": "Platformer",
+   "year": 2010
+ },           
+ {
+   "name": "Celeste",
+   "console": "Xbox One",
+   "genre": "Platformer",
+   "year": 2018
+ },            
+ {
+   "name": "Resogun",
+   "console": "PS4",
+   "genre": "Arcade",
+   "year": 2013
+ },          
+ {
+   "name": "Super Stardust HD",
+   "console": "PS3",
+   "genre": "Arcade",
+   "year": 2007
+ },           
+ {
+   "name": "PixelJunk Monsters",
+   "console": "PS3",
+   "genre": "Strategy",
+   "year": 2007
+ },           
+ {
+   "name": "Manhunt",
+   "console": "PS2",
+   "genre": "Horror",
+   "year": 2003
+ },            
  {
    "name": "Rocket League",
    "console": "PS4",
