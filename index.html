@@ -545,6 +545,8 @@
             })
             .then(() => {
                 alert("Score Locked In! Your points have been cashed out.");
+
+                window.lastShareScore = localStats.arcadeScore;
                 
                 localStats.arcadeScore = 0;
                 localStats.continues = 2;
@@ -707,20 +709,50 @@
         }
 
         function shareResults() {
-    // Grab the final score they just cashed out with
-    const finalScore = localStats.arcadeScore; 
+    // Grab the snapshot score we saved, or fallback to the active score
+    const finalScore = window.lastShareScore || localStats.arcadeScore; 
     
     const shareText = `Game Grid 🎮\nI cashed out with: ${finalScore} PTS!\n\nCan you beat my high score?\nplaygamegrid.io`;
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
+    // Try modern clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(shareText).then(() => {
             alert("Score copied to clipboard! Paste it to your friends.");
         }).catch(err => {
-            console.error("Could not copy text: ", err);
+            fallbackCopyTextToClipboard(shareText);
         });
     } else {
-        alert("Clipboard not supported. Here is your text:\n\n" + shareText);
+        // Use bulletproof fallback if modern API is blocked
+        fallbackCopyTextToClipboard(shareText);
     }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Keep it hidden and prevent scrolling down to it
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    textArea.style.opacity = "0";
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+        var successful = document.execCommand('copy');
+        if(successful) {
+            alert("Score copied to clipboard! Paste it to your friends.");
+        } else {
+            alert("Copy failed. Here is your text:\n\n" + text);
+        }
+    } catch (err) {
+        alert("Copy failed. Here is your text:\n\n" + text);
+    }
+    
+    document.body.removeChild(textArea);
 }
         function isWinCheck() { return emojiHistory.length > 0 && emojiHistory[emojiHistory.length-1].includes('🟩🟩🟩🟩'); }
 
