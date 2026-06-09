@@ -766,6 +766,7 @@
                 if (val && !g.name.toLowerCase().includes(val.toLowerCase())) return false;
                 return true;
             });
+            validGames.sort(() => Math.random() - 0.5);
             const matches = validGames.slice(0, 15);
             if (matches.length === 0) { suggestionsBox.style.display = 'none'; return; }
 
