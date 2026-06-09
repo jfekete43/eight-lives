@@ -487,31 +487,48 @@
                 query = query.orderBy(field, "desc")
                              .startAt(`${prefix}_999999999`)
                              .endAt(`${prefix}_000000000`)
-                             .limit(25);
+                             .limit(100);
             }
 
             query.get().then((querySnapshot) => {
                 loading.style.display = 'none';
-                let rank = 1;
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const row = document.createElement('div');
-                    row.style.display = 'flex';
-                    row.style.justifyContent = 'space-between';
-                    row.style.marginBottom = '10px';
-                    row.style.borderBottom = '1px solid #3a3a3c';
-                    row.style.paddingBottom = '5px';
-                    
-                    let nameSpan = `<span>${rank}. ${data.name}</span>`;
-                    if (rank === 1) nameSpan = `<span style="color:#e2b714;">${rank}. ${data.name} 👑</span>`;
-                    if (rank === 2) nameSpan = `<span style="color:#c0c0c0;">${rank}. ${data.name}</span>`;
-                    if (rank === 3) nameSpan = `<span style="color:#cd7f32;">${rank}. ${data.name}</span>`;
+                
+                // --- NEW FILTER LOGIC STARTS HERE ---
+                const seenNames = new Set();
+                let rankCount = 0;
+                const MAX_DISPLAY = 10; // Change this if you want a longer leaderboard
 
-                    row.innerHTML = `${nameSpan}<span>${data.score}</span>`;
-                    list.appendChild(row);
-                    rank++;
+                querySnapshot.forEach((doc) => {
+                    if (rankCount >= MAX_DISPLAY) return; 
+
+                    const data = doc.data();
+                    const playerName = data.name.toUpperCase();
+
+                    // Check if player is already on the board for this time period
+                    if (!seenNames.has(playerName)) {
+                        seenNames.add(playerName);
+                        rankCount++;
+
+                        // --- YOUR ORIGINAL ROW STYLING ---
+                        const row = document.createElement('div');
+                        row.style.display = 'flex';
+                        row.style.justifyContent = 'space-between';
+                        row.style.marginBottom = '10px';
+                        row.style.borderBottom = '1px solid #3a3a3c';
+                        row.style.paddingBottom = '5px';
+                        
+                        let nameSpan = `<span>${rankCount}. ${data.name}</span>`;
+                        if (rankCount === 1) nameSpan = `<span style="color:#e2b714;">${rankCount}. ${data.name} 👑</span>`;
+                        if (rankCount === 2) nameSpan = `<span style="color:#c0c0c0;">${rankCount}. ${data.name}</span>`;
+                        if (rankCount === 3) nameSpan = `<span style="color:#cd7f32;">${rankCount}. ${data.name}</span>`;
+
+                        row.innerHTML = `${nameSpan}<span>${data.score}</span>`;
+                        list.appendChild(row);
+                    }
                 });
-                if (rank === 1) list.innerHTML = "<p>No scores yet for this time period!</p>";
+                
+                // If the loop finishes and nobody is on the board
+                if (rankCount === 0) list.innerHTML = "<p>No scores yet for this time period!</p>";
             }).catch((error) => {
                 loading.innerText = "Error loading database.";
                 console.error("Error getting documents: ", error);
