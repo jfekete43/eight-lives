@@ -359,6 +359,7 @@
         const MAX_GUESSES = 6; 
         let currentGuesses = 0;
         let emojiHistory = []; 
+        let pastGuesses = new Set();
 
         const POINTS_DISTRIBUTION = [100, 50, 25, 10, 5, 1];
         
@@ -425,6 +426,7 @@
             gameOver = false;
             currentGuesses = 0;
             emojiHistory = [];
+            pastGuesses.clear();
             knownConsole = null; knownGenre = null; eliminatedConsoles.clear(); eliminatedGenres.clear(); minYear = -Infinity; maxYear = Infinity;
 
             targetGame = database[Math.floor(Math.random() * database.length)];
@@ -628,6 +630,7 @@
 
             playSound('guess');
             currentGuesses++;
+            pastGuesses.add(guessedGame.name);
             updateLivesDisplay();
 
             const grid = document.getElementById('guess-grid');
@@ -836,6 +839,7 @@ function fallbackCopyTextToClipboard(text) {
             const val = inputElement.value; suggestionsBox.innerHTML = '';
             
             let validGames = database.filter(g => {
+                if (pastGuesses.has(g.name)) return false;
                 if (knownConsole && g.console !== knownConsole) return false;
                 if (knownGenre && g.genre !== knownGenre) return false;
                 if (eliminatedConsoles.has(g.console)) return false;
