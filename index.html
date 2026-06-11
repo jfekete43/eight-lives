@@ -279,10 +279,13 @@
         <div class="overlay-text text-win">VICTORY</div>
         <div class="overlay-subtext" id="victory-subtext">You got it in X guesses!</div>
         <div class="overlay-points" id="victory-points" style="display:none;">+100 POINTS</div>
+        
         <div id="victory-status" style="font-family: 'Press Start 2P', monospace; font-size: 12px; color: white; margin-bottom: 30px;">
             BANK: <span style="color:#538d4e;">0</span> | LIVES: <span style="color:#e2b714;">2</span>
         </div>
+
         <div class="button-group">
+            <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
             <button class="arcade-btn" onclick="resetGame(true, false)">Next Round</button>
             <button class="arcade-btn submit-btn" id="btn-submit-win" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
@@ -292,10 +295,13 @@
         <div class="overlay-text text-lose" id="game-over-title">GAME OVER</div>
         <div class="overlay-subtext">The correct game was:<div class="game-over-answer" id="game-over-answer">Game Name</div></div>
         <div class="overlay-points" id="lose-points" style="display:none; color: #e2b714;">X CONTINUES LEFT</div>
-        <div id="victory-status" style="font-family: 'Press Start 2P', monospace; font-size: 12px; color: white; margin-bottom: 30px;">
+        
+        <div id="game-over-status" style="font-family: 'Press Start 2P', monospace; font-size: 12px; color: white; margin-bottom: 30px; display: none;">
             BANK: <span style="color:#538d4e;">0</span> | LIVES: <span style="color:#e2b714;">2</span>
         </div>
+
         <div class="button-group">
+            <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
             <button class="arcade-btn" id="btn-retry-lose" onclick="resetGame(true, false)">Continue</button>
             <button class="arcade-btn submit-btn" id="btn-submit-lose" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
@@ -693,11 +699,15 @@
                 
                 const pointsWon = POINTS_DISTRIBUTION[currentGuesses - 1];
                 localStats.arcadeScore += pointsWon;
-                document.getElementById('victory-status').innerHTML = `BANK: <span style="color:#538d4e;">${localStats.arcadeScore}</span> | LIVES: <span style="color:#e2b714;">${localStats.continues}</span>`;
                 if (localStats.arcadeScore > localStats.highScore) localStats.highScore = localStats.arcadeScore;
                 
                 document.getElementById('victory-points').innerText = `+${pointsWon} POINTS`;
                 document.getElementById('victory-points').style.display = 'block';
+                
+                // Update Victory Status Bar
+                const vicStatus = document.getElementById('victory-status');
+                if(vicStatus) vicStatus.innerHTML = `BANK: <span style="color:#538d4e;">${localStats.arcadeScore}</span> | LIVES: <span style="color:#e2b714;">${localStats.continues}</span>`;
+                
                 playSound('win');
                 document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
                 
@@ -709,8 +719,6 @@
 
                 if (localStats.continues > 0) {
                     localStats.continues--;
-                    document.getElementById('game-over-status').innerHTML = `BANK: <span style="color:#538d4e;">${localStats.arcadeScore}</span> | LIVES: <span style="color:#e2b714;">${localStats.continues}</span>`;
-                    document.getElementById('game-over-status').style.display = 'block';
                     document.getElementById('game-over-title').innerText = "ROUND FAILED";
                     
                     if (localStats.continues === 0) {
@@ -725,6 +733,13 @@
                     document.getElementById('btn-retry-lose').innerText = "Continue Round";
                     document.getElementById('btn-retry-lose').onclick = () => resetGame(true, false); 
                     document.getElementById('btn-submit-lose').style.display = localStats.arcadeScore > 0 ? 'block' : 'none';
+
+                    // Update Game Over Status Bar
+                    const loseStatus = document.getElementById('game-over-status');
+                    if(loseStatus) {
+                        loseStatus.innerHTML = `BANK: <span style="color:#538d4e;">${localStats.arcadeScore}</span> | LIVES: <span style="color:#e2b714;">${localStats.continues}</span>`;
+                        loseStatus.style.display = 'block';
+                    }
                     
                 } else {
                     localStats.arcadeScore = 0;
@@ -739,6 +754,10 @@
                     document.getElementById('btn-retry-lose').innerText = "New Run";
                     document.getElementById('btn-retry-lose').onclick = () => resetGame(true, true); 
                     document.getElementById('btn-submit-lose').style.display = 'none'; 
+                    
+                    // Hide the status bar on a total wipeout
+                    const loseStatus = document.getElementById('game-over-status');
+                    if(loseStatus) loseStatus.style.display = 'none';
                 }
 
                 playSound('lose');
@@ -750,7 +769,6 @@
             document.getElementById('continues-left').innerText = localStats.continues;
             document.getElementById('high-score').innerText = localStats.highScore;
         }
-
         function shareResults() {
     // Grab the snapshot score we saved, or fallback to the active score
     const finalScore = window.lastShareScore || localStats.arcadeScore; 
