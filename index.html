@@ -309,7 +309,7 @@
         </div>
     </div>
 <!-- ACCOUNT REGISTRATION MODAL -->
-    <div id="account-modal" class="overlay-screen" style="display: none; z-index: 200;">
+    <div id="account-modal" class="overlay-screen" style="display: none; z-index: 9999;">
         <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #e2b714; border-radius: 10px; max-width: 400px; width: 90%; text-align: center;">
             <div class="overlay-text" style="font-size: 24px; color: #e2b714; margin-bottom: 10px;">SAVE YOUR STATS</div>
             <div class="overlay-subtext" style="margin-bottom: 25px;">Create a profile to secure your Lifetime Bank and unlock the Global Leaderboard.</div>
@@ -354,6 +354,40 @@
             .catch((error) => {
                 console.error("Silent login failed:", error.code, error.message);
             });
+        // --- GOOGLE ACCOUNT LINKING ---
+        document.getElementById('btn-google-signup').addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const user = firebase.auth().currentUser;
+
+            if (user) {
+                // This command tells Firebase to merge the Ghost ID with the Google Account
+                user.linkWithPopup(provider)
+                    .then((result) => {
+                        // Success!
+                        console.log("Account successfully linked:", result.user.email);
+                        alert("Profile Saved! Your lifetime stats are now permanently secure.");
+                        
+                        // Close the modal
+                        document.getElementById('account-modal').style.display = 'none';
+                        
+                        // Hide the "Save Profile" buttons since they are now registered
+                        const saveButtons = document.querySelectorAll("button[onclick=\"document.getElementById('account-modal').style.display='flex'\"]");
+                        saveButtons.forEach(btn => btn.style.display = 'none');
+                    })
+                    .catch((error) => {
+                        console.error("Error linking account:", error);
+                        
+                        // Handle the specific error where they already created an account
+                        if (error.code === 'auth/credential-already-in-use') {
+                            alert("This Google account is already linked to another Game Grid profile. Try a different email or log in directly.");
+                        } else {
+                            alert("Something went wrong. Please try again.");
+                        }
+                    });
+            } else {
+                console.error("No anonymous user found to link.");
+            }
+        });
         // -------------------------------
 
         // Web Audio API
