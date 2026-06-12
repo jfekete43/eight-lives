@@ -287,6 +287,7 @@
         <div class="button-group">
             <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
             <button class="arcade-btn" onclick="resetGame(true, false)">Next Round</button>
+            <button class="arcade-btn" onclick="document.getElementById('account-modal').style.display='flex'" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
             <button class="arcade-btn submit-btn" id="btn-submit-win" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
     </div>
@@ -303,10 +304,32 @@
         <div class="button-group">
             <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
             <button class="arcade-btn" id="btn-retry-lose" onclick="resetGame(true, false)">Continue</button>
+            <button class="arcade-btn" onclick="document.getElementById('account-modal').style.display='flex'" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
             <button class="arcade-btn submit-btn" id="btn-submit-lose" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
     </div>
-
+<!-- ACCOUNT REGISTRATION MODAL -->
+    <div id="account-modal" class="overlay-screen" style="display: none; z-index: 200;">
+        <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #e2b714; border-radius: 10px; max-width: 400px; width: 90%; text-align: center;">
+            <div class="overlay-text" style="font-size: 24px; color: #e2b714; margin-bottom: 10px;">SAVE YOUR STATS</div>
+            <div class="overlay-subtext" style="margin-bottom: 25px;">Create a profile to secure your Lifetime Bank and unlock the Global Leaderboard.</div>
+            
+            <!-- Email & Password Form -->
+            <input type="email" id="signup-email" placeholder="EMAIL ADDRESS" style="width: 100%; padding: 10px; margin-bottom: 15px; background: black; color: white; border: 1px solid #555; font-family: 'Press Start 2P', monospace; font-size: 10px; box-sizing: border-box;">
+            
+            <input type="password" id="signup-password" placeholder="PASSWORD" style="width: 100%; padding: 10px; margin-bottom: 20px; background: black; color: white; border: 1px solid #555; font-family: 'Press Start 2P', monospace; font-size: 10px; box-sizing: border-box;">
+            
+            <button class="arcade-btn" id="btn-email-signup" style="width: 100%; margin-bottom: 20px; border-color: #538d4e; color: #538d4e;">LINK WITH EMAIL</button>
+            
+            <div style="color: #888; font-family: 'Press Start 2P', monospace; font-size: 10px; margin-bottom: 20px;">- OR -</div>
+            
+            <!-- Google Button -->
+            <button class="arcade-btn" id="btn-google-signup" style="width: 100%; margin-bottom: 25px; border-color: #4285F4; color: #4285F4;">LINK WITH GOOGLE</button>
+            
+            <!-- Cancel / Close -->
+            <button class="arcade-btn" onclick="document.getElementById('account-modal').style.display='none'" style="border-color: #555; color: #555; font-size: 10px;">KEEP PLAYING AS GUEST</button>
+        </div>
+    </div>
     <script>
         // --- FIREBASE INITIALIZATION ---
         const firebaseConfig = {
