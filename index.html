@@ -179,14 +179,14 @@
     <div class="crt-scanlines"></div>
     <div class="crt-vignette"></div>
 
-    <div class="header-container">
+   <div class="header-container">
         <div class="header-actions left">
-            <button class="text-btn" onclick="resetGame(true, true)">NEW</button>
-            <button class="text-btn" onclick="toggleModal('flex')">STATS</button>
-        </div>
+            </div>
+        
         <h1>Game Grid</h1>
+        
         <div class="header-actions right">
-            <button class="text-btn" onclick="toggleLeaderboard('flex')">LEADERS</button>
+            <button class="text-btn" onclick="openMainMenu()" style="color: #e2b714; border: 1px solid #e2b714; padding: 5px 10px;">MENU &#9776;</button>
         </div>
     </div>
         
@@ -330,6 +330,28 @@
             <button class="arcade-btn" onclick="closeAccountModal()" style="border-color: #555; color: #555; font-size: 10px;">KEEP PLAYING AS GUEST</button>
         </div>
     </div>
+
+    <!-- MAIN NAVIGATION MENU -->
+    <div id="main-menu" class="overlay-screen" style="display: none; z-index: 99999;">
+        <div style="background-color: #1a1a1a; padding: 40px; border: 2px solid #e2b714; border-radius: 10px; min-width: 250px; text-align: center;">
+            <div class="overlay-text" style="font-size: 24px; color: #e2b714; margin-bottom: 30px;">PAUSED</div>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- Existing Game Features using YOUR specific functions -->
+                <button class="arcade-btn" onclick="closeMainMenu(); resetGame(true, true)">NEW RUN</button>
+                <button class="arcade-btn" onclick="closeMainMenu(); toggleModal('flex')">STATS</button>
+                <button class="arcade-btn" onclick="closeMainMenu(); toggleLeaderboard('flex')">LEADERBOARD</button>
+                
+                <div style="height: 2px; background-color: #333; margin: 10px 0;"></div>
+                
+                <!-- The New Profile/Login Hub -->
+                <button class="arcade-btn" id="nav-profile-btn" onclick="handleProfileClick()" style="border-color: #4285F4; color: #4285F4;">PROFILE / LOG IN</button>
+                
+                <!-- Close Button -->
+                <button class="arcade-btn" onclick="closeMainMenu()" style="border-color: #555; color: #555; margin-top: 15px;">BACK TO GAME</button>
+            </div>
+        </div>
+    </div>
     <script>
         // --- FIREBASE INITIALIZATION ---
         const firebaseConfig = {
@@ -413,6 +435,30 @@
             // Bring the correct end screen back up
             if (modal.dataset.returnScreen) {
                 document.getElementById(modal.dataset.returnScreen).style.display = 'flex';
+            }
+        }
+        // --- MAIN MENU NAVIGATION ---
+        function openMainMenu() {
+            document.getElementById('main-menu').style.display = 'flex';
+        }
+
+        function closeMainMenu() {
+            document.getElementById('main-menu').style.display = 'none';
+        }
+
+        function handleProfileClick() {
+            closeMainMenu();
+            const user = firebase.auth().currentUser;
+            
+            // If they are an anonymous guest, show them the Link/Login options
+            if (user && user.isAnonymous) {
+                const modal = document.getElementById('account-modal');
+                modal.style.display = 'flex';
+                modal.style.position = 'fixed';
+                modal.style.zIndex = '99999';
+            } else if (user && !user.isAnonymous) {
+                // They are fully logged in. Eventually, this will open their Player Locker.
+                alert("Player Locker coming soon!");
             }
         }
 
