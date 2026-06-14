@@ -287,7 +287,7 @@
         <div class="button-group">
             <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
             <button class="arcade-btn" onclick="resetGame(true, false)">Next Round</button>
-            <button class="arcade-btn" onclick="document.getElementById('account-modal').style.display='flex'" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
+            <button class="arcade-btn" onclick="openAccountModal('victory-screen')" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
             <button class="arcade-btn submit-btn" id="btn-submit-win" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
     </div>
@@ -304,7 +304,7 @@
         <div class="button-group">
             <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
             <button class="arcade-btn" id="btn-retry-lose" onclick="resetGame(true, false)">Continue</button>
-            <button class="arcade-btn" onclick="document.getElementById('account-modal').style.display='flex'" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
+            <button class="arcade-btn" onclick="openAccountModal('game-over-screen')" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
             <button class="arcade-btn submit-btn" id="btn-submit-lose" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
     </div>
@@ -327,7 +327,7 @@
             <button class="arcade-btn" id="btn-google-signup" style="width: 100%; margin-bottom: 25px; border-color: #4285F4; color: #4285F4;">LINK WITH GOOGLE</button>
             
             <!-- Cancel / Close -->
-            <button class="arcade-btn" onclick="document.getElementById('account-modal').style.display='none'" style="border-color: #555; color: #555; font-size: 10px;">KEEP PLAYING AS GUEST</button>
+            <button class="arcade-btn" onclick="closeAccountModal()" style="border-color: #555; color: #555; font-size: 10px;">KEEP PLAYING AS GUEST</button>
         </div>
     </div>
     <script>
@@ -389,6 +389,32 @@
             }
         });
         // -------------------------------
+        // --- MODAL SCREEN SWAP LOGIC ---
+        function openAccountModal(fromScreen) {
+            // Hide the active game end screen
+            document.getElementById('victory-screen').style.display = 'none';
+            document.getElementById('game-over-screen').style.display = 'none';
+            
+            // Show the Account Modal and force it to the absolute front
+            const modal = document.getElementById('account-modal');
+            modal.style.display = 'flex';
+            modal.style.position = 'fixed'; 
+            modal.style.zIndex = '99999';
+            
+            // Tag the modal with the screen we just came from so it knows where to go back to
+            modal.dataset.returnScreen = fromScreen;
+        }
+
+        function closeAccountModal() {
+            // Hide the Account Modal
+            const modal = document.getElementById('account-modal');
+            modal.style.display = 'none';
+            
+            // Bring the correct end screen back up
+            if (modal.dataset.returnScreen) {
+                document.getElementById(modal.dataset.returnScreen).style.display = 'flex';
+            }
+        }
 
         // Web Audio API
         let audioCtx = null;
