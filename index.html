@@ -326,6 +326,11 @@
             <!-- Google Button -->
             <button class="arcade-btn" id="btn-google-signup" style="width: 100%; margin-bottom: 25px; border-color: #4285F4; color: #4285F4;">LINK WITH GOOGLE</button>
             
+            <div style="color: #888; font-family: 'Press Start 2P', monospace; font-size: 10px; margin-bottom: 20px;">- ALREADY SECURED? -</div>
+            
+            <!-- Existing Account Login -->
+            <button class="arcade-btn" id="btn-google-login" style="width: 100%; margin-bottom: 25px; border-color: #e2b714; color: #e2b714;">LOG IN TO EXISTING PROFILE</button>
+            
             <!-- Cancel / Close -->
             <button class="arcade-btn" onclick="closeAccountModal()" style="border-color: #555; color: #555; font-size: 10px;">KEEP PLAYING AS GUEST</button>
         </div>
@@ -410,7 +415,29 @@
                 console.error("No anonymous user found to link.");
             }
         });
+
+        // --- GOOGLE EXISTING ACCOUNT LOGIN ---
+        document.getElementById('btn-google-login').addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            // This command throws away the anonymous Ghost ID and pulls down the official profile
+            firebase.auth().signInWithPopup(provider)
+                .then((result) => {
+                    // Success! Update their local ID to match their cloud profile
+                    currentUID = result.user.uid;
+                    console.log("Successfully logged in:", result.user.email);
+                    alert("Welcome back! Your profile is loaded.");
+                    
+                    // Close the modal
+                    closeAccountModal();
+                })
+                .catch((error) => {
+                    console.error("Login failed:", error.message);
+                    alert("Login failed. Please try again.");
+                });
+        });
         // -------------------------------
+
         // --- MODAL SCREEN SWAP LOGIC ---
         function openAccountModal(fromScreen) {
             // Hide the active game end screen
