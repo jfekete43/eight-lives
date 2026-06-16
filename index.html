@@ -392,13 +392,15 @@
                     .then((result) => {
                         // Success!
                         console.log("Account successfully linked:", result.user.email);
-                        alert("Profile Saved! Your lifetime stats are now permanently secure.");
                         
-                        // Close the modal
-                        document.getElementById('account-modal').style.display = 'none';
+                        // -- NEW: Trigger the Locker Builder --
+                        syncPlayerProfile(result.user);
+                        
+                        // Close the modal using our new function
+                        closeAccountModal();
                         
                         // Hide the "Save Profile" buttons since they are now registered
-                        const saveButtons = document.querySelectorAll("button[onclick=\"document.getElementById('account-modal').style.display='flex'\"]");
+                        const saveButtons = document.querySelectorAll("button[onclick=\"openAccountModal('victory-screen')\"], button[onclick=\"openAccountModal('game-over-screen')\"]");
                         saveButtons.forEach(btn => btn.style.display = 'none');
                     })
                     .catch((error) => {
@@ -426,7 +428,9 @@
                     // Success! Update their local ID to match their cloud profile
                     currentUID = result.user.uid;
                     console.log("Successfully logged in:", result.user.email);
-                    alert("Welcome back! Your profile is loaded.");
+                    
+                    // -- NEW: Pull down their Locker --
+                    syncPlayerProfile(result.user);
                     
                     // Close the modal
                     closeAccountModal();
@@ -463,6 +467,42 @@
             if (modal.dataset.returnScreen) {
                 document.getElementById(modal.dataset.returnScreen).style.display = 'flex';
             }
+        }
+        // --- PLAYER LOCKER (FIRESTORE) LOGIC ---
+        function syncPlayerProfile(user) {
+            const userRef = db.collection("users").doc(user.uid);
+
+            userRef.get().then((doc) => {
+                if (doc.exists) {
+                    // Scenario A: They already have a locker (Logging in on a new device)
+                    const data = doc.data();
+                    console.log("Locker found for:", data.arcadeTag);
+                    alert(`Welcome back to the Grid, ${data.arcadeTag}!`);
+                    
+                    // Eventually, we will load their lifetime points from here!
+                } else {
+                    // Scenario B: Brand new account linked! We need to build their locker.
+                    let tag = prompt("Profile Secured! Enter your official Arcade Tag (10 characters max):", "PLAYER");
+                    if (!tag) tag = "PLAYER"; // Fallback if they hit cancel
+                    const cleanTag = tag.substring(0, 10).toUpperCase();
+
+                    // Create the document in the database
+                    userRef.set({
+                        arcadeTag: cleanTag,
+                        email: user.email,
+                        lifetimePoints: 0, 
+                        equippedTitle: "Insert Coin",
+                        joinDate: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        console.log("New Player Locker created!");
+                        alert(`Locker established! You are officially recognized as ${cleanTag}.`);
+                    }).catch((error) => {
+                        console.error("Error building locker:", error);
+                    });
+                }
+            }).catch((error) => {
+                console.error("Error accessing database:", error);
+            });
         }
         // --- MAIN MENU NAVIGATION ---
         function openMainMenu() {
