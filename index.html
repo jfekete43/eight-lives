@@ -518,6 +518,8 @@
                         email: user.email,
                         lifetimePoints: 0, 
                         equippedTitle: "Insert Coin",
+                        unlockedBadges: [], // <-- NEW: Holds everything they own
+                        equippedBadges: [], // <-- NEW: Holds the 1-3 they display
                         joinDate: firebase.firestore.FieldValue.serverTimestamp()
                     }).then(() => {
                         console.log("New Player Locker created!");
@@ -562,6 +564,15 @@
             { threshold: 5000, title: "Console Cowboy" },
             { threshold: 10000, title: "Grid Master" }
         ];
+        // --- BADGE REGISTRY ---
+        // This is the master dictionary of all badges in the game.
+        const BADGE_REGISTRY = {
+            "SCORE_50": { icon: "🔥", desc: "Best Run: 50+ Pts" },
+            "SCORE_100": { icon: "⚡", desc: "Best Run: 100+ Pts" },
+            "SCORE_150": { icon: "🚀", desc: "Best Run: 150+ Pts" },
+            "STREAK_5": { icon: "🎯", desc: "5 Game Win Streak" },
+            "STREAK_10": { icon: "🏆", desc: "10 Game Win Streak" }
+        };
 
         function getPrestigeData(points) {
             let currentRank = PRESTIGE_RANKS[0];
@@ -880,6 +891,43 @@
             });
         }
 
+        // --- BADGE VALIDATOR ENGINE ---
+        function evaluatePerformanceBadges(uid) {
+            const userRef = db.collection("users").doc(uid);
+            
+            userRef.get().then((doc) => {
+                if (!doc.exists) return;
+                
+                const data = doc.data();
+                // If they have older accounts without the arrays, default to empty
+                const currentBadges = data.unlockedBadges || []; 
+                let newlyEarned = [];
+
+                // 1. High Score Checks
+                if (localStats.highScore >= 150 && !currentBadges.includes("SCORE_150")) newlyEarned.push("SCORE_150");
+                if (localStats.highScore >= 100 && !currentBadges.includes("SCORE_100")) newlyEarned.push("SCORE_100");
+                if (localStats.highScore >= 50 && !currentBadges.includes("SCORE_50")) newlyEarned.push("SCORE_50");
+
+                // 2. Streak Checks
+                if (localStats.maxStreak >= 10 && !currentBadges.includes("STREAK_10")) newlyEarned.push("STREAK_10");
+                if (localStats.maxStreak >= 5 && !currentBadges.includes("STREAK_5")) newlyEarned.push("STREAK_5");
+
+                // If they earned anything new, push it to Firestore
+                if (newlyEarned.length > 0) {
+                    userRef.update({
+                        // arrayUnion safely adds new items without deleting existing ones
+                        unlockedBadges: firebase.firestore.FieldValue.arrayUnion(...newlyEarned) 
+                    }).then(() => {
+                        console.log("New badges unlocked!", newlyEarned);
+                        // Convert IDs to icons to show the user what they won!
+                        const earnedIcons = newlyEarned.map(id => BADGE_REGISTRY[id].icon).join(" ");
+                        setTimeout(() => {
+                            alert(`🎖️ ACHIEVEMENT UNLOCKED! 🎖️\nYou earned: ${earnedIcons}\nCheck your locker to equip them!`);
+                        }, 500); // Slight delay so it pops up right after the cash-out alert
+                    });
+                }
+            }).catch(err => console.error("Error evaluating badges:", err));
+        }
         function submitToLeaderboard() {
             if (localStats.arcadeScore <= 0) {
                 alert("You need a score above 0 to enter the Hall of Fame!");
@@ -940,6 +988,10 @@
                             lifetimePoints: firebase.firestore.FieldValue.increment(pointsToDeposit)
                         }).then(() => {
                             console.log(`Deposited ${pointsToDeposit} points into Lifetime Bank!`);
+                            
+                            // --> NEW: Trigger the Badge Validator! <--
+                            evaluatePerformanceBadges(user.uid);
+                            
                         }).catch(err => console.error("Bank deposit failed:", err));
                     }
 
