@@ -359,7 +359,7 @@
     </div>
     <!-- PLAYER LOCKER MODAL -->
     <div id="locker-modal" class="overlay-screen" style="display: none; z-index: 99999;">
-        <div style="background-color: #1a1a1a; padding: 40px; border: 2px solid #538d4e; border-radius: 10px; min-width: 300px; text-align: center;">
+        <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #538d4e; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto;">
             <div class="overlay-text" style="font-size: 24px; color: #538d4e; margin-bottom: 5px;">MY LOCKER</div>
             <div id="locker-title" style="color: #e2b714; font-family: 'Press Start 2P', monospace; font-size: 10px; margin-bottom: 30px;">[TITLE]</div>
             
@@ -371,15 +371,26 @@
                 BANK: <span id="locker-bank" style="color: #538d4e;">0</span> PTS
             </div>
 
-            <!-- NEW: Rank Progress Bar -->
+            <!-- Rank Progress Bar -->
             <div style="width: 100%; background-color: #333; height: 10px; border-radius: 5px; margin-bottom: 8px; overflow: hidden; border: 1px solid #555;">
                 <div id="rank-progress-bar" style="width: 0%; background-color: #e2b714; height: 100%; transition: width 0.5s ease-in-out;"></div>
             </div>
-            <div id="rank-next-text" style="font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888; margin-bottom: 30px;">...</div>
+            <div id="rank-next-text" style="font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888; margin-bottom: 20px;">...</div>
             
+            <!-- NEW: TROPHY CASE -->
+            <div style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
+                <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #e2b714; margin-bottom: 10px;">EQUIPPED BADGES</div>
+                <div id="equipped-badges-display" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; font-size: 28px; min-height: 35px;">
+                    <!-- Equipped badges render here -->
+                </div>
+                
+                <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #888; margin-bottom: 10px;">YOUR COLLECTION (Click to Equip)</div>
+                <div id="unlocked-badges-display" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 25px; background: black; padding: 10px; border-radius: 8px; border: 1px solid #333; min-height: 40px;">
+                    <!-- Unlocked badges render here -->
+                </div>
+            </div>
+
             <button class="arcade-btn" onclick="document.getElementById('locker-modal').style.display='none'" style="border-color: #555; color: #555; width: 100%; margin-bottom: 15px;">CLOSE LOCKER</button>
-            
-            <!-- A quick Log Out button in case players share a device -->
             <button class="arcade-btn" id="btn-logout" style="border-color: #e23636; color: #e23636; font-size: 10px; width: 100%;">LOG OUT</button>
         </div>
     </div>
@@ -588,6 +599,77 @@
             return { currentRank, nextRank };
         }
 
+        // --- BADGE UI MANAGER ---
+        let activeLockerUID = null;
+        let activeEquippedBadges = [];
+        let activeUnlockedBadges = [];
+
+        function renderBadgeUI() {
+            const equippedContainer = document.getElementById('equipped-badges-display');
+            const unlockedContainer = document.getElementById('unlocked-badges-display');
+            equippedContainer.innerHTML = '';
+            unlockedContainer.innerHTML = '';
+
+            if (activeUnlockedBadges.length === 0) {
+                unlockedContainer.innerHTML = '<span style="color: #555; font-size: 10px; margin-top: 10px;">Play games to earn badges!</span>';
+            }
+
+            activeUnlockedBadges.forEach(badgeId => {
+                const badgeData = BADGE_REGISTRY[badgeId];
+                if (!badgeData) return;
+
+                const isEquipped = activeEquippedBadges.includes(badgeId);
+                
+                // Build the Collection Button
+                const badgeEl = document.createElement('div');
+                badgeEl.innerText = badgeData.icon;
+                badgeEl.title = badgeData.desc; // Shows tooltip on hover
+                badgeEl.style.cursor = 'pointer';
+                badgeEl.style.fontSize = '24px';
+                badgeEl.style.padding = '5px';
+                badgeEl.style.border = isEquipped ? '2px solid #538d4e' : '2px solid transparent';
+                badgeEl.style.borderRadius = '5px';
+                badgeEl.style.backgroundColor = isEquipped ? '#1a2e1a' : 'transparent';
+                badgeEl.style.transition = 'all 0.2s';
+                
+                badgeEl.onclick = () => toggleBadge(badgeId);
+                unlockedContainer.appendChild(badgeEl);
+
+                // Build the Equipped Display
+                if (isEquipped) {
+                    const eqEl = document.createElement('div');
+                    eqEl.innerText = badgeData.icon;
+                    eqEl.title = badgeData.desc;
+                    eqEl.style.cursor = 'pointer';
+                    eqEl.onclick = () => toggleBadge(badgeId);
+                    equippedContainer.appendChild(eqEl);
+                }
+            });
+        }
+
+        function toggleBadge(badgeId) {
+            if (activeEquippedBadges.includes(badgeId)) {
+                // Remove it
+                activeEquippedBadges = activeEquippedBadges.filter(id => id !== badgeId);
+            } else {
+                // Add it if they have room
+                if (activeEquippedBadges.length >= 3) {
+                    alert("You can only equip up to 3 badges at a time!");
+                    return;
+                }
+                activeEquippedBadges.push(badgeId);
+            }
+            
+            renderBadgeUI(); // Update screen instantly
+            
+            // Save preference to Firestore silently in the background
+            if (activeLockerUID) {
+                db.collection("users").doc(activeLockerUID).update({
+                    equippedBadges: activeEquippedBadges
+                }).catch(err => console.error("Error saving badges:", err));
+            }
+        }
+
         function handleProfileClick() {
             closeMainMenu();
             const user = firebase.auth().currentUser;
@@ -634,6 +716,13 @@
                             db.collection("users").doc(user.uid).update({ equippedTitle: earnedTitle });
                         }
                         
+                        // --- NEW: Load Badges into UI ---
+                        activeLockerUID = user.uid;
+                        activeUnlockedBadges = data.unlockedBadges || [];
+                        activeEquippedBadges = data.equippedBadges || [];
+                        renderBadgeUI();
+                        // --------------------------------
+
                         // Display the locker
                         document.getElementById('locker-modal').style.display = 'flex';
                     }
