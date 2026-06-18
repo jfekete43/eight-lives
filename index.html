@@ -764,48 +764,76 @@
                 return;
             }
             
-            const initials = prompt("Enter your name (10 characters max):", "PLAYER");
-            if (!initials) return; 
-            
-            const cleanInitials = initials.substring(0, 10).toUpperCase();
+            // Disable buttons immediately so they can't double-click
             document.getElementById('btn-submit-win').style.display = 'none';
             document.getElementById('btn-submit-lose').style.display = 'none';
-            
-            // Build the data strings for time-based leaderboards
-            const periods = getPeriods();
-            const paddedScore = localStats.arcadeScore.toString().padStart(9, '0');
 
-            db.collection("leaderboard").add({
-                name: cleanInitials,
-                score: localStats.arcadeScore,
-                uid: currentUID,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                day_score: `${periods.day}_${paddedScore}`,
-                week_score: `${periods.week}_${paddedScore}`,
-                month_score: `${periods.month}_${paddedScore}`
-            })
-            .then(() => {
-                alert("Score Locked In! Your points have been cashed out.");
+            const user = firebase.auth().currentUser;
 
-                window.lastShareScore = localStats.arcadeScore;
-                
-                localStats.arcadeScore = 0;
-                localStats.continues = 2;
-                localStorage.setItem('gamedleStats', JSON.stringify(localStats));
-                document.getElementById('current-score').innerText = localStats.arcadeScore;
-                document.getElementById('continues-left').innerText = localStats.continues;
-                
-                document.getElementById('victory-screen').style.display = 'none';
-                document.getElementById('game-over-screen').style.display = 'none';
-                document.getElementById('share-btn').style.display = 'block';
-                toggleLeaderboard('flex');
-            })
-            .catch((error) => {
-                console.error("Error writing document: ", error);
-                alert("Failed to connect to the database. Are your security rules active?");
-                document.getElementById('btn-submit-win').style.display = 'block';
-                document.getElementById('btn-submit-lose').style.display = 'block';
-            });
+            // SMART ROUTING: Determine if they are a Guest or a Registered Player
+            if (user && !user.isAnonymous) {
+                // They are registered! Go into their Locker and fetch their official Arcade Tag
+                db.collection("users").doc(user.uid).get().then((doc) => {
+                    if (doc.exists && doc.data().arcadeTag) {
+                        finalizeCashOut(doc.data().arcadeTag);
+                    } else {
+                        askForGuestName(); // Failsafe if locker is missing
+                    }
+                }).catch(() => askForGuestName());
+            } else {
+                // They are an anonymous guest. Use the prompt.
+                askForGuestName();
+            }
+
+            // --- HELPER 1: The Guest Prompt ---
+            function askForGuestName() {
+                const initials = prompt("Enter your name (10 characters max):", "PLAYER");
+                if (!initials) {
+                    // Restore buttons if they hit Cancel
+                    document.getElementById('btn-submit-win').style.display = 'block';
+                    document.getElementById('btn-submit-lose').style.display = 'block';
+                    return; 
+                }
+                finalizeCashOut(initials.substring(0, 10).toUpperCase());
+            }
+
+            // --- HELPER 2: The Database Submission ---
+            function finalizeCashOut(cleanName) {
+                const periods = getPeriods();
+                const paddedScore = localStats.arcadeScore.toString().padStart(9, '0');
+
+                db.collection("leaderboard").add({
+                    name: cleanName,
+                    score: localStats.arcadeScore,
+                    uid: currentUID,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    day_score: `${periods.day}_${paddedScore}`,
+                    week_score: `${periods.week}_${paddedScore}`,
+                    month_score: `${periods.month}_${paddedScore}`
+                })
+                .then(() => {
+                    alert(`Score Locked In! ${cleanName}'s points have been cashed out.`);
+
+                    window.lastShareScore = localStats.arcadeScore;
+                    
+                    localStats.arcadeScore = 0;
+                    localStats.continues = 2;
+                    localStorage.setItem('gamedleStats', JSON.stringify(localStats));
+                    document.getElementById('current-score').innerText = localStats.arcadeScore;
+                    document.getElementById('continues-left').innerText = localStats.continues;
+                    
+                    document.getElementById('victory-screen').style.display = 'none';
+                    document.getElementById('game-over-screen').style.display = 'none';
+                    document.getElementById('share-btn').style.display = 'block';
+                    toggleLeaderboard('flex');
+                })
+                .catch((error) => {
+                    console.error("Error writing document: ", error);
+                    alert("Failed to connect to the database. Are your security rules active?");
+                    document.getElementById('btn-submit-win').style.display = 'block';
+                    document.getElementById('btn-submit-lose').style.display = 'block';
+                });
+            }
         }
         // ----------------------------------
 
