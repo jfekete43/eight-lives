@@ -357,6 +357,24 @@
             </div>
         </div>
     </div>
+    <div id="locker-modal" class="overlay-screen" style="display: none; z-index: 99999;">
+        <div style="background-color: #1a1a1a; padding: 40px; border: 2px solid #538d4e; border-radius: 10px; min-width: 300px; text-align: center;">
+            <div class="overlay-text" style="font-size: 24px; color: #538d4e; margin-bottom: 5px;">MY LOCKER</div>
+            <div id="locker-title" style="color: #e2b714; font-family: 'Press Start 2P', monospace; font-size: 10px; margin-bottom: 30px;">[TITLE]</div>
+            
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 14px; color: white; margin-bottom: 20px;">
+                TAG: <span id="locker-tag" style="color: #4285F4;">...</span>
+            </div>
+            
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 14px; color: white; margin-bottom: 30px;">
+                BANK: <span id="locker-bank" style="color: #538d4e;">0</span> PTS
+            </div>
+            
+            <button class="arcade-btn" onclick="document.getElementById('locker-modal').style.display='none'" style="border-color: #555; color: #555; width: 100%; margin-bottom: 15px;">CLOSE LOCKER</button>
+            
+            <button class="arcade-btn" id="btn-logout" style="border-color: #e23636; color: #e23636; font-size: 10px; width: 100%;">LOG OUT</button>
+        </div>
+    </div>
     <script>
         // --- FIREBASE INITIALIZATION ---
         const firebaseConfig = {
@@ -507,6 +525,20 @@
         // --- MAIN MENU NAVIGATION ---
         function openMainMenu() {
             document.getElementById('main-menu').style.display = 'flex';
+            
+            // DYNAMIC BUTTON UPDATE: Check if they are logged in
+            const user = firebase.auth().currentUser;
+            const profileBtn = document.getElementById('nav-profile-btn');
+            
+            if (user && !user.isAnonymous) {
+                profileBtn.innerText = "MY LOCKER";
+                profileBtn.style.borderColor = "#538d4e";
+                profileBtn.style.color = "#538d4e";
+            } else {
+                profileBtn.innerText = "PROFILE / LOG IN";
+                profileBtn.style.borderColor = "#4285F4";
+                profileBtn.style.color = "#4285F4";
+            }
         }
 
         function closeMainMenu() {
@@ -517,17 +549,36 @@
             closeMainMenu();
             const user = firebase.auth().currentUser;
             
-            // If they are an anonymous guest, show them the Link/Login options
             if (user && user.isAnonymous) {
+                // GUEST: Show them the Link/Login options
                 const modal = document.getElementById('account-modal');
                 modal.style.display = 'flex';
                 modal.style.position = 'fixed';
                 modal.style.zIndex = '99999';
             } else if (user && !user.isAnonymous) {
-                // They are fully logged in! Let's check/build their locker.
-                syncPlayerProfile(user);
+                // LOGGED IN: Open their visual locker!
+                db.collection("users").doc(user.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        document.getElementById('locker-tag').innerText = data.arcadeTag;
+                        document.getElementById('locker-bank').innerText = data.lifetimePoints;
+                        document.getElementById('locker-title').innerText = data.equippedTitle || "Insert Coin";
+                        
+                        document.getElementById('locker-modal').style.display = 'flex';
+                    }
+                }).catch(err => console.error("Error loading locker details:", err));
             }
         }
+
+        // --- LOG OUT BUTTON LOGIC ---
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            firebase.auth().signOut().then(() => {
+                document.getElementById('locker-modal').style.display = 'none';
+                alert("You have been securely logged out. Returning to Guest Mode.");
+                // Reload the page to reset everything to a clean guest state
+                location.reload(); 
+            });
+        });
 
         // Web Audio API
         let audioCtx = null;
