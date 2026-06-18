@@ -945,13 +945,17 @@
                         const row = document.createElement('div');
                         row.style.display = 'flex';
                         row.style.justifyContent = 'space-between';
-                        row.style.alignItems = 'center'; // Keeps the score aligned with the two-line name
+                        row.style.alignItems = 'center'; 
                         row.style.marginBottom = '10px';
                         row.style.borderBottom = '1px solid #3a3a3c';
                         row.style.paddingBottom = '5px';
                         
-                        // --- NEW: Format the Title ---
+                        // --- NEW: Format the Title and Badges ---
                         const displayTitle = data.title ? data.title : "Insert Coin";
+                        
+                        // Map the saved badge IDs to their actual icons
+                        const playerBadges = data.badges || [];
+                        const badgeIcons = playerBadges.map(id => BADGE_REGISTRY[id] ? BADGE_REGISTRY[id].icon : "").join(" ");
                         
                         let nameColor = "white";
                         let crown = "";
@@ -959,10 +963,13 @@
                         if (rankCount === 2) nameColor = "#c0c0c0";
                         if (rankCount === 3) nameColor = "#cd7f32";
 
-                        // Stacking the Name and Title for a clean look
+                        // Stacking the Name, Badges, and Title for a clean look
                         const nameSpan = `
                             <div style="display: flex; flex-direction: column; line-height: 1.4;">
-                                <span style="color: ${nameColor};">${rankCount}. ${data.name}${crown}</span>
+                                <div>
+                                    <span style="color: ${nameColor};">${rankCount}. ${data.name}${crown}</span>
+                                    <span style="font-size: 14px; margin-left: 5px; letter-spacing: 2px;">${badgeIcons}</span>
+                                </div>
                                 <span style="color: #888; font-size: 8px; text-transform: uppercase;">${displayTitle}</span>
                             </div>
                         `;
@@ -1031,9 +1038,10 @@
             if (user && !user.isAnonymous) {
                 db.collection("users").doc(user.uid).get().then((doc) => {
                     if (doc.exists && doc.data().arcadeTag) {
-                        // --- NEW: Grab their title, default to Insert Coin if missing ---
                         const title = doc.data().equippedTitle || "Insert Coin";
-                        finalizeCashOut(doc.data().arcadeTag, title);
+                        // --- NEW: Grab their equipped badges ---
+                        const badges = doc.data().equippedBadges || [];
+                        finalizeCashOut(doc.data().arcadeTag, title, badges);
                     } else {
                         askForGuestName(); 
                     }
@@ -1050,12 +1058,12 @@
                     document.getElementById('btn-submit-lose').style.display = 'block';
                     return; 
                 }
-                // Guests get a default "Guest" title
-                finalizeCashOut(initials.substring(0, 10).toUpperCase(), "Guest");
+                // Guests get a default "Guest" title and no badges
+                finalizeCashOut(initials.substring(0, 10).toUpperCase(), "Guest", []);
             }
 
             // --- HELPER 2: The Database Submission ---
-            function finalizeCashOut(cleanName, playerTitle) {
+            function finalizeCashOut(cleanName, playerTitle, playerBadges) {
                 const periods = getPeriods();
                 const paddedScore = localStats.arcadeScore.toString().padStart(9, '0');
                 const pointsToDeposit = localStats.arcadeScore;
@@ -1063,7 +1071,8 @@
                 db.collection("leaderboard").add({
                     name: cleanName,
                     score: pointsToDeposit,
-                    title: playerTitle, // <-- NEW: Saves their title to the board!
+                    title: playerTitle,
+                    badges: playerBadges, // <-- NEW: Saves their badges to the board!
                     uid: currentUID,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     day_score: `${periods.day}_${paddedScore}`,
@@ -1077,10 +1086,7 @@
                             lifetimePoints: firebase.firestore.FieldValue.increment(pointsToDeposit)
                         }).then(() => {
                             console.log(`Deposited ${pointsToDeposit} points into Lifetime Bank!`);
-                            
-                            // --> NEW: Trigger the Badge Validator! <--
                             evaluatePerformanceBadges(user.uid);
-                            
                         }).catch(err => console.error("Bank deposit failed:", err));
                     }
 
