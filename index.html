@@ -838,25 +838,36 @@
                     const data = doc.data();
                     const playerName = data.name.toUpperCase();
 
-                    // Check if player is already on the board for this time period
                     if (!seenNames.has(playerName)) {
                         seenNames.add(playerName);
                         rankCount++;
 
-                        // --- YOUR ORIGINAL ROW STYLING ---
                         const row = document.createElement('div');
                         row.style.display = 'flex';
                         row.style.justifyContent = 'space-between';
+                        row.style.alignItems = 'center'; // Keeps the score aligned with the two-line name
                         row.style.marginBottom = '10px';
                         row.style.borderBottom = '1px solid #3a3a3c';
                         row.style.paddingBottom = '5px';
                         
-                        let nameSpan = `<span>${rankCount}. ${data.name}</span>`;
-                        if (rankCount === 1) nameSpan = `<span style="color:#e2b714;">${rankCount}. ${data.name} 👑</span>`;
-                        if (rankCount === 2) nameSpan = `<span style="color:#c0c0c0;">${rankCount}. ${data.name}</span>`;
-                        if (rankCount === 3) nameSpan = `<span style="color:#cd7f32;">${rankCount}. ${data.name}</span>`;
+                        // --- NEW: Format the Title ---
+                        const displayTitle = data.title ? data.title : "Insert Coin";
+                        
+                        let nameColor = "white";
+                        let crown = "";
+                        if (rankCount === 1) { nameColor = "#e2b714"; crown = " 👑"; }
+                        if (rankCount === 2) nameColor = "#c0c0c0";
+                        if (rankCount === 3) nameColor = "#cd7f32";
 
-                        row.innerHTML = `${nameSpan}<span>${data.score}</span>`;
+                        // Stacking the Name and Title for a clean look
+                        const nameSpan = `
+                            <div style="display: flex; flex-direction: column; line-height: 1.4;">
+                                <span style="color: ${nameColor};">${rankCount}. ${data.name}${crown}</span>
+                                <span style="color: #888; font-size: 8px;">[${displayTitle}]</span>
+                            </div>
+                        `;
+
+                        row.innerHTML = `${nameSpan}<span style="color: ${nameColor};">${data.score}</span>`;
                         list.appendChild(row);
                     }
                 });
@@ -875,24 +886,22 @@
                 return;
             }
             
-            // Disable buttons immediately so they can't double-click
             document.getElementById('btn-submit-win').style.display = 'none';
             document.getElementById('btn-submit-lose').style.display = 'none';
 
             const user = firebase.auth().currentUser;
 
-            // SMART ROUTING: Determine if they are a Guest or a Registered Player
             if (user && !user.isAnonymous) {
-                // They are registered! Go into their Locker and fetch their official Arcade Tag
                 db.collection("users").doc(user.uid).get().then((doc) => {
                     if (doc.exists && doc.data().arcadeTag) {
-                        finalizeCashOut(doc.data().arcadeTag);
+                        // --- NEW: Grab their title, default to Insert Coin if missing ---
+                        const title = doc.data().equippedTitle || "Insert Coin";
+                        finalizeCashOut(doc.data().arcadeTag, title);
                     } else {
-                        askForGuestName(); // Failsafe if locker is missing
+                        askForGuestName(); 
                     }
                 }).catch(() => askForGuestName());
             } else {
-                // They are an anonymous guest. Use the prompt.
                 askForGuestName();
             }
 
@@ -900,25 +909,24 @@
             function askForGuestName() {
                 const initials = prompt("Enter your name (10 characters max):", "PLAYER");
                 if (!initials) {
-                    // Restore buttons if they hit Cancel
                     document.getElementById('btn-submit-win').style.display = 'block';
                     document.getElementById('btn-submit-lose').style.display = 'block';
                     return; 
                 }
-                finalizeCashOut(initials.substring(0, 10).toUpperCase());
+                // Guests get a default "Guest" title
+                finalizeCashOut(initials.substring(0, 10).toUpperCase(), "Guest");
             }
 
-           // --- HELPER 2: The Database Submission ---
-            function finalizeCashOut(cleanName) {
+            // --- HELPER 2: The Database Submission ---
+            function finalizeCashOut(cleanName, playerTitle) {
                 const periods = getPeriods();
                 const paddedScore = localStats.arcadeScore.toString().padStart(9, '0');
-                
-                // We lock in the score variable here so we don't accidentally deposit 0 when the game resets below
                 const pointsToDeposit = localStats.arcadeScore;
 
                 db.collection("leaderboard").add({
                     name: cleanName,
                     score: pointsToDeposit,
+                    title: playerTitle, // <-- NEW: Saves their title to the board!
                     uid: currentUID,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     day_score: `${periods.day}_${paddedScore}`,
@@ -926,17 +934,14 @@
                     month_score: `${periods.month}_${paddedScore}`
                 })
                 .then(() => {
-                    // --- NEW: DEPOSIT INTO LIFETIME BANK ---
                     const user = firebase.auth().currentUser;
                     if (user && !user.isAnonymous) {
-                        // Tell Firebase to mathematically add the new points to their running total
                         db.collection("users").doc(user.uid).update({
                             lifetimePoints: firebase.firestore.FieldValue.increment(pointsToDeposit)
                         }).then(() => {
                             console.log(`Deposited ${pointsToDeposit} points into Lifetime Bank!`);
                         }).catch(err => console.error("Bank deposit failed:", err));
                     }
-                    // ---------------------------------------
 
                     alert(`Score Locked In! ${cleanName}'s points have been cashed out.`);
 
