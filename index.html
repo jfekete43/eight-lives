@@ -357,6 +357,7 @@
             </div>
         </div>
     </div>
+    <!-- PLAYER LOCKER MODAL -->
     <div id="locker-modal" class="overlay-screen" style="display: none; z-index: 99999;">
         <div style="background-color: #1a1a1a; padding: 40px; border: 2px solid #538d4e; border-radius: 10px; min-width: 300px; text-align: center;">
             <div class="overlay-text" style="font-size: 24px; color: #538d4e; margin-bottom: 5px;">MY LOCKER</div>
@@ -366,12 +367,19 @@
                 TAG: <span id="locker-tag" style="color: #4285F4;">...</span>
             </div>
             
-            <div style="font-family: 'Press Start 2P', monospace; font-size: 14px; color: white; margin-bottom: 30px;">
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 14px; color: white; margin-bottom: 10px;">
                 BANK: <span id="locker-bank" style="color: #538d4e;">0</span> PTS
             </div>
+
+            <!-- NEW: Rank Progress Bar -->
+            <div style="width: 100%; background-color: #333; height: 10px; border-radius: 5px; margin-bottom: 8px; overflow: hidden; border: 1px solid #555;">
+                <div id="rank-progress-bar" style="width: 0%; background-color: #e2b714; height: 100%; transition: width 0.5s ease-in-out;"></div>
+            </div>
+            <div id="rank-next-text" style="font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888; margin-bottom: 30px;">...</div>
             
             <button class="arcade-btn" onclick="document.getElementById('locker-modal').style.display='none'" style="border-color: #555; color: #555; width: 100%; margin-bottom: 15px;">CLOSE LOCKER</button>
             
+            <!-- A quick Log Out button in case players share a device -->
             <button class="arcade-btn" id="btn-logout" style="border-color: #e23636; color: #e23636; font-size: 10px; width: 100%;">LOG OUT</button>
         </div>
     </div>
@@ -545,25 +553,77 @@
             document.getElementById('main-menu').style.display = 'none';
         }
 
+        // --- PRESTIGE RANKING SYSTEM ---
+        const PRESTIGE_RANKS = [
+            { threshold: 0, title: "Insert Coin" },
+            { threshold: 500, title: "8-Bit Novice" },
+            { threshold: 1500, title: "Arcade Rat" },
+            { threshold: 3000, title: "16-Bit Brawler" },
+            { threshold: 5000, title: "Console Cowboy" },
+            { threshold: 10000, title: "Grid Master" }
+        ];
+
+        function getPrestigeData(points) {
+            let currentRank = PRESTIGE_RANKS[0];
+            let nextRank = null;
+
+            for (let i = 0; i < PRESTIGE_RANKS.length; i++) {
+                if (points >= PRESTIGE_RANKS[i].threshold) {
+                    currentRank = PRESTIGE_RANKS[i];
+                    // Grab the next rank in the array (will be undefined if they are max rank)
+                    nextRank = PRESTIGE_RANKS[i + 1] || null; 
+                }
+            }
+            return { currentRank, nextRank };
+        }
+
         function handleProfileClick() {
             closeMainMenu();
             const user = firebase.auth().currentUser;
             
             if (user && user.isAnonymous) {
-                // GUEST: Show them the Link/Login options
                 const modal = document.getElementById('account-modal');
                 modal.style.display = 'flex';
                 modal.style.position = 'fixed';
                 modal.style.zIndex = '99999';
             } else if (user && !user.isAnonymous) {
-                // LOGGED IN: Open their visual locker!
+                
+                // Fetch their official data
                 db.collection("users").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         const data = doc.data();
-                        document.getElementById('locker-tag').innerText = data.arcadeTag;
-                        document.getElementById('locker-bank').innerText = data.lifetimePoints;
-                        document.getElementById('locker-title').innerText = data.equippedTitle || "Insert Coin";
+                        const points = data.lifetimePoints || 0;
                         
+                        // --- NEW: Calculate their Rank and Progress ---
+                        const prestige = getPrestigeData(points);
+                        const earnedTitle = prestige.currentRank.title;
+
+                        // Update the text fields
+                        document.getElementById('locker-tag').innerText = data.arcadeTag;
+                        document.getElementById('locker-bank').innerText = points;
+                        document.getElementById('locker-title').innerText = earnedTitle;
+
+                        // Update the Progress Bar
+                        if (prestige.nextRank) {
+                            const pointsNeeded = prestige.nextRank.threshold - points;
+                            const levelRange = prestige.nextRank.threshold - prestige.currentRank.threshold;
+                            const pointsIntoLevel = points - prestige.currentRank.threshold;
+                            const progressPercent = (pointsIntoLevel / levelRange) * 100;
+
+                            document.getElementById('rank-progress-bar').style.width = `${progressPercent}%`;
+                            document.getElementById('rank-next-text').innerText = `${pointsNeeded} PTS TO NEXT RANK`;
+                        } else {
+                            // They hit the maximum rank!
+                            document.getElementById('rank-progress-bar').style.width = `100%`;
+                            document.getElementById('rank-next-text').innerText = `MAXIMUM RANK ACHIEVED`;
+                        }
+
+                        // Silent background update if they ranked up since their last check
+                        if (data.equippedTitle !== earnedTitle) {
+                            db.collection("users").doc(user.uid).update({ equippedTitle: earnedTitle });
+                        }
+                        
+                        // Display the locker
                         document.getElementById('locker-modal').style.display = 'flex';
                     }
                 }).catch(err => console.error("Error loading locker details:", err));
