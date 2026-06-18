@@ -524,8 +524,8 @@
                 modal.style.position = 'fixed';
                 modal.style.zIndex = '99999';
             } else if (user && !user.isAnonymous) {
-                // They are fully logged in. Eventually, this will open their Player Locker.
-                alert("Player Locker coming soon!");
+                // They are fully logged in! Let's check/build their locker.
+                syncPlayerProfile(user);
             }
         }
 
