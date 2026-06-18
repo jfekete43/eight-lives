@@ -924,16 +924,16 @@
                              .limit(100);
             }
 
-            query.get().then((querySnapshot) => {
+            query.get().then(async (querySnapshot) => {
                 loading.style.display = 'none';
                 
-                // --- NEW FILTER LOGIC STARTS HERE ---
                 const seenNames = new Set();
                 let rankCount = 0;
-                const MAX_DISPLAY = 10; // Change this if you want a longer leaderboard
+                const MAX_DISPLAY = 10; 
 
-                querySnapshot.forEach((doc) => {
-                    if (rankCount >= MAX_DISPLAY) return; 
+                // We use 'for...of' so we can pause and securely fetch live profiles
+                for (let doc of querySnapshot.docs) {
+                    if (rankCount >= MAX_DISPLAY) break; 
 
                     const data = doc.data();
                     const playerName = data.name.toUpperCase();
@@ -941,6 +941,37 @@
                     if (!seenNames.has(playerName)) {
                         seenNames.add(playerName);
                         rankCount++;
+
+                        // --- 1. LIVE AVATAR FETCH ---
+                        // Fallback to the snapshot, but try to grab their live Locker data
+                        let liveTitle = data.title || "Insert Coin"; 
+                        let liveBadges = data.badges || []; 
+                        
+                        if (data.uid) {
+                            try {
+                                const userDoc = await db.collection("users").doc(data.uid).get();
+                                if (userDoc.exists) {
+                                    liveTitle = userDoc.data().equippedTitle || liveTitle;
+                                    liveBadges = userDoc.data().equippedBadges || [];
+                                }
+                            } catch (err) { console.error("Could not fetch live profile"); }
+                        }
+
+                        const badgeIcons = liveBadges.map(id => BADGE_REGISTRY[id] ? BADGE_REGISTRY[id].icon : "").join(" ");
+                        
+                        // --- 2. THE HIDDEN DATE STAMP ---
+                        let tooltipParams = "";
+                        let cursorStyle = "default";
+                        
+                        // Only generate the date logic if we are on the All-Time tab
+                        if (filter === 'all' && data.timestamp) {
+                            const d = data.timestamp.toDate();
+                            const formattedDate = d.toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
+                            
+                            // 'title' creates the desktop hover. 'onclick' creates the mobile tap.
+                            tooltipParams = `title="Record set on: ${formattedDate}" onclick="alert('Record set on: ${formattedDate}')"`;
+                            cursorStyle = "pointer"; // Changes mouse to a hand so desktop users know it's interactive
+                        }
 
                         const row = document.createElement('div');
                         row.style.display = 'flex';
@@ -950,43 +981,34 @@
                         row.style.borderBottom = '1px solid #3a3a3c';
                         row.style.paddingBottom = '5px';
                         
-                        // --- NEW: Format the Title and Badges ---
-                        const displayTitle = data.title ? data.title : "Insert Coin";
-                        
-                        // Map the saved badge IDs to their actual icons
-                        const playerBadges = data.badges || [];
-                        const badgeIcons = playerBadges.map(id => BADGE_REGISTRY[id] ? BADGE_REGISTRY[id].icon : "").join(" ");
-                        
                         let nameColor = "white";
                         let crown = "";
                         if (rankCount === 1) { nameColor = "#e2b714"; crown = " 👑"; }
                         if (rankCount === 2) nameColor = "#c0c0c0";
                         if (rankCount === 3) nameColor = "#cd7f32";
 
-                        // Stacking the Name, Badges, and Title for a clean look
+                        // Apply the hidden tooltip to the whole left side
                         const nameSpan = `
-                            <div style="display: flex; flex-direction: column; line-height: 1.4;">
+                            <div ${tooltipParams} style="display: flex; flex-direction: column; line-height: 1.4; cursor: ${cursorStyle};">
                                 <div>
                                     <span style="color: ${nameColor};">${rankCount}. ${data.name}${crown}</span>
                                     <span style="font-size: 14px; margin-left: 5px; letter-spacing: 2px;">${badgeIcons}</span>
                                 </div>
-                                <span style="color: #888; font-size: 8px; text-transform: uppercase;">${displayTitle}</span>
+                                <span style="color: #888; font-size: 8px; text-transform: uppercase;">${liveTitle}</span>
                             </div>
                         `;
 
                         row.innerHTML = `${nameSpan}<span style="color: ${nameColor};">${data.score}</span>`;
                         list.appendChild(row);
                     }
-                });
+                }
                 
-                // If the loop finishes and nobody is on the board
                 if (rankCount === 0) list.innerHTML = "<p>No scores yet for this time period!</p>";
             }).catch((error) => {
                 loading.innerText = "Error loading database.";
                 console.error("Error getting documents: ", error);
             });
         }
-
         // --- BADGE VALIDATOR ENGINE ---
         function evaluatePerformanceBadges(uid) {
             const userRef = db.collection("users").doc(uid);
