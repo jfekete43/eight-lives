@@ -588,7 +588,12 @@
             "DAY_1": { icon: "🥇", desc: "Daily 1st Place" },
             "DAY_3": { icon: "🥈", desc: "Daily Top 3" },
             "DAY_10": { icon: "🎖️", desc: "Daily Top 10" },
-            "DAY_25": { icon: "🏅", desc: "Daily Top 25" }
+            "DAY_25": { icon: "🏅", desc: "Daily Top 25" },
+
+            // Challenge Badges
+            "PLAY_50": { icon: "🕹️", desc: "Arcade Addict: Play 50 Games" },
+            "RPG_5": { icon: "🐉", desc: "Specialist: Guess 5 RPGs" },
+            "FLAWLESS_3": { icon: "👁️", desc: "Sniper: 3 First-Try Wins" }
         };
 
         function getPrestigeData(points) {
@@ -811,6 +816,8 @@
                     if (parsed.currentStreak === undefined) parsed.currentStreak = 0;
                     if (parsed.played === undefined) parsed.played = 0;
                     if (parsed.wins === undefined) parsed.wins = 0;
+                    if (parsed.rpgWins === undefined) parsed.rpgWins = 0;
+                    if (parsed.firstTryWins === undefined) parsed.firstTryWins = 0;
                     
                     return parsed;
                 }
@@ -820,7 +827,8 @@
             return {
                 played: 0, wins: 0, currentStreak: 0, maxStreak: 0,
                 guessDistribution: [0, 0, 0, 0, 0, 0],
-                arcadeScore: 0, highScore: 0, continues: 2
+                arcadeScore: 0, highScore: 0, continues: 2,
+                rpgWins: 0, firstTryWins: 0
             };
         }
         
@@ -1039,6 +1047,11 @@
                 // 2. Streak Checks
                 if (localStats.maxStreak >= 10 && !currentBadges.includes("STREAK_10")) newlyEarned.push("STREAK_10");
                 if (localStats.maxStreak >= 5 && !currentBadges.includes("STREAK_5")) newlyEarned.push("STREAK_5");
+
+                // 3. Challenge Checks
+                if (localStats.played >= 50 && !currentBadges.includes("PLAY_50")) newlyEarned.push("PLAY_50");
+                if (localStats.rpgWins >= 5 && !currentBadges.includes("RPG_5")) newlyEarned.push("RPG_5");
+                if (localStats.firstTryWins >= 3 && !currentBadges.includes("FLAWLESS_3")) newlyEarned.push("FLAWLESS_3");
 
                 // If they earned anything new, push it to Firestore
                 if (newlyEarned.length > 0) {
@@ -1300,6 +1313,10 @@
 
             if (isWin) {
                 localStats.wins++;
+                // --- NEW: Challenge Trackers ---
+                if (targetGame.genre === "RPG") localStats.rpgWins++;
+                if (currentGuesses === 1) localStats.firstTryWins++;
+                // -------------------------------
                 localStats.currentStreak++;
                 if (localStats.currentStreak > localStats.maxStreak) localStats.maxStreak = localStats.currentStreak;
                 localStats.guessDistribution[currentGuesses - 1]++;
