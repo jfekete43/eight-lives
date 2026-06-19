@@ -576,13 +576,19 @@
             { threshold: 10000, title: "Grid Master" }
         ];
         // --- BADGE REGISTRY ---
-        // This is the master dictionary of all badges in the game.
         const BADGE_REGISTRY = {
+            // Performance Badges
             "SCORE_50": { icon: "🔥", desc: "Best Run: 50+ Pts" },
             "SCORE_100": { icon: "⚡", desc: "Best Run: 100+ Pts" },
             "SCORE_150": { icon: "🚀", desc: "Best Run: 150+ Pts" },
             "STREAK_5": { icon: "🎯", desc: "5 Game Win Streak" },
-            "STREAK_10": { icon: "🏆", desc: "10 Game Win Streak" }
+            "STREAK_10": { icon: "🏆", desc: "10 Game Win Streak" },
+            
+            // Leaderboard Badges
+            "DAY_1": { icon: "🥇", desc: "Daily 1st Place" },
+            "DAY_3": { icon: "🥈", desc: "Daily Top 3" },
+            "DAY_10": { icon: "🎖️", desc: "Daily Top 10" },
+            "DAY_25": { icon: "🏅", desc: "Daily Top 25" }
         };
 
         function getPrestigeData(points) {
@@ -680,6 +686,13 @@
                 modal.style.position = 'fixed';
                 modal.style.zIndex = '99999';
             } else if (user && !user.isAnonymous) {
+                
+                // --- NEW: Trigger the Historical Scanner in the background ---
+                checkHistoricalBadges(user.uid);
+                // -----------------------------------------------------------
+
+                // Fetch their official data
+                db.collection("users").doc(user.uid).get().then((doc) => {
                 
                 // Fetch their official data
                 db.collection("users").doc(user.uid).get().then((doc) => {
@@ -1045,6 +1058,79 @@
                     });
                 }
             }).catch(err => console.error("Error evaluating badges:", err));
+        }
+        // --- HISTORICAL LEADERBOARD SCANNER ---
+        function checkHistoricalBadges(uid) {
+            const userRef = db.collection("users").doc(uid);
+            
+            userRef.get().then(doc => {
+                if (!doc.exists) return;
+                const data = doc.data();
+                
+                // 1. Ensure we only run this check once per day
+                const todayStr = new Date().toISOString().split('T')[0];
+                const lastChecked = data.lastBadgeCheck || "";
+                if (lastChecked === todayStr) return; 
+
+                // 2. Get yesterday's date string
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yString = yesterday.toISOString().split('T')[0];
+
+                // 3. Query yesterday's Top 25 scores
+                db.collection("leaderboard")
+                  .where("day_score", ">=", yString + "_")
+                  .where("day_score", "<=", yString + "_\uf8ff")
+                  .orderBy("day_score", "desc")
+                  .limit(25)
+                  .get()
+                  .then(snapshot => {
+                      let rank = 1;
+                      let userRank = -1;
+                      let earnedBadges = [];
+                      const seenNames = new Set();
+
+                      // Deduplicate names just like the real leaderboard
+                      snapshot.forEach(scoreDoc => {
+                          const scoreData = scoreDoc.data();
+                          const pName = scoreData.name.toUpperCase();
+                          
+                          if (!seenNames.has(pName)) {
+                              seenNames.add(pName);
+                              if (scoreData.uid === uid) {
+                                  userRank = rank; // We found the player!
+                              }
+                              rank++;
+                          }
+                      });
+
+                      // 4. Assign the appropriate badge
+                      if (userRank !== -1) {
+                          if (userRank === 1) earnedBadges.push("DAY_1");
+                          else if (userRank <= 3) earnedBadges.push("DAY_3");
+                          else if (userRank <= 10) earnedBadges.push("DAY_10");
+                          else if (userRank <= 25) earnedBadges.push("DAY_25");
+                      }
+
+                      // 5. Update Firestore silently
+                      const currentBadges = data.unlockedBadges || [];
+                      const trulyNew = earnedBadges.filter(b => !currentBadges.includes(b)); // Ensure no duplicates
+                      
+                      let updatePayload = { lastBadgeCheck: todayStr };
+                      if (trulyNew.length > 0) {
+                          updatePayload.unlockedBadges = firebase.firestore.FieldValue.arrayUnion(...trulyNew);
+                      }
+
+                      userRef.update(updatePayload).then(() => {
+                          if (trulyNew.length > 0) {
+                              const earnedIcons = trulyNew.map(id => BADGE_REGISTRY[id].icon).join(" ");
+                              setTimeout(() => {
+                                  alert(`📅 YESTERDAY'S RESULTS ARE IN!\nYou earned: ${earnedIcons}\nCheck your locker to equip them!`);
+                              }, 500);
+                          }
+                      });
+                  }).catch(err => console.error("Error scanning historical board:", err));
+            }).catch(err => console.error("Error loading user for badge scan:", err));
         }
         function submitToLeaderboard() {
             if (localStats.arcadeScore <= 0) {
