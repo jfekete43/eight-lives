@@ -693,9 +693,6 @@
 
                 // Fetch their official data
                 db.collection("users").doc(user.uid).get().then((doc) => {
-                
-                // Fetch their official data
-                db.collection("users").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         const data = doc.data();
                         const points = data.lifetimePoints || 0;
