@@ -1402,7 +1402,8 @@
                 document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
                 
                 document.getElementById('btn-submit-win').style.display = localStats.arcadeScore > 0 ? 'block' : 'none';
-                setTimeout(() => { document.getElementById('victory-screen').style.display = 'flex'; }, 800);
+                // --- INCREASED TIMEOUT: Wait 1.5 seconds so the score animation can finish ---
+                setTimeout(() => { document.getElementById('victory-screen').style.display = 'flex'; }, 1500);
             } else {
                 localStats.currentStreak = 0;
                 document.getElementById('game-over-answer').innerText = targetGame.name;
