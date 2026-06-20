@@ -384,15 +384,21 @@
     <!-- PLAYER LOCKER MODAL -->
     <div id="locker-modal" class="overlay-screen" style="display: none; z-index: 99999;">
         <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #538d4e; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto;">
-            <div class="overlay-text" style="font-size: 24px; color: #538d4e; margin-bottom: 5px;">MY LOCKER</div>
-            <div id="locker-title" style="color: #e2b714; font-family: 'Press Start 2P', monospace; font-size: 10px; margin-bottom: 30px;">[TITLE]</div>
+            <div class="overlay-text" style="font-size: 24px; color: #538d4e; margin-bottom: 15px;">MY LOCKER</div>
+            
+            <!-- NEW: Title Dropdown Menu -->
+            <select id="locker-title-select" onchange="updateEquippedTitle(this.value)" style="background-color: transparent; color: #e2b714; font-family: 'Press Start 2P', monospace; font-size: 10px; border: 1px solid #e2b714; border-radius: 4px; padding: 8px; margin-bottom: 25px; text-align: center; width: 100%; cursor: pointer; outline: none;">
+                <option value="Insert Coin">Insert Coin</option>
+            </select>
             
             <div style="font-family: 'Press Start 2P', monospace; font-size: 14px; color: white; margin-bottom: 20px;">
                 TAG: <span id="locker-tag" style="color: #4285F4;">...</span>
             </div>
             
-            <div style="font-family: 'Press Start 2P', monospace; font-size: 14px; color: white; margin-bottom: 10px;">
-                BANK: <span id="locker-bank" style="color: #538d4e;">0</span> PTS
+            <!-- NEW: Dual Economy Display -->
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: white; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                <div>RANK: <span id="locker-bank" style="color: #538d4e;">0</span> PTS</div>
+                <div>COINS: <span id="locker-coins" style="color: #e2b714;">0</span> 🪙</div>
             </div>
 
             <!-- Rank Progress Bar -->
@@ -401,7 +407,7 @@
             </div>
             <div id="rank-next-text" style="font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888; margin-bottom: 20px;">...</div>
             
-            <!-- NEW: TROPHY CASE -->
+            <!-- TROPHY CASE -->
             <div style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
                 <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #e2b714; margin-bottom: 10px;">EQUIPPED BADGES</div>
                 <div id="equipped-badges-display" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; font-size: 28px; min-height: 35px;">
@@ -711,6 +717,15 @@
             }
         }
 
+        // --- SAVE TITLE PREFERENCE ---
+        function updateEquippedTitle(newTitle) {
+            const user = firebase.auth().currentUser;
+            if (user && !user.isAnonymous) {
+                db.collection("users").doc(user.uid).update({
+                    equippedTitle: newTitle
+                }).catch(err => console.error("Error updating title:", err));
+            }
+        }
         function handleProfileClick() {
             closeMainMenu();
             const user = firebase.auth().currentUser;
@@ -731,15 +746,41 @@
                     if (doc.exists) {
                         const data = doc.data();
                         const points = data.lifetimePoints || 0;
+                        const coins = data.spendableCoins || 0; // --- NEW: Load the wallet ---
                         
-                        // --- NEW: Calculate their Rank and Progress ---
+                        // --- Calculate their Rank and Progress ---
                         const prestige = getPrestigeData(points);
                         const earnedTitle = prestige.currentRank.title;
+
+                        // --- NEW: Title Dropdown Logic ---
+                        let unlocked = data.unlockedTitles || ["Insert Coin"];
+                        
+                        // If they leveled up but haven't unlocked the title yet, give it to them!
+                        if (!unlocked.includes(earnedTitle)) {
+                            unlocked.push(earnedTitle);
+                            db.collection("users").doc(user.uid).update({ 
+                                unlockedTitles: firebase.firestore.FieldValue.arrayUnion(earnedTitle) 
+                            });
+                        }
+
+                        // Build the Dropdown options
+                        const titleSelect = document.getElementById('locker-title-select');
+                        titleSelect.innerHTML = ''; 
+                        unlocked.forEach(title => {
+                            const opt = document.createElement('option');
+                            opt.value = title;
+                            opt.innerText = title;
+                            titleSelect.appendChild(opt);
+                        });
+                        
+                        // Set the dropdown to what they are currently wearing
+                        titleSelect.value = data.equippedTitle || "Insert Coin";
+                        // ---------------------------------
 
                         // Update the text fields
                         document.getElementById('locker-tag').innerText = data.arcadeTag;
                         document.getElementById('locker-bank').innerText = points;
-                        document.getElementById('locker-title').innerText = earnedTitle;
+                        document.getElementById('locker-coins').innerText = coins; // Show the wallet!
 
                         // Update the Progress Bar
                         if (prestige.nextRank) {
@@ -755,13 +796,8 @@
                             document.getElementById('rank-progress-bar').style.width = `100%`;
                             document.getElementById('rank-next-text').innerText = `MAXIMUM RANK ACHIEVED`;
                         }
-
-                        // Silent background update if they ranked up since their last check
-                        if (data.equippedTitle !== earnedTitle) {
-                            db.collection("users").doc(user.uid).update({ equippedTitle: earnedTitle });
-                        }
                         
-                        // --- NEW: Load Badges into UI ---
+                        // --- Load Badges into UI ---
                         activeLockerUID = user.uid;
                         activeUnlockedBadges = data.unlockedBadges || [];
                         activeEquippedBadges = data.equippedBadges || [];
