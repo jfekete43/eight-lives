@@ -370,6 +370,7 @@
                 <button class="arcade-btn" onclick="closeMainMenu(); resetGame(true, true)">NEW RUN</button>
                 <button class="arcade-btn" onclick="closeMainMenu(); toggleModal('flex')">STATS</button>
                 <button class="arcade-btn" onclick="closeMainMenu(); toggleLeaderboard('flex')">LEADERBOARD</button>
+                <button class="arcade-btn" id="nav-shop-btn" onclick="openShopModal()" style="border-color: #e2b714; color: #e2b714;">ITEM SHOP</button>
                 
                 <div style="height: 2px; background-color: #333; margin: 10px 0;"></div>
                 
@@ -422,6 +423,31 @@
 
             <button class="arcade-btn" onclick="document.getElementById('locker-modal').style.display='none'" style="border-color: #555; color: #555; width: 100%; margin-bottom: 15px;">CLOSE LOCKER</button>
             <button class="arcade-btn" id="btn-logout" style="border-color: #e23636; color: #e23636; font-size: 10px; width: 100%;">LOG OUT</button>
+        </div>
+    </div>
+    <!-- THE ITEM SHOP MODAL -->
+    <div id="shop-modal" class="overlay-screen" style="display: none; z-index: 99999;">
+        <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #e2b714; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto;">
+            <div class="overlay-text" style="font-size: 24px; color: #e2b714; margin-bottom: 5px;">ITEM SHOP</div>
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #888; margin-bottom: 25px;">SPEND YOUR CASHOUT COINS</div>
+            
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 14px; color: white; margin-bottom: 25px; background: black; padding: 10px; border: 1px solid #333; border-radius: 4px;">
+                WALLET: <span id="shop-wallet-display" style="color: #e2b714;">0</span> 🪙
+            </div>
+            
+            <!-- Avatars Section -->
+            <div style="text-align: left; font-family: 'Press Start 2P', monospace; font-size: 12px; color: #538d4e; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px;">AVATARS</div>
+            <div id="shop-avatars-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 30px;">
+                <!-- Avatars injected here -->
+            </div>
+
+            <!-- Banners Section -->
+            <div style="text-align: left; font-family: 'Press Start 2P', monospace; font-size: 12px; color: #4285F4; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px;">BANNERS</div>
+            <div id="shop-banners-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 30px;">
+                <!-- Banners injected here -->
+            </div>
+
+            <button class="arcade-btn" onclick="closeShopModal()" style="border-color: #555; color: #555; width: 100%;">EXIT SHOP</button>
         </div>
     </div>
     <script>
@@ -597,6 +623,23 @@
                 profileBtn.style.color = "#4285F4";
             }
         }
+        // --- SHOP MODAL LOGIC ---
+        function openShopModal() {
+            closeMainMenu();
+            const user = firebase.auth().currentUser;
+            
+            if (user && !user.isAnonymous) {
+                document.getElementById('shop-modal').style.display = 'flex';
+                // We will add the rendering and database fetch logic here in Phase 2!
+            } else {
+                alert("You need to save your profile to access the Item Shop!");
+                openAccountModal('main-menu');
+            }
+        }
+
+        function closeShopModal() {
+            document.getElementById('shop-modal').style.display = 'none';
+        }
 
         function closeMainMenu() {
             document.getElementById('main-menu').style.display = 'none';
@@ -630,6 +673,21 @@
             "PLAY_50": { icon: "🕹️", desc: "Arcade Addict: Play 50 Games" },
             "RPG_5": { icon: "🐉", desc: "Specialist: Guess 5 RPGs" },
             "FLAWLESS_3": { icon: "👁️", desc: "Sniper: 3 First-Try Wins" }
+        };
+        // --- SHOP INVENTORY ---
+        const SHOP_INVENTORY = {
+            avatars: {
+                "AVATAR_GHOST": { name: "Retro Ghost", icon: "👻", price: 50 },
+                "AVATAR_ALIEN": { name: "Pixel Alien", icon: "👾", price: 150 },
+                "AVATAR_ROBOT": { name: "Mecha", icon: "🤖", price: 300 },
+                "AVATAR_SKULL": { name: "Game Over", icon: "💀", price: 500 },
+                "AVATAR_CROWN": { name: "High Roller", icon: "👑", price: 1000 }
+            },
+            banners: {
+                "BANNER_BLUE": { name: "Grid Blue", color: "#1a2a3a", price: 200 },
+                "BANNER_RED": { name: "Arcade Red", color: "#3a1a1a", price: 200 },
+                "BANNER_GOLD": { name: "Gold Rush", color: "#2e251a", price: 1000 }
+            }
         };
 
         function getPrestigeData(points) {
