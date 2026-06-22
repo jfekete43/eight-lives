@@ -400,7 +400,7 @@
             <!-- Dual Economy Display -->
             <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: white; margin-bottom: 10px; display: flex; justify-content: space-between;">
                 <div>RANK: <span id="locker-bank" style="color: #538d4e;">0</span> PTS</div>
-                <div>COINS: <span id="locker-coins" style="color: #e2b714;">0</span> 🪙</div>
+                <div>COINS: <span id="locker-coins" style="color: #e2b714;">0</span> [C]</div>
             </div>
 
             <!-- Rank Progress Bar -->
@@ -420,7 +420,7 @@
             <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #888; margin-bottom: 25px;">SPEND YOUR CASHOUT COINS</div>
             
             <div style="font-family: 'Press Start 2P', monospace; font-size: 14px; color: white; margin-bottom: 25px; background: black; padding: 10px; border: 1px solid #333; border-radius: 4px;">
-                WALLET: <span id="shop-wallet-display" style="color: #e2b714;">0</span> 🪙
+                WALLET: <span id="shop-wallet-display" style="color: #e2b714;">0</span> [C]
             </div>
             
             <!-- Avatars Section -->
@@ -671,7 +671,7 @@
                     if (isClaimed) {
                         buttonHTML = `<button disabled style="background:#272729; color:#555; border:1px solid #555; padding:8px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:8px;">CLAIMED</button>`;
                     } else if (isComplete) {
-                        buttonHTML = `<button onclick="claimChallenge('${challenge.id}', ${challenge.reward})" style="background:#e2b714; color:black; border:none; padding:8px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">CLAIM ${challenge.reward} 🪙</button>`;
+                        buttonHTML = `<button onclick="claimChallenge('${challenge.id}', ${challenge.reward})" style="background:#e2b714; color:black; border:none; padding:8px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">CLAIM ${challenge.reward} [C]</button>`;
                     } else {
                         buttonHTML = `<div style="font-family:'Press Start 2P', monospace; font-size:10px; color:#888;">${currentProgress} / ${challenge.target}</div>`;
                     }
@@ -685,7 +685,7 @@
                             </div>
                             
                             <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-size:10px; color:#e2b714;">REWARD: ${challenge.reward} 🪙</span>
+                                <span style="font-size:10px; color:#e2b714;">REWARD: ${challenge.reward} [C]</span>
                                 ${buttonHTML}
                             </div>
                         </div>
@@ -744,7 +744,7 @@
                 } else if (isOwned) {
                     btnLogic = `<button onclick="processShopAction('${id}', 'avatars')" style="background:transparent; color:#e2b714; border:1px solid #e2b714; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px; cursor:pointer;">EQUIP</button>`;
                 } else {
-                    btnLogic = `<button onclick="processShopAction('${id}', 'avatars')" style="background:#e2b714; color:black; border:none; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">${item.price} 🪙</button>`;
+                    btnLogic = `<button onclick="processShopAction('${id}', 'avatars')" style="background:#e2b714; color:black; border:none; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">${item.price} [C]</button>`;
                 }
 
                 avatarsDiv.innerHTML += `
@@ -767,7 +767,7 @@
                 } else if (isOwned) {
                     btnLogic = `<button onclick="processShopAction('${id}', 'banners')" style="background:transparent; color:#4285F4; border:1px solid #4285F4; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px; cursor:pointer;">EQUIP</button>`;
                 } else {
-                    btnLogic = `<button onclick="processShopAction('${id}', 'banners')" style="background:#4285F4; color:white; border:none; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">${item.price} 🪙</button>`;
+                    btnLogic = `<button onclick="processShopAction('${id}', 'banners')" style="background:#4285F4; color:white; border:none; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">${item.price} [C]</button>`;
                 }
 
                 bannersDiv.innerHTML += `
