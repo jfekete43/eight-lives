@@ -991,6 +991,7 @@
                         }
 
                         document.getElementById('locker-modal').style.display = 'flex';
+                    }
                 }).catch(err => console.error("Error loading locker details:", err));
             }
         }
@@ -1480,10 +1481,6 @@
                 if (currentGuesses === 1) localStats.challenges.firstTry++;
                 
                 localStats.wins++;
-                // --- NEW: Challenge Trackers ---
-                if (targetGame.genre === "RPG") localStats.rpgWins++;
-                if (currentGuesses === 1) localStats.firstTryWins++;
-                // -------------------------------
                 localStats.currentStreak++;
                 if (localStats.currentStreak > localStats.maxStreak) localStats.maxStreak = localStats.currentStreak;
                 localStats.guessDistribution[currentGuesses - 1]++;
