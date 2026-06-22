@@ -1195,7 +1195,7 @@
                 query = query.orderBy("score", "desc").limit(25);
             } else {
                 const prefix = periods[filter];
-                const field = filter + "_score"; // e.g., 'day_score'
+                const field = filter + "_score"; 
                 
                 query = query.orderBy(field, "desc")
                              .startAt(`${prefix}_999999999`)
@@ -1221,44 +1221,49 @@
                         seenNames.add(playerName);
                         rankCount++;
 
-                        // --- 1. LIVE AVATAR FETCH ---
-                        // Fallback to the snapshot, but try to grab their live Locker data
+                        // --- 1. LIVE STOREFRONT FETCH ---
                         let liveTitle = data.title || "Insert Coin"; 
-                        let liveBadges = data.badges || []; 
+                        let liveAvatar = "🕹️"; // The default starting avatar
+                        let liveBanner = "transparent"; // The default starting banner
                         
                         if (data.uid) {
                             try {
                                 const userDoc = await db.collection("users").doc(data.uid).get();
                                 if (userDoc.exists) {
-                                    liveTitle = userDoc.data().equippedTitle || liveTitle;
-                                    liveBadges = userDoc.data().equippedBadges || [];
+                                    const userData = userDoc.data();
+                                    liveTitle = userData.equippedTitle || liveTitle;
+                                    liveAvatar = userData.equippedAvatar || liveAvatar;
+                                    liveBanner = userData.equippedBanner || liveBanner;
                                 }
                             } catch (err) { console.error("Could not fetch live profile"); }
                         }
-
-                        const badgeIcons = liveBadges.map(id => BADGE_REGISTRY[id] ? BADGE_REGISTRY[id].icon : "").join(" ");
                         
                         // --- 2. THE HIDDEN DATE STAMP ---
                         let tooltipParams = "";
                         let cursorStyle = "default";
                         
-                        // Only generate the date logic if we are on the All-Time tab
                         if (filter === 'all' && data.timestamp) {
                             const d = data.timestamp.toDate();
                             const formattedDate = d.toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
                             
-                            // 'title' creates the desktop hover. 'onclick' creates the mobile tap.
                             tooltipParams = `title="Record set on: ${formattedDate}" onclick="alert('Record set on: ${formattedDate}')"`;
-                            cursorStyle = "pointer"; // Changes mouse to a hand so desktop users know it's interactive
+                            cursorStyle = "pointer";
                         }
 
                         const row = document.createElement('div');
                         row.style.display = 'flex';
                         row.style.justifyContent = 'space-between';
                         row.style.alignItems = 'center'; 
-                        row.style.marginBottom = '10px';
-                        row.style.borderBottom = '1px solid #3a3a3c';
-                        row.style.paddingBottom = '5px';
+                        row.style.marginBottom = '8px';
+                        
+                        // --- 3. APPLY THE BANNER COLOR ---
+                        row.style.backgroundColor = liveBanner;
+                        
+                        // Add some nice padding and borders so the colored rows look like cards
+                        row.style.borderRadius = '6px';
+                        row.style.padding = '8px 12px';
+                        row.style.border = liveBanner !== "transparent" ? '1px solid #444' : '1px solid transparent';
+                        row.style.borderBottom = liveBanner === "transparent" ? '1px solid #3a3a3c' : '1px solid #444';
                         
                         let nameColor = "white";
                         let crown = "";
@@ -1266,18 +1271,18 @@
                         if (rankCount === 2) nameColor = "#c0c0c0";
                         if (rankCount === 3) nameColor = "#cd7f32";
 
-                        // Apply the hidden tooltip to the whole left side
+                        // Apply the hidden tooltip and the AVATAR to the left side
                         const nameSpan = `
                             <div ${tooltipParams} style="display: flex; flex-direction: column; line-height: 1.4; cursor: ${cursorStyle};">
-                                <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 16px;">${liveAvatar}</span>
                                     <span style="color: ${nameColor};">${rankCount}. ${data.name}${crown}</span>
-                                    <span style="font-size: 14px; margin-left: 5px; letter-spacing: 2px;">${badgeIcons}</span>
                                 </div>
-                                <span style="color: #888; font-size: 8px; text-transform: uppercase;">${liveTitle}</span>
+                                <span style="color: #bbb; font-size: 8px; text-transform: uppercase; margin-top: 3px;">${liveTitle}</span>
                             </div>
                         `;
 
-                        row.innerHTML = `${nameSpan}<span style="color: ${nameColor};">${data.score}</span>`;
+                        row.innerHTML = `${nameSpan}<span style="color: ${nameColor}; font-weight: bold; font-size: 14px;">${data.score}</span>`;
                         list.appendChild(row);
                     }
                 }
