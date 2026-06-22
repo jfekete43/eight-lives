@@ -371,6 +371,7 @@
                 <button class="arcade-btn" onclick="closeMainMenu(); toggleModal('flex')">STATS</button>
                 <button class="arcade-btn" onclick="closeMainMenu(); toggleLeaderboard('flex')">LEADERBOARD</button>
                 <button class="arcade-btn" id="nav-shop-btn" onclick="openShopModal()" style="border-color: #e2b714; color: #e2b714;">ITEM SHOP</button>
+                <button class="arcade-btn" onclick="openChallengesModal()" style="border-color: #538d4e; color: #538d4e;">DAILY CHALLENGES</button>
                 
                 <div style="height: 2px; background-color: #333; margin: 10px 0;"></div>
                 
@@ -435,6 +436,19 @@
             </div>
 
             <button class="arcade-btn" onclick="closeShopModal()" style="border-color: #555; color: #555; width: 100%;">EXIT SHOP</button>
+        </div>
+    </div>
+    <!-- DAILY CHALLENGES MODAL -->
+    <div id="challenges-modal" class="overlay-screen" style="display: none; z-index: 99999;">
+        <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #538d4e; border-radius: 10px; width: 90%; max-width: 400px; text-align: center;">
+            <div class="overlay-text" style="font-size: 24px; color: #538d4e; margin-bottom: 5px;">CHALLENGES</div>
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #888; margin-bottom: 25px;">RESET EVERY 24 HOURS</div>
+            
+            <div id="challenges-container" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;">
+                <!-- Challenges inject here -->
+            </div>
+
+            <button class="arcade-btn" onclick="document.getElementById('challenges-modal').style.display='none'" style="border-color: #555; color: #555; width: 100%;">CLOSE</button>
         </div>
     </div>
     <script>
@@ -618,6 +632,86 @@
                 openAccountModal('main-menu');
             }
         }
+        // --- CHALLENGES ENGINE ---
+        function openChallengesModal() {
+            closeMainMenu();
+            const user = firebase.auth().currentUser;
+            
+            if (!user || user.isAnonymous) {
+                alert("You need to save your profile to access Daily Challenges!");
+                openAccountModal('main-menu');
+                return;
+            }
+
+            document.getElementById('challenges-modal').style.display = 'flex';
+            const container = document.getElementById('challenges-container');
+            container.innerHTML = '<span style="color:#538d4e; font-size:10px;">Syncing with Server...</span>';
+
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            // Get their live profile to check which ones are already claimed today
+            db.collection("users").doc(user.uid).get().then((doc) => {
+                container.innerHTML = '';
+                const data = doc.exists ? doc.data() : {};
+                const claimedArray = data.claimedChallenges || [];
+
+                DAILY_CHALLENGES.forEach(challenge => {
+                    // Check local storage for progress
+                    const currentProgress = localStats.challenges[challenge.type] || 0;
+                    const isComplete = currentProgress >= challenge.target;
+                    
+                    // Create a unique claim key for today (e.g., "2026-06-22_PLAY_3")
+                    const claimKey = `${todayStr}_${challenge.id}`;
+                    const isClaimed = claimedArray.includes(claimKey);
+
+                    // Calculate the progress bar width
+                    const percent = Math.min((currentProgress / challenge.target) * 100, 100);
+
+                    let buttonHTML = '';
+                    if (isClaimed) {
+                        buttonHTML = `<button disabled style="background:#272729; color:#555; border:1px solid #555; padding:8px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:8px;">CLAIMED</button>`;
+                    } else if (isComplete) {
+                        buttonHTML = `<button onclick="claimChallenge('${challenge.id}', ${challenge.reward})" style="background:#e2b714; color:black; border:none; padding:8px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">CLAIM ${challenge.reward} 🪙</button>`;
+                    } else {
+                        buttonHTML = `<div style="font-family:'Press Start 2P', monospace; font-size:10px; color:#888;">${currentProgress} / ${challenge.target}</div>`;
+                    }
+
+                    container.innerHTML += `
+                        <div style="background:#272729; border:1px solid #3a3a3c; border-radius:8px; padding:15px; text-align:left;">
+                            <div style="font-family:'Press Start 2P', monospace; font-size:10px; color:white; margin-bottom:10px; line-height:1.4;">${challenge.desc}</div>
+                            
+                            <div style="width:100%; background:#111; height:8px; border-radius:4px; margin-bottom:10px; overflow:hidden;">
+                                <div style="width:${percent}%; background:#538d4e; height:100%;"></div>
+                            </div>
+                            
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:10px; color:#e2b714;">REWARD: ${challenge.reward} 🪙</span>
+                                ${buttonHTML}
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function claimChallenge(challengeId, rewardAmount) {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            const claimKey = `${todayStr}_${challengeId}`;
+            const userRef = db.collection("users").doc(user.uid);
+
+            // Give them the coins and log the claim key so they can't double-dip
+            userRef.update({
+                spendableCoins: firebase.firestore.FieldValue.increment(rewardAmount),
+                claimedChallenges: firebase.firestore.FieldValue.arrayUnion(claimKey)
+            }).then(() => {
+                playSound('coin');
+                alert(`Challenge Complete! +${rewardAmount} Coins added to your wallet.`);
+                openChallengesModal(); // Instantly refresh to show "CLAIMED"
+            }).catch(err => console.error("Error claiming reward:", err));
+        }
 
         function closeShopModal() {
             document.getElementById('shop-modal').style.display = 'none';
@@ -759,6 +853,12 @@
                 "BANNER_GOLD": { name: "Gold Rush", color: "#2e251a", price: 1000 }
             }
         };
+        // --- CHALLENGE REGISTRY ---
+        const DAILY_CHALLENGES = [
+            { id: "PLAY_3", desc: "Play 3 Full Games", type: "played", target: 3, reward: 100 },
+            { id: "WIN_RPG", desc: "Guess an RPG Correctly", type: "rpgWins", target: 1, reward: 200 },
+            { id: "FIRST_TRY", desc: "Win on the 1st Try", type: "firstTry", target: 1, reward: 500 }
+        ];
 
         function getPrestigeData(points) {
             let currentRank = PRESTIGE_RANKS[0];
@@ -919,26 +1019,25 @@
         const POINTS_DISTRIBUTION = [100, 50, 25, 10, 5, 1];
         
         function loadStats() {
+            const todayStr = new Date().toISOString().split('T')[0]; // Gets "YYYY-MM-DD"
+            const defaultChallenges = { date: todayStr, played: 0, rpgWins: 0, firstTry: 0 };
+            
             try {
                 let saved = localStorage.getItem('gamedleStats');
                 if (saved) {
                     let parsed = JSON.parse(saved);
-                    // Safe fallbacks for older save files
-                    if (!parsed.guessDistribution || parsed.guessDistribution.length !== MAX_GUESSES) {
-                        parsed.guessDistribution = parsed.guessDistribution ? parsed.guessDistribution.slice(0, MAX_GUESSES) : [0,0,0,0,0,0];
-                        while (parsed.guessDistribution.length < MAX_GUESSES) parsed.guessDistribution.push(0);
-                    }
+                    // Safe fallbacks
+                    if (!parsed.guessDistribution) parsed.guessDistribution = [0,0,0,0,0,0];
                     if (parsed.arcadeScore === undefined) parsed.arcadeScore = 0;
                     if (parsed.highScore === undefined) parsed.highScore = 0;
                     if (parsed.continues === undefined) parsed.continues = 2;
                     
-                    // Patch for missing stats in old saves
-                    if (parsed.maxStreak === undefined) parsed.maxStreak = 0;
-                    if (parsed.currentStreak === undefined) parsed.currentStreak = 0;
-                    if (parsed.played === undefined) parsed.played = 0;
-                    if (parsed.wins === undefined) parsed.wins = 0;
-                    if (parsed.rpgWins === undefined) parsed.rpgWins = 0;
-                    if (parsed.firstTryWins === undefined) parsed.firstTryWins = 0;
+                    // --- NEW: Challenge Tracking ---
+                    if (!parsed.challenges || parsed.challenges.date !== todayStr) {
+                        // If it's a new day, wipe their progress clean!
+                        parsed.challenges = defaultChallenges;
+                    }
+                    // -------------------------------
                     
                     return parsed;
                 }
@@ -949,7 +1048,7 @@
                 played: 0, wins: 0, currentStreak: 0, maxStreak: 0,
                 guessDistribution: [0, 0, 0, 0, 0, 0],
                 arcadeScore: 0, highScore: 0, continues: 2,
-                rpgWins: 0, firstTryWins: 0
+                challenges: defaultChallenges // Apply the new trackers
             };
         }
         
@@ -1320,8 +1419,15 @@
             document.getElementById('guess-input').disabled = true;
             document.getElementById('guess-button').disabled = true;
             localStats.played++;
+            
+            // --- TICK CHALLENGE PROGRESS ---
+            localStats.challenges.played++;
 
             if (isWin) {
+                // Check for specific challenge criteria
+                if (targetGame.genre === "RPG") localStats.challenges.rpgWins++;
+                if (currentGuesses === 1) localStats.challenges.firstTry++;
+                
                 localStats.wins++;
                 // --- NEW: Challenge Trackers ---
                 if (targetGame.genre === "RPG") localStats.rpgWins++;
