@@ -388,17 +388,27 @@
         <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #538d4e; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto;">
             <div class="overlay-text" style="font-size: 24px; color: #538d4e; margin-bottom: 15px;">MY LOCKER</div>
             
-            <!-- Title Dropdown Menu -->
-            <select id="locker-title-select" onchange="updateEquippedTitle(this.value)" style="background-color: transparent; color: #e2b714; font-family: 'Press Start 2P', monospace; font-size: 10px; border: 1px solid #e2b714; border-radius: 4px; padding: 8px; margin-bottom: 25px; text-align: center; width: 100%; cursor: pointer; outline: none;">
-                <option value="Insert Coin">Insert Coin</option>
-            </select>
-            
-            <div style="font-family: 'Press Start 2P', monospace; font-size: 14px; color: white; margin-bottom: 20px;">
-                TAG: <span id="locker-tag" style="color: #4285F4;">...</span>
+            <!-- LIVE PREVIEW CARD -->
+            <div id="locker-preview-card" style="background-color: transparent; border-radius: 6px; padding: 15px; margin-bottom: 25px; border: 1px solid #3a3a3c; display: flex; align-items: center; gap: 15px; text-align: left;">
+                <div style="font-size: 32px;" id="locker-preview-avatar">🕹️</div>
+                <div style="display: flex; flex-direction: column; line-height: 1.4;">
+                    <div style="color: white; font-size: 16px; font-weight: bold;" id="locker-preview-name">PLAYER</div>
+                    <div style="color: #bbb; font-size: 8px; text-transform: uppercase; margin-top: 3px;" id="locker-preview-title">Insert Coin</div>
+                </div>
             </div>
+
+            <!-- CUSTOMIZATION DROPDOWNS -->
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888; text-align: left; margin-bottom: 5px;">TITLE:</div>
+            <select id="locker-title-select" onchange="updateEquippedItem('equippedTitle', this.value)" style="background-color: #111; color: #e2b714; font-family: 'Press Start 2P', monospace; font-size: 10px; border: 1px solid #e2b714; border-radius: 4px; padding: 8px; margin-bottom: 15px; width: 100%; cursor: pointer; outline: none;"></select>
+
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888; text-align: left; margin-bottom: 5px;">AVATAR:</div>
+            <select id="locker-avatar-select" onchange="updateEquippedItem('equippedAvatar', this.value)" style="background-color: #111; color: #538d4e; font-family: 'Press Start 2P', monospace; font-size: 10px; border: 1px solid #538d4e; border-radius: 4px; padding: 8px; margin-bottom: 15px; width: 100%; cursor: pointer; outline: none;"></select>
+
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888; text-align: left; margin-bottom: 5px;">BANNER:</div>
+            <select id="locker-banner-select" onchange="updateEquippedItem('equippedBanner', this.value)" style="background-color: #111; color: #4285F4; font-family: 'Press Start 2P', monospace; font-size: 10px; border: 1px solid #4285F4; border-radius: 4px; padding: 8px; margin-bottom: 25px; width: 100%; cursor: pointer; outline: none;"></select>
             
             <!-- Dual Economy Display -->
-            <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: white; margin-bottom: 10px; display: flex; justify-content: space-between;">
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: white; margin-bottom: 10px; display: flex; justify-content: space-between; border-top: 1px solid #333; padding-top: 15px;">
                 <div>RANK: <span id="locker-bank" style="color: #538d4e;">0</span> PTS</div>
                 <div>COINS: <span id="locker-coins" style="color: #e2b714;">0</span> [C]</div>
             </div>
@@ -873,13 +883,22 @@
             }
             return { currentRank, nextRank };
         }
-        // --- SAVE TITLE PREFERENCE ---
-        function updateEquippedTitle(newTitle) {
+        // --- SAVE LOCKER PREFERENCES ---
+        function updateEquippedItem(field, value) {
             const user = firebase.auth().currentUser;
             if (user && !user.isAnonymous) {
                 db.collection("users").doc(user.uid).update({
-                    equippedTitle: newTitle
-                }).catch(err => console.error("Error updating title:", err));
+                    [field]: value
+                }).then(() => {
+                    // Instantly update the Live Preview Card!
+                    if (field === 'equippedTitle') document.getElementById('locker-preview-title').innerText = value;
+                    if (field === 'equippedAvatar') document.getElementById('locker-preview-avatar').innerText = value;
+                    if (field === 'equippedBanner') {
+                        const previewCard = document.getElementById('locker-preview-card');
+                        previewCard.style.backgroundColor = value;
+                        previewCard.style.border = value !== "transparent" ? "1px solid #444" : "1px solid #3a3a3c";
+                    }
+                }).catch(err => console.error("Error updating locker:", err));
             }
         }
         function handleProfileClick() {
@@ -897,34 +916,67 @@
                         const data = doc.data();
                         const points = data.lifetimePoints || 0;
                         const coins = data.spendableCoins || 0;
+                        const eqTitle = data.equippedTitle || "Insert Coin";
+                        const eqAvatar = data.equippedAvatar || "🕹️";
+                        const eqBanner = data.equippedBanner || "transparent";
                         
-                        const prestige = getPrestigeData(points);
-                        const earnedTitle = prestige.currentRank.title;
+                        // 1. UPDATE LIVE PREVIEW CARD
+                        document.getElementById('locker-preview-name').innerText = data.arcadeTag;
+                        document.getElementById('locker-preview-title').innerText = eqTitle;
+                        document.getElementById('locker-preview-avatar').innerText = eqAvatar;
+                        const previewCard = document.getElementById('locker-preview-card');
+                        previewCard.style.backgroundColor = eqBanner;
+                        previewCard.style.border = eqBanner !== "transparent" ? "1px solid #444" : "1px solid #3a3a3c";
 
-                        let unlocked = data.unlockedTitles || ["Insert Coin"];
-                        
-                        if (!unlocked.includes(earnedTitle)) {
-                            unlocked.push(earnedTitle);
-                            db.collection("users").doc(user.uid).update({ 
-                                unlockedTitles: firebase.firestore.FieldValue.arrayUnion(earnedTitle) 
-                            });
-                        }
+                        // 2. BACKFILL ALL EARNED TITLES
+                        let earnedTitles = [];
+                        PRESTIGE_RANKS.forEach(rank => {
+                            if (points >= rank.threshold) earnedTitles.push(rank.title);
+                        });
+                        if (earnedTitles.length === 0) earnedTitles = ["Insert Coin"];
 
                         const titleSelect = document.getElementById('locker-title-select');
                         titleSelect.innerHTML = ''; 
-                        unlocked.forEach(title => {
+                        earnedTitles.forEach(title => {
                             const opt = document.createElement('option');
-                            opt.value = title;
-                            opt.innerText = title;
+                            opt.value = title; opt.innerText = title;
                             titleSelect.appendChild(opt);
                         });
-                        
-                        titleSelect.value = data.equippedTitle || "Insert Coin";
+                        titleSelect.value = eqTitle;
 
-                        document.getElementById('locker-tag').innerText = data.arcadeTag;
+                        // 3. POPULATE AVATARS (Default + Shop Purchases)
+                        const ownedAvatars = data.ownedAvatars || [];
+                        const avatarSelect = document.getElementById('locker-avatar-select');
+                        avatarSelect.innerHTML = '<option value="🕹️">🕹️ Default Player</option>';
+                        ownedAvatars.forEach(id => {
+                            if (SHOP_INVENTORY.avatars[id]) {
+                                const item = SHOP_INVENTORY.avatars[id];
+                                const opt = document.createElement('option');
+                                opt.value = item.icon; opt.innerText = `${item.icon} ${item.name}`;
+                                avatarSelect.appendChild(opt);
+                            }
+                        });
+                        avatarSelect.value = eqAvatar;
+
+                        // 4. POPULATE BANNERS (Default + Shop Purchases)
+                        const ownedBanners = data.ownedBanners || [];
+                        const bannerSelect = document.getElementById('locker-banner-select');
+                        bannerSelect.innerHTML = '<option value="transparent">⬛ Default Grid</option>';
+                        ownedBanners.forEach(id => {
+                            if (SHOP_INVENTORY.banners[id]) {
+                                const item = SHOP_INVENTORY.banners[id];
+                                const opt = document.createElement('option');
+                                opt.value = item.color; opt.innerText = `🎨 ${item.name}`;
+                                bannerSelect.appendChild(opt);
+                            }
+                        });
+                        bannerSelect.value = eqBanner;
+
+                        // 5. RENDER ECONOMY & PROGRESS BAR
                         document.getElementById('locker-bank').innerText = points;
                         document.getElementById('locker-coins').innerText = coins; 
 
+                        const prestige = getPrestigeData(points);
                         if (prestige.nextRank) {
                             const pointsNeeded = prestige.nextRank.threshold - points;
                             const levelRange = prestige.nextRank.threshold - prestige.currentRank.threshold;
@@ -939,7 +991,6 @@
                         }
 
                         document.getElementById('locker-modal').style.display = 'flex';
-                    }
                 }).catch(err => console.error("Error loading locker details:", err));
             }
         }
