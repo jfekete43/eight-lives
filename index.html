@@ -387,7 +387,7 @@
         <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #538d4e; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto;">
             <div class="overlay-text" style="font-size: 24px; color: #538d4e; margin-bottom: 15px;">MY LOCKER</div>
             
-            <!-- NEW: Title Dropdown Menu -->
+            <!-- Title Dropdown Menu -->
             <select id="locker-title-select" onchange="updateEquippedTitle(this.value)" style="background-color: transparent; color: #e2b714; font-family: 'Press Start 2P', monospace; font-size: 10px; border: 1px solid #e2b714; border-radius: 4px; padding: 8px; margin-bottom: 25px; text-align: center; width: 100%; cursor: pointer; outline: none;">
                 <option value="Insert Coin">Insert Coin</option>
             </select>
@@ -396,30 +396,17 @@
                 TAG: <span id="locker-tag" style="color: #4285F4;">...</span>
             </div>
             
-            <!-- NEW: Dual Economy Display -->
+            <!-- Dual Economy Display -->
             <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: white; margin-bottom: 10px; display: flex; justify-content: space-between;">
                 <div>RANK: <span id="locker-bank" style="color: #538d4e;">0</span> PTS</div>
                 <div>COINS: <span id="locker-coins" style="color: #e2b714;">0</span> 🪙</div>
             </div>
 
             <!-- Rank Progress Bar -->
-            <div style="width: 100%; background-color: #333; height: 10px; border-radius: 5px; margin-bottom: 8px; overflow: hidden; border: 1px solid #555;">
+            <div style="width: 100%; background-color: #333; height: 10px; border-radius: 5px; margin-bottom: 25px; overflow: hidden; border: 1px solid #555;">
                 <div id="rank-progress-bar" style="width: 0%; background-color: #e2b714; height: 100%; transition: width 0.5s ease-in-out;"></div>
             </div>
-            <div id="rank-next-text" style="font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888; margin-bottom: 20px;">...</div>
-            
-            <!-- TROPHY CASE -->
-            <div style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
-                <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #e2b714; margin-bottom: 10px;">EQUIPPED BADGES</div>
-                <div id="equipped-badges-display" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; font-size: 28px; min-height: 35px;">
-                    <!-- Equipped badges render here -->
-                </div>
-                
-                <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #888; margin-bottom: 10px;">YOUR COLLECTION (Click to Equip)</div>
-                <div id="unlocked-badges-display" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 25px; background: black; padding: 10px; border-radius: 8px; border: 1px solid #333; min-height: 40px;">
-                    <!-- Unlocked badges render here -->
-                </div>
-            </div>
+            <div id="rank-next-text" style="font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888; margin-bottom: 25px;">...</div>
 
             <button class="arcade-btn" onclick="document.getElementById('locker-modal').style.display='none'" style="border-color: #555; color: #555; width: 100%; margin-bottom: 15px;">CLOSE LOCKER</button>
             <button class="arcade-btn" id="btn-logout" style="border-color: #e23636; color: #e23636; font-size: 10px; width: 100%;">LOG OUT</button>
@@ -569,41 +556,30 @@
 
             userRef.get().then((doc) => {
                 if (doc.exists) {
-                    // Scenario A: They already have a locker (Logging in on a new device)
                     const data = doc.data();
                     console.log("Locker found for:", data.arcadeTag);
                     alert(`Welcome back to the Grid, ${data.arcadeTag}!`);
-                    
-                    // Eventually, we will load their lifetime points from here!
                 } else {
-                    // Scenario B: Brand new account linked! We need to build their locker.
                     let tag = prompt("Profile Secured! Enter your official Arcade Tag (10 characters max):", "PLAYER");
-                    if (!tag) tag = "PLAYER"; // Fallback if they hit cancel
+                    if (!tag) tag = "PLAYER"; 
                     const cleanTag = tag.substring(0, 10).toUpperCase();
 
-                    // Create the document in the database
                     userRef.set({
                         arcadeTag: cleanTag,
                         email: user.email,
                         lifetimePoints: 0, 
-                        spendableCoins: 0, // <-- NEW: The shop currency
+                        spendableCoins: 0, 
                         equippedTitle: "Insert Coin",
-                        unlockedTitles: ["Insert Coin"], // <-- NEW: For the title dropdown
-                        unlockedBadges: [], 
-                        equippedBadges: [], 
-                        equippedAvatar: "🕹️", // <-- NEW: Default Avatar
-                        equippedBanner: "#1a1a1a", // <-- NEW: Default Banner
+                        unlockedTitles: ["Insert Coin"],
+                        equippedAvatar: "🕹️", 
+                        equippedBanner: "#1a1a1a", 
                         joinDate: firebase.firestore.FieldValue.serverTimestamp()
                     }).then(() => {
                         console.log("New Player Locker created!");
                         alert(`Locker established! You are officially recognized as ${cleanTag}.`);
-                    }).catch((error) => {
-                        console.error("Error building locker:", error);
-                    });
+                    }).catch((error) => console.error("Error building locker:", error));
                 }
-            }).catch((error) => {
-                console.error("Error accessing database:", error);
-            });
+            }).catch((error) => console.error("Error accessing database:", error));
         }
         // --- MAIN MENU NAVIGATION ---
         function openMainMenu() {
@@ -768,26 +744,6 @@
             { threshold: 5000, title: "Console Cowboy" },
             { threshold: 10000, title: "Grid Master" }
         ];
-        // --- BADGE REGISTRY ---
-        const BADGE_REGISTRY = {
-            // Performance Badges
-            "SCORE_50": { icon: "🔥", desc: "Best Run: 50+ Pts" },
-            "SCORE_100": { icon: "⚡", desc: "Best Run: 100+ Pts" },
-            "SCORE_150": { icon: "🚀", desc: "Best Run: 150+ Pts" },
-            "STREAK_5": { icon: "🎯", desc: "5 Game Win Streak" },
-            "STREAK_10": { icon: "🏆", desc: "10 Game Win Streak" },
-            
-            // Leaderboard Badges
-            "DAY_1": { icon: "🥇", desc: "Daily 1st Place" },
-            "DAY_3": { icon: "🥈", desc: "Daily Top 3" },
-            "DAY_10": { icon: "🎖️", desc: "Daily Top 10" },
-            "DAY_25": { icon: "🏅", desc: "Daily Top 25" },
-
-            // Challenge Badges
-            "PLAY_50": { icon: "🕹️", desc: "Arcade Addict: Play 50 Games" },
-            "RPG_5": { icon: "🐉", desc: "Specialist: Guess 5 RPGs" },
-            "FLAWLESS_3": { icon: "👁️", desc: "Sniper: 3 First-Try Wins" }
-        };
         // --- SHOP INVENTORY ---
         const SHOP_INVENTORY = {
             avatars: {
@@ -817,78 +773,6 @@
             }
             return { currentRank, nextRank };
         }
-
-        // --- BADGE UI MANAGER ---
-        let activeLockerUID = null;
-        let activeEquippedBadges = [];
-        let activeUnlockedBadges = [];
-
-        function renderBadgeUI() {
-            const equippedContainer = document.getElementById('equipped-badges-display');
-            const unlockedContainer = document.getElementById('unlocked-badges-display');
-            equippedContainer.innerHTML = '';
-            unlockedContainer.innerHTML = '';
-
-            if (activeUnlockedBadges.length === 0) {
-                unlockedContainer.innerHTML = '<span style="color: #555; font-size: 10px; margin-top: 10px;">Play games to earn badges!</span>';
-            }
-
-            activeUnlockedBadges.forEach(badgeId => {
-                const badgeData = BADGE_REGISTRY[badgeId];
-                if (!badgeData) return;
-
-                const isEquipped = activeEquippedBadges.includes(badgeId);
-                
-                // Build the Collection Button
-                const badgeEl = document.createElement('div');
-                badgeEl.innerText = badgeData.icon;
-                badgeEl.title = badgeData.desc; // Shows tooltip on hover
-                badgeEl.style.cursor = 'pointer';
-                badgeEl.style.fontSize = '24px';
-                badgeEl.style.padding = '5px';
-                badgeEl.style.border = isEquipped ? '2px solid #538d4e' : '2px solid transparent';
-                badgeEl.style.borderRadius = '5px';
-                badgeEl.style.backgroundColor = isEquipped ? '#1a2e1a' : 'transparent';
-                badgeEl.style.transition = 'all 0.2s';
-                
-                badgeEl.onclick = () => toggleBadge(badgeId);
-                unlockedContainer.appendChild(badgeEl);
-
-                // Build the Equipped Display
-                if (isEquipped) {
-                    const eqEl = document.createElement('div');
-                    eqEl.innerText = badgeData.icon;
-                    eqEl.title = badgeData.desc;
-                    eqEl.style.cursor = 'pointer';
-                    eqEl.onclick = () => toggleBadge(badgeId);
-                    equippedContainer.appendChild(eqEl);
-                }
-            });
-        }
-
-        function toggleBadge(badgeId) {
-            if (activeEquippedBadges.includes(badgeId)) {
-                // Remove it
-                activeEquippedBadges = activeEquippedBadges.filter(id => id !== badgeId);
-            } else {
-                // Add it if they have room
-                if (activeEquippedBadges.length >= 3) {
-                    alert("You can only equip up to 3 badges at a time!");
-                    return;
-                }
-                activeEquippedBadges.push(badgeId);
-            }
-            
-            renderBadgeUI(); // Update screen instantly
-            
-            // Save preference to Firestore silently in the background
-            if (activeLockerUID) {
-                db.collection("users").doc(activeLockerUID).update({
-                    equippedBadges: activeEquippedBadges
-                }).catch(err => console.error("Error saving badges:", err));
-            }
-        }
-
         // --- SAVE TITLE PREFERENCE ---
         function updateEquippedTitle(newTitle) {
             const user = firebase.auth().currentUser;
@@ -908,26 +792,17 @@
                 modal.style.position = 'fixed';
                 modal.style.zIndex = '99999';
             } else if (user && !user.isAnonymous) {
-                
-                // --- NEW: Trigger the Historical Scanner in the background ---
-                checkHistoricalBadges(user.uid);
-                // -----------------------------------------------------------
-
-                // Fetch their official data
                 db.collection("users").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
                         const data = doc.data();
                         const points = data.lifetimePoints || 0;
-                        const coins = data.spendableCoins || 0; // --- NEW: Load the wallet ---
+                        const coins = data.spendableCoins || 0;
                         
-                        // --- Calculate their Rank and Progress ---
                         const prestige = getPrestigeData(points);
                         const earnedTitle = prestige.currentRank.title;
 
-                        // --- NEW: Title Dropdown Logic ---
                         let unlocked = data.unlockedTitles || ["Insert Coin"];
                         
-                        // If they leveled up but haven't unlocked the title yet, give it to them!
                         if (!unlocked.includes(earnedTitle)) {
                             unlocked.push(earnedTitle);
                             db.collection("users").doc(user.uid).update({ 
@@ -935,7 +810,6 @@
                             });
                         }
 
-                        // Build the Dropdown options
                         const titleSelect = document.getElementById('locker-title-select');
                         titleSelect.innerHTML = ''; 
                         unlocked.forEach(title => {
@@ -945,16 +819,12 @@
                             titleSelect.appendChild(opt);
                         });
                         
-                        // Set the dropdown to what they are currently wearing
                         titleSelect.value = data.equippedTitle || "Insert Coin";
-                        // ---------------------------------
 
-                        // Update the text fields
                         document.getElementById('locker-tag').innerText = data.arcadeTag;
                         document.getElementById('locker-bank').innerText = points;
-                        document.getElementById('locker-coins').innerText = coins; // Show the wallet!
+                        document.getElementById('locker-coins').innerText = coins; 
 
-                        // Update the Progress Bar
                         if (prestige.nextRank) {
                             const pointsNeeded = prestige.nextRank.threshold - points;
                             const levelRange = prestige.nextRank.threshold - prestige.currentRank.threshold;
@@ -964,25 +834,15 @@
                             document.getElementById('rank-progress-bar').style.width = `${progressPercent}%`;
                             document.getElementById('rank-next-text').innerText = `${pointsNeeded} PTS TO NEXT RANK`;
                         } else {
-                            // They hit the maximum rank!
                             document.getElementById('rank-progress-bar').style.width = `100%`;
                             document.getElementById('rank-next-text').innerText = `MAXIMUM RANK ACHIEVED`;
                         }
-                        
-                        // --- Load Badges into UI ---
-                        activeLockerUID = user.uid;
-                        activeUnlockedBadges = data.unlockedBadges || [];
-                        activeEquippedBadges = data.equippedBadges || [];
-                        renderBadgeUI();
-                        // --------------------------------
 
-                        // Display the locker
                         document.getElementById('locker-modal').style.display = 'flex';
                     }
                 }).catch(err => console.error("Error loading locker details:", err));
             }
         }
-
         // --- LOG OUT BUTTON LOGIC ---
         document.getElementById('btn-logout').addEventListener('click', () => {
             firebase.auth().signOut().then(() => {
@@ -1293,121 +1153,6 @@
                 console.error("Error getting documents: ", error);
             });
         }
-        // --- BADGE VALIDATOR ENGINE ---
-        function evaluatePerformanceBadges(uid) {
-            const userRef = db.collection("users").doc(uid);
-            
-            userRef.get().then((doc) => {
-                if (!doc.exists) return;
-                
-                const data = doc.data();
-                // If they have older accounts without the arrays, default to empty
-                const currentBadges = data.unlockedBadges || []; 
-                let newlyEarned = [];
-
-                // 1. High Score Checks
-                if (localStats.highScore >= 150 && !currentBadges.includes("SCORE_150")) newlyEarned.push("SCORE_150");
-                if (localStats.highScore >= 100 && !currentBadges.includes("SCORE_100")) newlyEarned.push("SCORE_100");
-                if (localStats.highScore >= 50 && !currentBadges.includes("SCORE_50")) newlyEarned.push("SCORE_50");
-
-                // 2. Streak Checks
-                if (localStats.maxStreak >= 10 && !currentBadges.includes("STREAK_10")) newlyEarned.push("STREAK_10");
-                if (localStats.maxStreak >= 5 && !currentBadges.includes("STREAK_5")) newlyEarned.push("STREAK_5");
-
-                // 3. Challenge Checks
-                if (localStats.played >= 50 && !currentBadges.includes("PLAY_50")) newlyEarned.push("PLAY_50");
-                if (localStats.rpgWins >= 5 && !currentBadges.includes("RPG_5")) newlyEarned.push("RPG_5");
-                if (localStats.firstTryWins >= 3 && !currentBadges.includes("FLAWLESS_3")) newlyEarned.push("FLAWLESS_3");
-
-                // If they earned anything new, push it to Firestore
-                if (newlyEarned.length > 0) {
-                    userRef.update({
-                        // arrayUnion safely adds new items without deleting existing ones
-                        unlockedBadges: firebase.firestore.FieldValue.arrayUnion(...newlyEarned) 
-                    }).then(() => {
-                        console.log("New badges unlocked!", newlyEarned);
-                        // Convert IDs to icons to show the user what they won!
-                        const earnedIcons = newlyEarned.map(id => BADGE_REGISTRY[id].icon).join(" ");
-                        setTimeout(() => {
-                            alert(`🎖️ ACHIEVEMENT UNLOCKED! 🎖️\nYou earned: ${earnedIcons}\nCheck your locker to equip them!`);
-                        }, 500); // Slight delay so it pops up right after the cash-out alert
-                    });
-                }
-            }).catch(err => console.error("Error evaluating badges:", err));
-        }
-        // --- HISTORICAL LEADERBOARD SCANNER ---
-        function checkHistoricalBadges(uid) {
-            const userRef = db.collection("users").doc(uid);
-            
-            userRef.get().then(doc => {
-                if (!doc.exists) return;
-                const data = doc.data();
-                
-                // 1. Ensure we only run this check once per day
-                const todayStr = new Date().toISOString().split('T')[0];
-                const lastChecked = data.lastBadgeCheck || "";
-                if (lastChecked === todayStr) return; 
-
-                // 2. Get yesterday's date string
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                const yString = yesterday.toISOString().split('T')[0];
-
-                // 3. Query yesterday's Top 25 scores
-                db.collection("leaderboard")
-                  .where("day_score", ">=", yString + "_")
-                  .where("day_score", "<=", yString + "_\uf8ff")
-                  .orderBy("day_score", "desc")
-                  .limit(25)
-                  .get()
-                  .then(snapshot => {
-                      let rank = 1;
-                      let userRank = -1;
-                      let earnedBadges = [];
-                      const seenNames = new Set();
-
-                      // Deduplicate names just like the real leaderboard
-                      snapshot.forEach(scoreDoc => {
-                          const scoreData = scoreDoc.data();
-                          const pName = scoreData.name.toUpperCase();
-                          
-                          if (!seenNames.has(pName)) {
-                              seenNames.add(pName);
-                              if (scoreData.uid === uid) {
-                                  userRank = rank; // We found the player!
-                              }
-                              rank++;
-                          }
-                      });
-
-                      // 4. Assign the appropriate badge
-                      if (userRank !== -1) {
-                          if (userRank === 1) earnedBadges.push("DAY_1");
-                          else if (userRank <= 3) earnedBadges.push("DAY_3");
-                          else if (userRank <= 10) earnedBadges.push("DAY_10");
-                          else if (userRank <= 25) earnedBadges.push("DAY_25");
-                      }
-
-                      // 5. Update Firestore silently
-                      const currentBadges = data.unlockedBadges || [];
-                      const trulyNew = earnedBadges.filter(b => !currentBadges.includes(b)); // Ensure no duplicates
-                      
-                      let updatePayload = { lastBadgeCheck: todayStr };
-                      if (trulyNew.length > 0) {
-                          updatePayload.unlockedBadges = firebase.firestore.FieldValue.arrayUnion(...trulyNew);
-                      }
-
-                      userRef.update(updatePayload).then(() => {
-                          if (trulyNew.length > 0) {
-                              const earnedIcons = trulyNew.map(id => BADGE_REGISTRY[id].icon).join(" ");
-                              setTimeout(() => {
-                                  alert(`📅 YESTERDAY'S RESULTS ARE IN!\nYou earned: ${earnedIcons}\nCheck your locker to equip them!`);
-                              }, 500);
-                          }
-                      });
-                  }).catch(err => console.error("Error scanning historical board:", err));
-            }).catch(err => console.error("Error loading user for badge scan:", err));
-        }
         function submitToLeaderboard() {
             if (localStats.arcadeScore <= 0) {
                 alert("You need a score above 0 to enter the Hall of Fame!");
@@ -1423,9 +1168,7 @@
                 db.collection("users").doc(user.uid).get().then((doc) => {
                     if (doc.exists && doc.data().arcadeTag) {
                         const title = doc.data().equippedTitle || "Insert Coin";
-                        // --- NEW: Grab their equipped badges ---
-                        const badges = doc.data().equippedBadges || [];
-                        finalizeCashOut(doc.data().arcadeTag, title, badges);
+                        finalizeCashOut(doc.data().arcadeTag, title);
                     } else {
                         askForGuestName(); 
                     }
@@ -1434,7 +1177,6 @@
                 askForGuestName();
             }
 
-            // --- HELPER 1: The Guest Prompt ---
             function askForGuestName() {
                 const initials = prompt("Enter your name (10 characters max):", "PLAYER");
                 if (!initials) {
@@ -1442,12 +1184,10 @@
                     document.getElementById('btn-submit-lose').style.display = 'block';
                     return; 
                 }
-                // Guests get a default "Guest" title and no badges
-                finalizeCashOut(initials.substring(0, 10).toUpperCase(), "Guest", []);
+                finalizeCashOut(initials.substring(0, 10).toUpperCase(), "Guest");
             }
 
-            // --- HELPER 2: The Database Submission ---
-            function finalizeCashOut(cleanName, playerTitle, playerBadges) {
+            function finalizeCashOut(cleanName, playerTitle) {
                 const periods = getPeriods();
                 const paddedScore = localStats.arcadeScore.toString().padStart(9, '0');
                 const pointsToDeposit = localStats.arcadeScore;
@@ -1456,27 +1196,23 @@
                     name: cleanName,
                     score: pointsToDeposit,
                     title: playerTitle,
-                    badges: playerBadges, // <-- NEW: Saves their badges to the board!
                     uid: currentUID,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     day_score: `${periods.day}_${paddedScore}`,
                     week_score: `${periods.week}_${paddedScore}`,
                     month_score: `${periods.month}_${paddedScore}`
-                })
-                .then(() => {
+                }).then(() => {
                     const user = firebase.auth().currentUser;
                     if (user && !user.isAnonymous) {
                         db.collection("users").doc(user.uid).update({
                             lifetimePoints: firebase.firestore.FieldValue.increment(pointsToDeposit),
-                            spendableCoins: firebase.firestore.FieldValue.increment(pointsToDeposit) // <-- NEW: Give them shop money!
+                            spendableCoins: firebase.firestore.FieldValue.increment(pointsToDeposit)
                         }).then(() => {
                             console.log(`Deposited ${pointsToDeposit} points into Lifetime & Spendable Banks!`);
-                            evaluatePerformanceBadges(user.uid);
                         }).catch(err => console.error("Bank deposit failed:", err));
                     }
 
                     alert(`Score Locked In! ${cleanName}'s points have been cashed out.`);
-
                     window.lastShareScore = pointsToDeposit;
                     
                     localStats.arcadeScore = 0;
@@ -1489,8 +1225,7 @@
                     document.getElementById('game-over-screen').style.display = 'none';
                     document.getElementById('share-btn').style.display = 'block';
                     toggleLeaderboard('flex');
-                })
-                .catch((error) => {
+                }).catch((error) => {
                     console.error("Error writing document: ", error);
                     alert("Failed to connect to the database. Are your security rules active?");
                     document.getElementById('btn-submit-win').style.display = 'block';
