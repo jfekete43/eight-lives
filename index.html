@@ -630,7 +630,13 @@
             
             if (user && !user.isAnonymous) {
                 document.getElementById('shop-modal').style.display = 'flex';
-                // We will add the rendering and database fetch logic here in Phase 2!
+                document.getElementById('shop-avatars-container').innerHTML = '<span style="color:#e2b714; font-size:10px;">Loading Inventory...</span>';
+                document.getElementById('shop-banners-container').innerHTML = '';
+                
+                // Fetch live profile to get exact coin count and owned items
+                db.collection("users").doc(user.uid).get().then((doc) => {
+                    if (doc.exists) renderShopUI(doc.data());
+                });
             } else {
                 alert("You need to save your profile to access the Item Shop!");
                 openAccountModal('main-menu');
@@ -639,6 +645,114 @@
 
         function closeShopModal() {
             document.getElementById('shop-modal').style.display = 'none';
+        }
+
+        // --- RENDER STOREFRONT ---
+        function renderShopUI(data) {
+            document.getElementById('shop-wallet-display').innerText = data.spendableCoins || 0;
+            
+            // Set fallbacks for players who haven't bought anything yet
+            const ownedAvatars = data.ownedAvatars || [];
+            const ownedBanners = data.ownedBanners || [];
+            const eqAvatar = data.equippedAvatar || "🕹️";
+            const eqBanner = data.equippedBanner || "#1a1a1a";
+
+            const avatarsDiv = document.getElementById('shop-avatars-container');
+            const bannersDiv = document.getElementById('shop-banners-container');
+            
+            avatarsDiv.innerHTML = '';
+            bannersDiv.innerHTML = '';
+
+            // 1. Paint the Avatars
+            for (const [id, item] of Object.entries(SHOP_INVENTORY.avatars)) {
+                const isOwned = ownedAvatars.includes(id);
+                const isEquipped = eqAvatar === item.icon;
+                
+                let btnLogic = "";
+                if (isEquipped) {
+                    btnLogic = `<button disabled style="background:#538d4e; color:white; border:none; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px;">EQUIPPED</button>`;
+                } else if (isOwned) {
+                    btnLogic = `<button onclick="processShopAction('${id}', 'avatars')" style="background:transparent; color:#e2b714; border:1px solid #e2b714; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px; cursor:pointer;">EQUIP</button>`;
+                } else {
+                    btnLogic = `<button onclick="processShopAction('${id}', 'avatars')" style="background:#e2b714; color:black; border:none; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">${item.price} 🪙</button>`;
+                }
+
+                avatarsDiv.innerHTML += `
+                    <div style="background: #272729; border: 2px solid ${isEquipped ? '#538d4e' : '#3a3a3c'}; border-radius: 8px; padding: 10px; width: 100px; text-align: center; display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 32px; margin-bottom: 5px;">${item.icon}</div>
+                        <div style="font-size: 8px; color: white; margin-bottom: 15px; flex-grow: 1; line-height:1.4;">${item.name}</div>
+                        ${btnLogic}
+                    </div>
+                `;
+            }
+
+            // 2. Paint the Banners
+            for (const [id, item] of Object.entries(SHOP_INVENTORY.banners)) {
+                const isOwned = ownedBanners.includes(id);
+                const isEquipped = eqBanner === item.color;
+                
+                let btnLogic = "";
+                if (isEquipped) {
+                    btnLogic = `<button disabled style="background:#4285F4; color:white; border:none; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px;">EQUIPPED</button>`;
+                } else if (isOwned) {
+                    btnLogic = `<button onclick="processShopAction('${id}', 'banners')" style="background:transparent; color:#4285F4; border:1px solid #4285F4; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px; cursor:pointer;">EQUIP</button>`;
+                } else {
+                    btnLogic = `<button onclick="processShopAction('${id}', 'banners')" style="background:#4285F4; color:white; border:none; padding:8px 5px; width:100%; font-family: 'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">${item.price} 🪙</button>`;
+                }
+
+                bannersDiv.innerHTML += `
+                    <div style="background: #272729; border: 2px solid ${isEquipped ? '#4285F4' : '#3a3a3c'}; border-radius: 8px; padding: 10px; width: 100px; text-align: center; display: flex; flex-direction: column; align-items: center;">
+                        <div style="width: 100%; height: 32px; background-color: ${item.color}; border: 2px solid #111; border-radius: 4px; margin-bottom: 8px;"></div>
+                        <div style="font-size: 8px; color: white; margin-bottom: 15px; flex-grow: 1; line-height:1.4;">${item.name}</div>
+                        ${btnLogic}
+                    </div>
+                `;
+            }
+        }
+
+        // --- TRANSACTION ENGINE ---
+        function processShopAction(itemId, category) {
+            const user = firebase.auth().currentUser;
+            if (!user || user.isAnonymous) return;
+
+            const itemDef = SHOP_INVENTORY[category][itemId];
+            if (!itemDef) return;
+
+            const userRef = db.collection("users").doc(user.uid);
+            
+            userRef.get().then(doc => {
+                if(!doc.exists) return;
+                const data = doc.data();
+                const coins = data.spendableCoins || 0;
+                const owned = data[category === 'avatars' ? 'ownedAvatars' : 'ownedBanners'] || [];
+                const equippedField = category === 'avatars' ? 'equippedAvatar' : 'equippedBanner';
+                const itemValue = category === 'avatars' ? itemDef.icon : itemDef.color;
+
+                if (owned.includes(itemId)) {
+                    // ACTION: EQUIP OWNED ITEM
+                    userRef.update({ [equippedField]: itemValue }).then(() => openShopModal());
+                } else {
+                    // ACTION: BUY NEW ITEM
+                    if (coins >= itemDef.price) {
+                        userRef.update({
+                            spendableCoins: firebase.firestore.FieldValue.increment(-itemDef.price),
+                            [category === 'avatars' ? 'ownedAvatars' : 'ownedBanners']: firebase.firestore.FieldValue.arrayUnion(itemId),
+                            [equippedField]: itemValue // Auto-equip on purchase!
+                        }).then(() => {
+                            playSound('coin'); // Cha-ching!
+                            openShopModal(); // Instantly refresh the shop UI
+                        });
+                    } else {
+                        // JUICE: Flash their wallet red if they are broke
+                        const wallet = document.getElementById('shop-wallet-display');
+                        wallet.style.color = '#e23636'; 
+                        wallet.classList.remove('shake');
+                        void wallet.offsetWidth; 
+                        wallet.classList.add('shake');
+                        setTimeout(() => wallet.style.color = '#e2b714', 600);
+                    }
+                }
+            });
         }
 
         function closeMainMenu() {
