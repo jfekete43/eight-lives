@@ -60,9 +60,33 @@
         h1 { 
             margin: 0; text-align: center;
             font-family: 'Bungee', sans-serif; 
-            font-size: clamp(18px, 5.5vw, 32px);
-            letter-spacing: 1px;
-            color: #ffffff; text-shadow: 2px 2px 0px #e23636, -2px -2px 0px #538d4e;
+            font-size: clamp(28px, 7.5vw, 48px); /* Significantly boosted size */
+            letter-spacing: 3px;
+            color: #ffffff; 
+            text-transform: uppercase;
+            
+            /* High-depth 3D layered arcade shadow with neon aura glow */
+            text-shadow: 
+                3px 3px 0px #e23636, 
+                6px 6px 0px #111112,
+                -1px -1px 0px #538d4e,
+                0 0 15px rgba(226, 54, 54, 0.3);
+                
+            /* Smooth arcade float animation */
+            animation: titleFloat 4s ease-in-out infinite alternate;
+            display: inline-block;
+        }
+
+        @keyframes titleFloat {
+            0% {
+                transform: translateY(0px) scale(1);
+                text-shadow: 3px 3px 0px #e23636, 6px 6px 0px #111112, -1px -1px 0px #538d4e, 0 0 15px rgba(226, 54, 54, 0.3);
+            }
+            100% {
+                transform: translateY(-6px) scale(1.02);
+                /* Shadow spreads slightly as it floats closer to the glass */
+                text-shadow: 4px 8px 0px #e23636, 8px 12px 0px #111112, -1px -1px 0px #538d4e, 0 0 25px rgba(226, 54, 54, 0.5);
+            }
         }
         
         .header-actions { display: flex; }
