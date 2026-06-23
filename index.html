@@ -506,6 +506,10 @@
                 // The browser remembers them! 
                 currentUID = user.uid;
                 console.log("Welcome back. Logged in as:", user.isAnonymous ? "Guest Profile" : user.email);
+                
+                // NEW: If they are logged in, pull their cross-device stats!
+                if (!user.isAnonymous) pullStatsFromCloud(); 
+                
             } else {
                 // Brand new visitor, generate a Ghost ID
                 auth.signInAnonymously().catch(err => console.error("Silent login failed:", err));
@@ -1127,6 +1131,47 @@
                 challenges: defaultChallenges // Apply the new trackers
             };
         }
+        // --- CLOUD SYNC ENGINE ---
+        function syncStatsToCloud() {
+            const user = firebase.auth().currentUser;
+            if (user && !user.isAnonymous) {
+                db.collection("users").doc(user.uid).set({
+                    stats: localStats
+                }, { merge: true }).catch(err => console.error("Cloud sync save failed:", err));
+            }
+        }
+
+        function pullStatsFromCloud() {
+            const user = firebase.auth().currentUser;
+            if (!user || user.isAnonymous) return;
+
+            db.collection("users").doc(user.uid).get().then(doc => {
+                if (doc.exists && doc.data().stats) {
+                    let cloudStats = doc.data().stats;
+                    
+                    // 1. Verify Daily Challenges aren't expired from an old session
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    if (!cloudStats.challenges || cloudStats.challenges.date !== todayStr) {
+                        cloudStats.challenges = { date: todayStr, played: 0, rpgWins: 0, firstTry: 0 };
+                    }
+
+                    // 2. Only overwrite local if the Cloud has more (or equal) games played.
+                    if (cloudStats.played >= localStats.played) {
+                        localStats = cloudStats;
+                        localStorage.setItem('gamedleStats', JSON.stringify(localStats));
+                        
+                        // 3. Update the active HUD
+                        document.getElementById('current-score').innerText = localStats.arcadeScore;
+                        document.getElementById('continues-left').innerText = localStats.continues;
+                        document.getElementById('high-score').innerText = localStats.highScore;
+                        console.log("Cloud stats successfully downloaded and applied!");
+                    } else if (localStats.played > cloudStats.played) {
+                        // If they played as a guest and THEN logged in, upload their new progress!
+                        syncStatsToCloud();
+                    }
+                }
+            });
+        }
         
         let localStats = loadStats();
         let knownConsole = null, knownGenre = null, eliminatedConsoles = new Set(), eliminatedGenres = new Set(), minYear = -Infinity, maxYear = Infinity;
@@ -1154,6 +1199,7 @@
                 localStats.arcadeScore = 0;
                 localStats.continues = 2;
                 localStorage.setItem('gamedleStats', JSON.stringify(localStats));
+                syncStatsToCloud();
             }
             
             gameOver = false;
@@ -1393,6 +1439,7 @@
                     localStats.arcadeScore = 0;
                     localStats.continues = 2;
                     localStorage.setItem('gamedleStats', JSON.stringify(localStats));
+                    syncStatsToCloud();
                     document.getElementById('current-score').innerText = localStats.arcadeScore;
                     document.getElementById('continues-left').innerText = localStats.continues;
                     
@@ -1589,6 +1636,7 @@
             }
             
             localStorage.setItem('gamedleStats', JSON.stringify(localStats));
+            syncStatsToCloud();
             document.getElementById('continues-left').innerText = localStats.continues;
             document.getElementById('high-score').innerText = localStats.highScore;
         }
