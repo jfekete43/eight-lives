@@ -60,10 +60,11 @@
         h1 { 
             margin: 0; text-align: center;
             font-family: 'Bungee', sans-serif; 
-            font-size: clamp(28px, 7.5vw, 48px); /* Significantly boosted size */
-            letter-spacing: 3px;
+            font-size: clamp(20px, 6vw, 48px); /* Adjusted minimum scale for mobile */
+            letter-spacing: 2px;
             color: #ffffff; 
             text-transform: uppercase;
+            white-space: nowrap; /* Prevents stacking */
             
             /* High-depth 3D layered arcade shadow with neon aura glow */
             text-shadow: 
@@ -84,19 +85,20 @@
             }
             100% {
                 transform: translateY(-6px) scale(1.02);
-                /* Shadow spreads slightly as it floats closer to the glass */
                 text-shadow: 4px 8px 0px #e23636, 8px 12px 0px #111112, -1px -1px 0px #538d4e, 0 0 25px rgba(226, 54, 54, 0.5);
             }
         }
         
-        .header-actions { display: flex; }
+        .header-actions { display: flex; min-width: 75px; } /* Gives columns a safe zone */
         .header-actions.left { justify-content: flex-start; gap: 15px; }
         .header-actions.right { justify-content: flex-end; }
 
         .text-btn {
             background: transparent; border: none; color: #818384;
-            font-size: 16px; font-weight: bold; cursor: pointer;
+            font-size: clamp(12px, 3.5vw, 16px); /* Scales button gracefully */
+            font-weight: bold; cursor: pointer;
             letter-spacing: 1px; transition: color 0.2s; padding: 0;
+            white-space: nowrap; /* Prevents "MENU" and the icon from separating */
         }
         .text-btn:hover { color: white; }
 
