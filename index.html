@@ -317,7 +317,14 @@
             <button class="close-btn" onclick="toggleLeaderboard('none')">&times;</button>
             <h2>HALL OF FAME</h2>
             
-            <div class="tabs-container">
+            <!-- NEW: Master Toggle Buttons -->
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;">
+                <button class="arcade-btn" id="btn-mode-single" onclick="setLeaderboardMode('single')" style="font-size: 10px; padding: 10px; width: 50%; border-color: #e2b714; color: #e2b714;">SINGLE RUN</button>
+                <button class="arcade-btn" id="btn-mode-career" onclick="setLeaderboardMode('career')" style="font-size: 10px; padding: 10px; width: 50%; border-color: #555; color: #555;">CAREER BANK</button>
+            </div>
+
+            <!-- Existing Tabs (Wrapped in an ID so we can hide them in Career Mode) -->
+            <div class="tabs-container" id="leaderboard-sub-tabs">
                 <button class="tab-btn active" id="tab-all" onclick="loadLeaderboard('all')">ALL-TIME</button>
                 <button class="tab-btn" id="tab-month" onclick="loadLeaderboard('month')">MONTH</button>
                 <button class="tab-btn" id="tab-week" onclick="loadLeaderboard('week')">WEEK</button>
@@ -326,12 +333,12 @@
 
             <div id="leaderboard-loading" style="color: #e2b714; font-size: 14px; margin-top: 15px;">Connecting to database...</div>
             <div id="leaderboard-list" style="text-align: left; margin-top: 20px; font-family: 'Press Start 2P', monospace; font-size: 12px; line-height: 2;">
-                </div>
+                <!-- Rows inject here -->
+            </div>
             
             <button id="share-btn" onclick="shareResults()" style="display: none; width: 100%; background-color: #e2b714; color: black; padding: 15px; margin-top: 25px; border: none; font-family: 'Press Start 2P', monospace; font-weight: bold; cursor: pointer; border-radius: 4px;">
                 SHARE SCORE 📋
             </button>
-            
         </div>
     </div>
 
@@ -1278,31 +1285,108 @@
             return { day: dayStr, week: weekStr, month: monthStr };
         }
 
+        // --- LEADERBOARD LOGIC ---
+        let currentLeaderboardMode = 'single';
+        let currentLeaderboardFilter = 'all';
+
+        function setLeaderboardMode(mode) {
+            currentLeaderboardMode = mode;
+            const btnSingle = document.getElementById('btn-mode-single');
+            const btnCareer = document.getElementById('btn-mode-career');
+            const subTabs = document.getElementById('leaderboard-sub-tabs');
+
+            if (mode === 'single') {
+                btnSingle.style.borderColor = '#e2b714'; btnSingle.style.color = '#e2b714';
+                btnCareer.style.borderColor = '#555'; btnCareer.style.color = '#555';
+                subTabs.style.display = 'flex';
+                loadLeaderboard(currentLeaderboardFilter); // Reload the last viewed time period
+            } else {
+                btnCareer.style.borderColor = '#538d4e'; btnCareer.style.color = '#538d4e';
+                btnSingle.style.borderColor = '#555'; btnSingle.style.color = '#555';
+                subTabs.style.display = 'none'; // Hide the time tabs!
+                loadLeaderboard('career'); // Trigger the new user query
+            }
+        }
+
         function toggleLeaderboard(displayState) {
             const modal = document.getElementById('leaderboard-modal');
             modal.style.display = displayState;
-            
             if (displayState === 'flex') {
-                loadLeaderboard('all'); // Default to All-Time
+                setLeaderboardMode('single'); // Always default to Single Run when opening
             }
         }
 
         function loadLeaderboard(filter) {
-            // Update Active Tab UI
-            ['all', 'month', 'week', 'day'].forEach(tab => {
-                document.getElementById('tab-' + tab).classList.remove('active');
-            });
-            document.getElementById('tab-' + filter).classList.add('active');
-
             const list = document.getElementById('leaderboard-list');
             const loading = document.getElementById('leaderboard-loading');
             list.innerHTML = '';
             loading.style.display = 'block';
 
+            // --- CAREER BANK QUERY (Top Grinders) ---
+            if (filter === 'career') {
+                // Query the "users" collection directly, sorted by lifetimePoints!
+                db.collection("users").orderBy("lifetimePoints", "desc").limit(25).get().then((querySnapshot) => {
+                    loading.style.display = 'none';
+                    let rankCount = 0;
+
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        rankCount++;
+
+                        // Since we are querying the profile directly, we don't need a secondary live fetch!
+                        const liveTitle = data.equippedTitle || "Insert Coin";
+                        const liveAvatar = data.equippedAvatar || "🕹️";
+                        const liveBanner = data.equippedBanner || "transparent";
+
+                        const row = document.createElement('div');
+                        row.style.display = 'flex';
+                        row.style.justifyContent = 'space-between';
+                        row.style.alignItems = 'center'; 
+                        row.style.marginBottom = '8px';
+                        row.style.backgroundColor = liveBanner;
+                        row.style.borderRadius = '6px';
+                        row.style.padding = '8px 12px';
+                        row.style.border = liveBanner !== "transparent" ? '1px solid #444' : '1px solid transparent';
+                        row.style.borderBottom = liveBanner === "transparent" ? '1px solid #3a3a3c' : '1px solid #444';
+
+                        let nameColor = "white"; let crown = "";
+                        if (rankCount === 1) { nameColor = "#e2b714"; crown = " 👑"; }
+                        if (rankCount === 2) nameColor = "#c0c0c0";
+                        if (rankCount === 3) nameColor = "#cd7f32";
+
+                        const nameSpan = `
+                            <div style="display: flex; flex-direction: column; line-height: 1.4;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 16px;">${liveAvatar}</span>
+                                    <span style="color: ${nameColor};">${rankCount}. ${data.arcadeTag}${crown}</span>
+                                </div>
+                                <span style="color: #bbb; font-size: 8px; text-transform: uppercase; margin-top: 3px;">${liveTitle}</span>
+                            </div>
+                        `;
+
+                        // Render the total lifetimePoints instead of a game score
+                        row.innerHTML = `${nameSpan}<span style="color: ${nameColor}; font-weight: bold; font-size: 14px;">${data.lifetimePoints || 0}</span>`;
+                        list.appendChild(row);
+                    });
+
+                    if (rankCount === 0) list.innerHTML = "<p>No players found!</p>";
+                }).catch(err => {
+                    loading.innerText = "Error loading career database.";
+                    console.error("Career fetch error:", err);
+                });
+                return; // Stop the function here so it doesn't run the single-run code below!
+            }
+
+            // --- SINGLE RUN QUERY (Highest Scores) ---
+            currentLeaderboardFilter = filter;
+            ['all', 'month', 'week', 'day'].forEach(tab => {
+                document.getElementById('tab-' + tab).classList.remove('active');
+            });
+            document.getElementById('tab-' + filter).classList.add('active');
+
             let query = db.collection("leaderboard");
             const periods = getPeriods();
 
-            // Setup the smart range query to avoid complex Firebase Indexing
             if (filter === 'all') {
                 query = query.orderBy("score", "desc").limit(25);
             } else {
@@ -1317,12 +1401,10 @@
 
             query.get().then(async (querySnapshot) => {
                 loading.style.display = 'none';
-                
                 const seenNames = new Set();
                 let rankCount = 0;
                 const MAX_DISPLAY = 10; 
 
-                // We use 'for...of' so we can pause and securely fetch live profiles
                 for (let doc of querySnapshot.docs) {
                     if (rankCount >= MAX_DISPLAY) break; 
 
@@ -1333,10 +1415,9 @@
                         seenNames.add(playerName);
                         rankCount++;
 
-                        // --- 1. LIVE STOREFRONT FETCH ---
                         let liveTitle = data.title || "Insert Coin"; 
-                        let liveAvatar = "🕹️"; // The default starting avatar
-                        let liveBanner = "transparent"; // The default starting banner
+                        let liveAvatar = "🕹️"; 
+                        let liveBanner = "transparent"; 
                         
                         if (data.uid) {
                             try {
@@ -1350,40 +1431,27 @@
                             } catch (err) { console.error("Could not fetch live profile"); }
                         }
                         
-                        // --- 2. THE HIDDEN DATE STAMP ---
-                        let tooltipParams = "";
-                        let cursorStyle = "default";
-                        
+                        let tooltipParams = ""; let cursorStyle = "default";
                         if (filter === 'all' && data.timestamp) {
                             const d = data.timestamp.toDate();
                             const formattedDate = d.toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
-                            
                             tooltipParams = `title="Record set on: ${formattedDate}" onclick="alert('Record set on: ${formattedDate}')"`;
                             cursorStyle = "pointer";
                         }
 
                         const row = document.createElement('div');
-                        row.style.display = 'flex';
-                        row.style.justifyContent = 'space-between';
-                        row.style.alignItems = 'center'; 
-                        row.style.marginBottom = '8px';
-                        
-                        // --- 3. APPLY THE BANNER COLOR ---
+                        row.style.display = 'flex'; row.style.justifyContent = 'space-between';
+                        row.style.alignItems = 'center'; row.style.marginBottom = '8px';
                         row.style.backgroundColor = liveBanner;
-                        
-                        // Add some nice padding and borders so the colored rows look like cards
-                        row.style.borderRadius = '6px';
-                        row.style.padding = '8px 12px';
+                        row.style.borderRadius = '6px'; row.style.padding = '8px 12px';
                         row.style.border = liveBanner !== "transparent" ? '1px solid #444' : '1px solid transparent';
                         row.style.borderBottom = liveBanner === "transparent" ? '1px solid #3a3a3c' : '1px solid #444';
                         
-                        let nameColor = "white";
-                        let crown = "";
+                        let nameColor = "white"; let crown = "";
                         if (rankCount === 1) { nameColor = "#e2b714"; crown = " 👑"; }
                         if (rankCount === 2) nameColor = "#c0c0c0";
                         if (rankCount === 3) nameColor = "#cd7f32";
 
-                        // Apply the hidden tooltip and the AVATAR to the left side
                         const nameSpan = `
                             <div ${tooltipParams} style="display: flex; flex-direction: column; line-height: 1.4; cursor: ${cursorStyle};">
                                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -1398,7 +1466,6 @@
                         list.appendChild(row);
                     }
                 }
-                
                 if (rankCount === 0) list.innerHTML = "<p>No scores yet for this time period!</p>";
             }).catch((error) => {
                 loading.innerText = "Error loading database.";
