@@ -56,6 +56,35 @@
             width: 100%; max-width: 600px; margin-bottom: 15px;
             position: relative; z-index: 10;
         }
+        /* --- HORIZONTAL SHOP CAROUSEL --- */
+        .shop-scroll-grid {
+            display: grid;
+            grid-template-rows: auto auto; /* Forces exactly 2 rows */
+            grid-auto-flow: column; /* Forces items to flow to the right */
+            grid-auto-columns: max-content; /* Sizes the columns perfectly to your cards */
+            gap: 15px;
+            overflow-x: auto; /* Enables horizontal scrolling */
+            overflow-y: hidden;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        /* Custom Retro Scrollbar */
+        .shop-scroll-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+        .shop-scroll-grid::-webkit-scrollbar-track {
+            background: #111; 
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+        .shop-scroll-grid::-webkit-scrollbar-thumb {
+            background: #555; 
+            border-radius: 4px;
+        }
+        .shop-scroll-grid::-webkit-scrollbar-thumb:hover {
+            background: #e2b714; /* Lights up gold when you interact with it */
+        }
 
         h1 { 
             margin: 0; text-align: center;
@@ -461,13 +490,13 @@
             
             <!-- Avatars Section -->
             <div style="text-align: left; font-family: 'Press Start 2P', monospace; font-size: 12px; color: #538d4e; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px;">AVATARS</div>
-            <div id="shop-avatars-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 30px;">
+            <div id="shop-avatars-container" class="shop-scroll-grid">
                 <!-- Avatars injected here -->
             </div>
 
             <!-- Banners Section -->
             <div style="text-align: left; font-family: 'Press Start 2P', monospace; font-size: 12px; color: #4285F4; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px;">BANNERS</div>
-            <div id="shop-banners-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 30px;">
+            <div id="shop-banners-container" class="shop-scroll-grid">
                 <!-- Banners injected here -->
             </div>
 
