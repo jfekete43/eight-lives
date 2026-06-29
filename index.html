@@ -292,11 +292,13 @@
         </div>
     </div>
 
-    <div style="color: #e2b714; font-family: 'Press Start 2P', monospace; font-size: 12px; margin-bottom: 10px; text-align: center; position: relative; z-index: 10;">
-        CONTINUES: <span id="continues-left">2</span>
+    <!-- HUD Cleanup: Hearts and Continues combined into one row -->
+    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px; width: 100%; max-width: 600px; position: relative; z-index: 10;">
+        <div class="lives-left" id="lives-display" style="margin-bottom: 0;"></div>
+        <div style="color: #e2b714; font-family: 'Press Start 2P', monospace; font-size: 14px; display: flex; align-items: center;">
+            CONTINUES: <span id="continues-left" style="margin-left: 10px;">2</span>
+        </div>
     </div>
-
-    <div class="lives-left" id="lives-display"></div>
 
     <div class="input-section">
         <div class="autocomplete-container">
@@ -323,7 +325,7 @@
                 <button class="arcade-btn" id="btn-mode-career" onclick="setLeaderboardMode('career')" style="font-size: 10px; padding: 10px; width: 50%; border-color: #555; color: #555;">CAREER BANK</button>
             </div>
 
-            <!-- Existing Tabs (Wrapped in an ID so we can hide them in Career Mode) -->
+            <!-- Existing Tabs (Now used for Career as well) -->
             <div class="tabs-container" id="leaderboard-sub-tabs">
                 <button class="tab-btn active" id="tab-all" onclick="loadLeaderboard('all')">ALL-TIME</button>
                 <button class="tab-btn" id="tab-month" onclick="loadLeaderboard('month')">MONTH</button>
@@ -371,9 +373,9 @@
         </div>
 
         <div class="button-group">
-            <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
+            <button class="arcade-btn share-btn" id="btn-share-win" onclick="shareResults()" style="display: none;">Share 📋</button>
             <button class="arcade-btn" onclick="resetGame(true, false)">Next Round</button>
-            <button class="arcade-btn" onclick="openAccountModal('victory-screen')" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
+            <button class="arcade-btn" id="btn-save-win" onclick="openAccountModal('victory-screen')" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
             <button class="arcade-btn submit-btn" id="btn-submit-win" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
     </div>
@@ -388,13 +390,14 @@
         </div>
 
         <div class="button-group">
-            <button class="arcade-btn share-btn" onclick="shareResults()">Share 📋</button>
+            <button class="arcade-btn share-btn" id="btn-share-lose" onclick="shareResults()" style="display: none;">Share 📋</button>
             <button class="arcade-btn" id="btn-retry-lose" onclick="resetGame(true, false)">Continue</button>
-            <button class="arcade-btn" onclick="openAccountModal('game-over-screen')" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
+            <button class="arcade-btn" id="btn-save-lose" onclick="openAccountModal('game-over-screen')" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
             <button class="arcade-btn submit-btn" id="btn-submit-lose" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
     </div>
-<!-- ACCOUNT REGISTRATION MODAL -->
+
+    <!-- ACCOUNT REGISTRATION MODAL -->
     <div id="account-modal" class="overlay-screen" style="display: none; z-index: 9999;">
         <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #e2b714; border-radius: 10px; max-width: 400px; width: 90%; text-align: center;">
             <div class="overlay-text" style="font-size: 24px; color: #e2b714; margin-bottom: 10px;">SAVE YOUR STATS</div>
@@ -439,12 +442,14 @@
                 
                 <!-- The New Profile/Login Hub -->
                 <button class="arcade-btn" id="nav-profile-btn" onclick="handleProfileClick()" style="border-color: #4285F4; color: #4285F4;">PROFILE / LOG IN</button>
+                <button class="arcade-btn" id="nav-logout-btn" onclick="performLogout()" style="border-color: #e23636; color: #e23636; display: none;">LOG OUT</button>
                 
                 <!-- Close Button -->
                 <button class="arcade-btn" onclick="closeMainMenu()" style="border-color: #555; color: #555; margin-top: 15px;">BACK TO GAME</button>
             </div>
         </div>
     </div>
+
     <!-- PLAYER LOCKER MODAL -->
     <div id="locker-modal" class="overlay-screen" style="display: none; z-index: 99999;">
         <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #538d4e; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto;">
@@ -485,6 +490,7 @@
             <button class="arcade-btn" id="btn-logout" style="border-color: #e23636; color: #e23636; font-size: 10px; width: 100%;">LOG OUT</button>
         </div>
     </div>
+
     <!-- THE ITEM SHOP MODAL -->
     <div id="shop-modal" class="overlay-screen" style="display: none; z-index: 99999;">
         <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #e2b714; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto;">
@@ -510,6 +516,7 @@
             <button class="arcade-btn" onclick="closeShopModal()" style="border-color: #555; color: #555; width: 100%;">EXIT SHOP</button>
         </div>
     </div>
+
     <!-- CHALLENGES MODAL -->
     <div id="challenges-modal" class="overlay-screen" style="display: none; z-index: 99999;">
         <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #538d4e; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto;">
@@ -682,16 +689,27 @@
             // DYNAMIC BUTTON UPDATE: Check if they are logged in
             const user = firebase.auth().currentUser;
             const profileBtn = document.getElementById('nav-profile-btn');
+            const logoutBtn = document.getElementById('nav-logout-btn');
             
             if (user && !user.isAnonymous) {
                 profileBtn.innerText = "MY LOCKER";
                 profileBtn.style.borderColor = "#538d4e";
                 profileBtn.style.color = "#538d4e";
+                logoutBtn.style.display = 'flex'; // Show logout
             } else {
                 profileBtn.innerText = "PROFILE / LOG IN";
                 profileBtn.style.borderColor = "#4285F4";
                 profileBtn.style.color = "#4285F4";
+                logoutBtn.style.display = 'none'; // Hide logout
             }
+        }
+        
+        function performLogout() {
+            firebase.auth().signOut().then(() => {
+                document.getElementById('locker-modal').style.display = 'none';
+                alert("You have been securely logged out. Returning to Guest Mode.");
+                location.reload(); 
+            });
         }
         // --- SHOP MODAL LOGIC ---
         function openShopModal() {
@@ -1108,14 +1126,15 @@
             }
         }
         // --- LOG OUT BUTTON LOGIC ---
-        document.getElementById('btn-logout').addEventListener('click', () => {
+        function performLogout() {
             firebase.auth().signOut().then(() => {
                 document.getElementById('locker-modal').style.display = 'none';
                 alert("You have been securely logged out. Returning to Guest Mode.");
-                // Reload the page to reset everything to a clean guest state
                 location.reload(); 
             });
-        });
+        }
+        
+        document.getElementById('btn-logout').addEventListener('click', performLogout);
 
         // Web Audio API
         let audioCtx = null;
@@ -1339,19 +1358,18 @@
             currentLeaderboardMode = mode;
             const btnSingle = document.getElementById('btn-mode-single');
             const btnCareer = document.getElementById('btn-mode-career');
-            const subTabs = document.getElementById('leaderboard-sub-tabs');
+            
+            // SubTabs stay visible for both modes now!
 
             if (mode === 'single') {
                 btnSingle.style.borderColor = '#e2b714'; btnSingle.style.color = '#e2b714';
                 btnCareer.style.borderColor = '#555'; btnCareer.style.color = '#555';
-                subTabs.style.display = 'flex';
-                loadLeaderboard(currentLeaderboardFilter); // Reload the last viewed time period
             } else {
                 btnCareer.style.borderColor = '#538d4e'; btnCareer.style.color = '#538d4e';
                 btnSingle.style.borderColor = '#555'; btnSingle.style.color = '#555';
-                subTabs.style.display = 'none'; // Hide the time tabs!
-                loadLeaderboard('career'); // Trigger the new user query
             }
+            // Automatically reload the list using the active timeframe tab
+            loadLeaderboard(currentLeaderboardFilter); 
         }
 
         function toggleLeaderboard(displayState) {
@@ -1368,10 +1386,23 @@
             list.innerHTML = '';
             loading.style.display = 'block';
 
-            // --- CAREER BANK QUERY (Top Grinders) ---
-            if (filter === 'career') {
-                // Query the "users" collection directly, sorted by lifetimePoints!
-                db.collection("users").orderBy("lifetimePoints", "desc").limit(25).get().then((querySnapshot) => {
+            currentLeaderboardFilter = filter;
+            ['all', 'month', 'week', 'day'].forEach(tab => {
+                document.getElementById('tab-' + tab).classList.remove('active');
+            });
+            document.getElementById('tab-' + filter).classList.add('active');
+            
+            const periods = getPeriods();
+
+            // --- CAREER BANK QUERY (Earnings by Timeframe) ---
+            if (currentLeaderboardMode === 'career') {
+                // Determine which cumulative field to query based on the tab
+                let queryField = "lifetimePoints";
+                if (filter === 'month') queryField = `career_${periods.month}`;
+                if (filter === 'week') queryField = `career_${periods.week}`;
+                if (filter === 'day') queryField = `career_${periods.day}`;
+
+                db.collection("users").orderBy(queryField, "desc").limit(25).get().then((querySnapshot) => {
                     loading.style.display = 'none';
                     let rankCount = 0;
 
@@ -1379,7 +1410,6 @@
                         const data = doc.data();
                         rankCount++;
 
-                        // Since we are querying the profile directly, we don't need a secondary live fetch!
                         const liveTitle = data.equippedTitle || "Insert Coin";
                         const liveAvatar = data.equippedAvatar || "🕹️";
                         const liveBanner = data.equippedBanner || "transparent";
@@ -1410,28 +1440,22 @@
                             </div>
                         `;
 
-                        // Render the total lifetimePoints instead of a game score
-                        row.innerHTML = `${nameSpan}<span style="color: ${nameColor}; font-weight: bold; font-size: 14px;">${data.lifetimePoints || 0}</span>`;
+                        // Render the specific points for the selected timeframe
+                        const displayScore = data[queryField] || 0;
+                        row.innerHTML = `${nameSpan}<span style="color: ${nameColor}; font-weight: bold; font-size: 14px;">${displayScore}</span>`;
                         list.appendChild(row);
                     });
 
-                    if (rankCount === 0) list.innerHTML = "<p>No players found!</p>";
+                    if (rankCount === 0) list.innerHTML = "<p>No players have cashed out during this timeframe yet!</p>";
                 }).catch(err => {
                     loading.innerText = "Error loading career database.";
                     console.error("Career fetch error:", err);
                 });
-                return; // Stop the function here so it doesn't run the single-run code below!
+                return; // Stop function
             }
 
             // --- SINGLE RUN QUERY (Highest Scores) ---
-            currentLeaderboardFilter = filter;
-            ['all', 'month', 'week', 'day'].forEach(tab => {
-                document.getElementById('tab-' + tab).classList.remove('active');
-            });
-            document.getElementById('tab-' + filter).classList.add('active');
-
             let query = db.collection("leaderboard");
-            const periods = getPeriods();
 
             if (filter === 'all') {
                 query = query.orderBy("score", "desc").limit(25);
@@ -1446,6 +1470,7 @@
             }
 
             query.get().then(async (querySnapshot) => {
+                // ... (Keep the rest of the existing Single Run query block exactly the same) ...
                 loading.style.display = 'none';
                 const seenNames = new Set();
                 let rankCount = 0;
@@ -1524,8 +1549,11 @@
                 return;
             }
             
-            document.getElementById('btn-submit-win').style.display = 'none';
-            document.getElementById('btn-submit-lose').style.display = 'none';
+            // Visual feedback immediately
+            ['win', 'lose'].forEach(state => {
+                const btn = document.getElementById(`btn-submit-${state}`);
+                if(btn) { btn.innerText = "CASHING OUT..."; btn.disabled = true; }
+            });
 
             const user = firebase.auth().currentUser;
 
@@ -1545,8 +1573,10 @@
             function askForGuestName() {
                 const initials = prompt("Enter your name (10 characters max):", "PLAYER");
                 if (!initials) {
-                    document.getElementById('btn-submit-win').style.display = 'block';
-                    document.getElementById('btn-submit-lose').style.display = 'block';
+                    ['win', 'lose'].forEach(state => {
+                        const btn = document.getElementById(`btn-submit-${state}`);
+                        if(btn) { btn.innerText = "Cash Out"; btn.disabled = false; }
+                    });
                     return; 
                 }
                 finalizeCashOut(initials.substring(0, 10).toUpperCase(), "Guest");
@@ -1569,16 +1599,29 @@
                 }).then(() => {
                     const user = firebase.auth().currentUser;
                     if (user && !user.isAnonymous) {
+                        // NEW: Update the cumulative career stats for specific timeframes
                         db.collection("users").doc(user.uid).update({
                             lifetimePoints: firebase.firestore.FieldValue.increment(pointsToDeposit),
-                            spendableCoins: firebase.firestore.FieldValue.increment(pointsToDeposit)
-                        }).then(() => {
-                            console.log(`Deposited ${pointsToDeposit} points into Lifetime & Spendable Banks!`);
+                            spendableCoins: firebase.firestore.FieldValue.increment(pointsToDeposit),
+                            [`career_${periods.day}`]: firebase.firestore.FieldValue.increment(pointsToDeposit),
+                            [`career_${periods.week}`]: firebase.firestore.FieldValue.increment(pointsToDeposit),
+                            [`career_${periods.month}`]: firebase.firestore.FieldValue.increment(pointsToDeposit)
                         }).catch(err => console.error("Bank deposit failed:", err));
                     }
 
-                    alert(`Score Locked In! ${cleanName}'s points have been cashed out.`);
                     window.lastShareScore = pointsToDeposit;
+                    
+                    // Transformation: Button becomes "CASHED OUT" and Share appears natively
+                    ['win', 'lose'].forEach(state => {
+                        const btn = document.getElementById(`btn-submit-${state}`);
+                        if(btn) {
+                            btn.innerText = "CASHED OUT ✅";
+                            btn.style.borderColor = "#538d4e";
+                            btn.style.color = "#538d4e";
+                        }
+                    });
+                    document.getElementById('btn-share-win').style.display = 'block';
+                    document.getElementById('btn-share-lose').style.display = 'block';
                     
                     localStats.arcadeScore = 0;
                     localStats.continues = 2;
@@ -1587,15 +1630,13 @@
                     document.getElementById('current-score').innerText = localStats.arcadeScore;
                     document.getElementById('continues-left').innerText = localStats.continues;
                     
-                    document.getElementById('victory-screen').style.display = 'none';
-                    document.getElementById('game-over-screen').style.display = 'none';
-                    document.getElementById('share-btn').style.display = 'block';
-                    toggleLeaderboard('flex');
                 }).catch((error) => {
                     console.error("Error writing document: ", error);
                     alert("Failed to connect to the database. Are your security rules active?");
-                    document.getElementById('btn-submit-win').style.display = 'block';
-                    document.getElementById('btn-submit-lose').style.display = 'block';
+                    ['win', 'lose'].forEach(state => {
+                        const btn = document.getElementById(`btn-submit-${state}`);
+                        if(btn) { btn.innerText = "Cash Out"; btn.disabled = false; }
+                    });
                 });
             }
         }
@@ -1686,47 +1727,31 @@
             document.getElementById('guess-input').disabled = true;
             document.getElementById('guess-button').disabled = true;
             localStats.played++;
-            
-            // --- TICK CHALLENGE PROGRESS ---
             localStats.challenges.played++;
+            
+            // 1. Reset Buttons for a fresh end screen
+            ['win', 'lose'].forEach(state => {
+                const btn = document.getElementById(`btn-submit-${state}`);
+                if(btn) {
+                    btn.innerText = "Cash Out";
+                    btn.disabled = false;
+                    btn.style.borderColor = "#e2b714";
+                    btn.style.color = "#e2b714";
+                }
+            });
+            document.getElementById('btn-share-win').style.display = 'none';
+            document.getElementById('btn-share-lose').style.display = 'none';
+
+            // 2. Hide "Save Profile" dynamically if they already have an account
+            const user = firebase.auth().currentUser;
+            const isGuest = !user || user.isAnonymous;
+            document.getElementById('btn-save-win').style.display = isGuest ? 'block' : 'none';
+            document.getElementById('btn-save-lose').style.display = isGuest ? 'block' : 'none';
 
             if (isWin) {
-                // Check for specific challenge criteria
-                if (targetGame.genre === "RPG") localStats.challenges.rpgWins++;
-                if (currentGuesses === 1) localStats.challenges.firstTry++;
-                
-                localStats.wins++;
-                localStats.currentStreak++;
-                if (localStats.currentStreak > localStats.maxStreak) localStats.maxStreak = localStats.currentStreak;
-                localStats.guessDistribution[currentGuesses - 1]++;
-                
-                const pointsWon = POINTS_DISTRIBUTION[currentGuesses - 1];
-                
-                // --- NEW: Trigger Score Animation ---
-                const oldScore = localStats.arcadeScore;
-                localStats.arcadeScore += pointsWon;
-                animateValue('current-score', oldScore, localStats.arcadeScore, 1200); // Ticks up over 1.2 seconds
-                
-                // Add a cool pulsing effect to the scoreboard while it counts
-                document.getElementById('current-score').classList.add('text-pulse');
-                setTimeout(() => {
-                    document.getElementById('current-score').classList.remove('text-pulse');
-                }, 1200);
-                // ------------------------------------
-                if (localStats.arcadeScore > localStats.highScore) localStats.highScore = localStats.arcadeScore;
-                
-                document.getElementById('victory-points').innerText = `+${pointsWon} POINTS`;
-                document.getElementById('victory-points').style.display = 'block';
-                
-                // Update Victory Status Bar
-                const vicStatus = document.getElementById('victory-status');
-                if(vicStatus) vicStatus.innerHTML = `BANK: <span style="color:#538d4e;">${localStats.arcadeScore}</span> | LIVES: <span style="color:#e2b714;">${localStats.continues}</span>`;
-                
-                playSound('win');
-                document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
+                // ... (Keep existing isWin logic exactly as is) ...
                 
                 document.getElementById('btn-submit-win').style.display = localStats.arcadeScore > 0 ? 'block' : 'none';
-                // --- INCREASED TIMEOUT: Wait 1.5 seconds so the score animation can finish ---
                 setTimeout(() => { document.getElementById('victory-screen').style.display = 'flex'; }, 1500);
             } else {
                 localStats.currentStreak = 0;
@@ -1748,8 +1773,7 @@
                     document.getElementById('btn-retry-lose').innerText = "Continue Round";
                     document.getElementById('btn-retry-lose').onclick = () => resetGame(true, false); 
                     document.getElementById('btn-submit-lose').style.display = localStats.arcadeScore > 0 ? 'block' : 'none';
-
-                    // Update Game Over Status Bar
+                    
                     const loseStatus = document.getElementById('game-over-status');
                     if(loseStatus) {
                         loseStatus.innerHTML = `BANK: <span style="color:#538d4e;">${localStats.arcadeScore}</span> | LIVES: <span style="color:#e2b714;">${localStats.continues}</span>`;
@@ -1761,7 +1785,6 @@
                     localStats.continues = 2; 
                     
                     document.getElementById('game-over-title').innerText = "GAME OVER";
-                    
                     document.getElementById('lose-points').innerText = "ALL POINTS LOST!";
                     document.getElementById('lose-points').style.color = "#e23636"; 
                     document.getElementById('lose-points').style.display = 'block';
@@ -1770,7 +1793,9 @@
                     document.getElementById('btn-retry-lose').onclick = () => resetGame(true, true); 
                     document.getElementById('btn-submit-lose').style.display = 'none'; 
                     
-                    // Hide the status bar on a total wipeout
+                    // Show Share Button automatically on a Total Wipeout
+                    document.getElementById('btn-share-lose').style.display = 'block';
+                    
                     const loseStatus = document.getElementById('game-over-status');
                     if(loseStatus) loseStatus.style.display = 'none';
                 }
