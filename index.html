@@ -221,7 +221,10 @@
         .share-btn { background-color: #538d4e; border-color: #538d4e; }
         .share-btn:hover { background-color: #43703e; border-color: #43703e; color: white; }
         .submit-btn { border-color: #e2b714; color: #e2b714; }
-        .submit-btn:hover { background-color: #e2b714; color: black; }
+        .submit-btn:hover:not(:disabled) { 
+            background-color: #e2b714 !important; 
+            color: #000000 !important; 
+        }
         /* --- GAME FEEL & JUICE --- */
         @keyframes shake {
             0% { transform: translate(1px, 1px) rotate(0deg); }
@@ -374,7 +377,7 @@
 
         <div class="button-group">
             <button class="arcade-btn share-btn" id="btn-share-win" onclick="shareResults()" style="display: none;">Share 📋</button>
-            <button class="arcade-btn" onclick="resetGame(true, false)">Next Round</button>
+            <button class="arcade-btn" id="btn-retry-win" onclick="resetGame(true, false)">Next Round</button>
             <button class="arcade-btn" id="btn-save-win" onclick="openAccountModal('victory-screen')" style="border-color: #4285F4; color: #4285F4;">Save Profile</button>
             <button class="arcade-btn submit-btn" id="btn-submit-win" onclick="submitToLeaderboard()">Cash Out</button>
         </div>
@@ -1613,13 +1616,24 @@
                     
                     // Transformation: Button becomes "CASHED OUT" and Share appears natively
                     ['win', 'lose'].forEach(state => {
-                        const btn = document.getElementById(`btn-submit-${state}`);
-                        if(btn) {
-                            btn.innerText = "CASHED OUT ✅";
-                            btn.style.borderColor = "#538d4e";
-                            btn.style.color = "#538d4e";
+                        // 1. Update the Cash Out button
+                        const btnSubmit = document.getElementById(`btn-submit-${state}`);
+                        if(btnSubmit) {
+                            btnSubmit.innerText = "CASHED OUT ✅";
+                            btnSubmit.style.borderColor = "#538d4e";
+                            btnSubmit.style.color = "#538d4e";
+                            btnSubmit.style.backgroundColor = "transparent";
+                            btnSubmit.disabled = true; // Disables the hover effect from kicking in
+                        }
+                        
+                        // 2. Force the Retry button to become a "New Run"
+                        const btnRetry = document.getElementById(`btn-retry-${state}`);
+                        if(btnRetry) {
+                            btnRetry.innerText = "New Run";
+                            btnRetry.onclick = () => resetGame(true, true); // True/True forces a full reset
                         }
                     });
+                    
                     document.getElementById('btn-share-win').style.display = 'block';
                     document.getElementById('btn-share-lose').style.display = 'block';
                     
