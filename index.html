@@ -1749,9 +1749,42 @@
             document.getElementById('btn-save-lose').style.display = isGuest ? 'block' : 'none';
 
             if (isWin) {
-                // ... (Keep existing isWin logic exactly as is) ...
+                // Check for specific challenge criteria
+                if (targetGame.genre === "RPG") localStats.challenges.rpgWins++;
+                if (currentGuesses === 1) localStats.challenges.firstTry++;
+                
+                localStats.wins++;
+                localStats.currentStreak++;
+                if (localStats.currentStreak > localStats.maxStreak) localStats.maxStreak = localStats.currentStreak;
+                localStats.guessDistribution[currentGuesses - 1]++;
+                
+                const pointsWon = POINTS_DISTRIBUTION[currentGuesses - 1];
+                
+                // --- NEW: Trigger Score Animation ---
+                const oldScore = localStats.arcadeScore;
+                localStats.arcadeScore += pointsWon;
+                animateValue('current-score', oldScore, localStats.arcadeScore, 1200); // Ticks up over 1.2 seconds
+                
+                // Add a cool pulsing effect to the scoreboard while it counts
+                document.getElementById('current-score').classList.add('text-pulse');
+                setTimeout(() => {
+                    document.getElementById('current-score').classList.remove('text-pulse');
+                }, 1200);
+                // ------------------------------------
+                if (localStats.arcadeScore > localStats.highScore) localStats.highScore = localStats.arcadeScore;
+                
+                document.getElementById('victory-points').innerText = `+${pointsWon} POINTS`;
+                document.getElementById('victory-points').style.display = 'block';
+                
+                // Update Victory Status Bar
+                const vicStatus = document.getElementById('victory-status');
+                if(vicStatus) vicStatus.innerHTML = `BANK: <span style="color:#538d4e;">${localStats.arcadeScore}</span> | LIVES: <span style="color:#e2b714;">${localStats.continues}</span>`;
+                
+                playSound('win');
+                document.getElementById('victory-subtext').innerText = `You got it in ${currentGuesses} ${currentGuesses === 1 ? 'try' : 'tries'}!`;
                 
                 document.getElementById('btn-submit-win').style.display = localStats.arcadeScore > 0 ? 'block' : 'none';
+                // --- INCREASED TIMEOUT: Wait 1.5 seconds so the score animation can finish ---
                 setTimeout(() => { document.getElementById('victory-screen').style.display = 'flex'; }, 1500);
             } else {
                 localStats.currentStreak = 0;
