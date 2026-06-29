@@ -981,12 +981,6 @@
             { id: "CAREER_WIN_25", desc: "Win 25 Games", type: "wins", target: 25, rewardType: "titles", rewardId: "Grid Veteran", rewardDisplay: "Veteran Title" },
             { id: "CAREER_STREAK_10", desc: "Reach a 10-Win Streak", type: "maxStreak", target: 10, rewardType: "avatars", rewardId: "AVATAR_WIZARD", rewardDisplay: "Wizard Avatar" }
         ];
-        // --- CHALLENGE REGISTRY ---
-        const DAILY_CHALLENGES = [
-            { id: "PLAY_3", desc: "Play 3 Full Games", type: "played", target: 3, reward: 100 },
-            { id: "WIN_RPG", desc: "Guess an RPG Correctly", type: "rpgWins", target: 1, reward: 200 },
-            { id: "FIRST_TRY", desc: "Win on the 1st Try", type: "firstTry", target: 1, reward: 500 }
-        ];
 
         function getPrestigeData(points) {
             let currentRank = PRESTIGE_RANKS[0];
