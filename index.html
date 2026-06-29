@@ -433,7 +433,7 @@
                 <button class="arcade-btn" onclick="closeMainMenu(); toggleModal('flex')">STATS</button>
                 <button class="arcade-btn" onclick="closeMainMenu(); toggleLeaderboard('flex')">LEADERBOARD</button>
                 <button class="arcade-btn" id="nav-shop-btn" onclick="openShopModal()" style="border-color: #e2b714; color: #e2b714;">ITEM SHOP</button>
-                <button class="arcade-btn" onclick="openChallengesModal()" style="border-color: #538d4e; color: #538d4e;">DAILY CHALLENGES</button>
+                <button class="arcade-btn" onclick="openChallengesModal()" style="border-color: #538d4e; color: #538d4e;">CHALLENGES</button>
                 
                 <div style="height: 2px; background-color: #333; margin: 10px 0;"></div>
                 
@@ -510,11 +510,16 @@
             <button class="arcade-btn" onclick="closeShopModal()" style="border-color: #555; color: #555; width: 100%;">EXIT SHOP</button>
         </div>
     </div>
-    <!-- DAILY CHALLENGES MODAL -->
+    <!-- CHALLENGES MODAL -->
     <div id="challenges-modal" class="overlay-screen" style="display: none; z-index: 99999;">
-        <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #538d4e; border-radius: 10px; width: 90%; max-width: 400px; text-align: center;">
-            <div class="overlay-text" style="font-size: 24px; color: #538d4e; margin-bottom: 5px;">CHALLENGES</div>
-            <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #888; margin-bottom: 25px;">RESET EVERY 24 HOURS</div>
+        <div style="background-color: #1a1a1a; padding: 30px; border: 2px solid #538d4e; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto;">
+            <div class="overlay-text" style="font-size: 24px; color: #538d4e; margin-bottom: 15px;">CHALLENGES</div>
+            
+            <!-- Dual Tabs -->
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 25px;">
+                <button class="arcade-btn" id="btn-chal-daily" onclick="setChallengeMode('daily')" style="font-size: 10px; padding: 10px; width: 50%; border-color: #e2b714; color: #e2b714;">DAILY</button>
+                <button class="arcade-btn" id="btn-chal-career" onclick="setChallengeMode('career')" style="font-size: 10px; padding: 10px; width: 50%; border-color: #555; color: #555;">CAREER</button>
+            </div>
             
             <div id="challenges-container" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;">
                 <!-- Challenges inject here -->
@@ -708,45 +713,66 @@
             }
         }
         // --- CHALLENGES ENGINE ---
+        let currentChallengeMode = 'daily';
+
+        function setChallengeMode(mode) {
+            currentChallengeMode = mode;
+            const btnDaily = document.getElementById('btn-chal-daily');
+            const btnCareer = document.getElementById('btn-chal-career');
+            
+            if (mode === 'daily') {
+                btnDaily.style.borderColor = '#e2b714'; btnDaily.style.color = '#e2b714';
+                btnCareer.style.borderColor = '#555'; btnCareer.style.color = '#555';
+            } else {
+                btnCareer.style.borderColor = '#e2b714'; btnCareer.style.color = '#e2b714';
+                btnDaily.style.borderColor = '#555'; btnDaily.style.color = '#555';
+            }
+            renderChallenges();
+        }
+
         function openChallengesModal() {
             closeMainMenu();
             const user = firebase.auth().currentUser;
-            
             if (!user || user.isAnonymous) {
-                alert("You need to save your profile to access Daily Challenges!");
+                alert("You need to save your profile to access Challenges!");
                 openAccountModal('main-menu');
                 return;
             }
-
             document.getElementById('challenges-modal').style.display = 'flex';
+            setChallengeMode('daily'); // Default to daily when opening
+        }
+
+        function renderChallenges() {
             const container = document.getElementById('challenges-container');
             container.innerHTML = '<span style="color:#538d4e; font-size:10px;">Syncing with Server...</span>';
+            const user = firebase.auth().currentUser;
+            if(!user) return;
 
-            const todayStr = new Date().toISOString().split('T')[0];
-
-            // Get their live profile to check which ones are already claimed today
             db.collection("users").doc(user.uid).get().then((doc) => {
                 container.innerHTML = '';
                 const data = doc.exists ? doc.data() : {};
                 const claimedArray = data.claimedChallenges || [];
+                const todayStr = new Date().toISOString().split('T')[0];
 
-                DAILY_CHALLENGES.forEach(challenge => {
-                    // Check local storage for progress
-                    const currentProgress = localStats.challenges[challenge.type] || 0;
+                const activeList = currentChallengeMode === 'daily' ? DAILY_CHALLENGES : CAREER_CHALLENGES;
+                const sourceStats = currentChallengeMode === 'daily' ? localStats.challenges : localStats;
+
+                activeList.forEach(challenge => {
+                    const currentProgress = sourceStats[challenge.type] || 0;
                     const isComplete = currentProgress >= challenge.target;
                     
-                    // Create a unique claim key for today (e.g., "2026-06-22_PLAY_3")
-                    const claimKey = `${todayStr}_${challenge.id}`;
+                    // Career challenges only get claimed once forever. Daily gets tagged with today's date.
+                    const claimKey = currentChallengeMode === 'daily' ? `${todayStr}_${challenge.id}` : challenge.id;
                     const isClaimed = claimedArray.includes(claimKey);
-
-                    // Calculate the progress bar width
+                    
                     const percent = Math.min((currentProgress / challenge.target) * 100, 100);
+                    let rewardText = currentChallengeMode === 'daily' ? `${challenge.reward} [C]` : challenge.rewardDisplay;
 
                     let buttonHTML = '';
                     if (isClaimed) {
                         buttonHTML = `<button disabled style="background:#272729; color:#555; border:1px solid #555; padding:8px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:8px;">CLAIMED</button>`;
                     } else if (isComplete) {
-                        buttonHTML = `<button onclick="claimChallenge('${challenge.id}', ${challenge.reward})" style="background:#e2b714; color:black; border:none; padding:8px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">CLAIM ${challenge.reward} [C]</button>`;
+                        buttonHTML = `<button onclick="claimChallenge('${challenge.id}', '${currentChallengeMode}')" style="background:#e2b714; color:black; border:none; padding:8px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">CLAIM</button>`;
                     } else {
                         buttonHTML = `<div style="font-family:'Press Start 2P', monospace; font-size:10px; color:#888;">${currentProgress} / ${challenge.target}</div>`;
                     }
@@ -754,13 +780,11 @@
                     container.innerHTML += `
                         <div style="background:#272729; border:1px solid #3a3a3c; border-radius:8px; padding:15px; text-align:left;">
                             <div style="font-family:'Press Start 2P', monospace; font-size:10px; color:white; margin-bottom:10px; line-height:1.4;">${challenge.desc}</div>
-                            
                             <div style="width:100%; background:#111; height:8px; border-radius:4px; margin-bottom:10px; overflow:hidden;">
                                 <div style="width:${percent}%; background:#538d4e; height:100%;"></div>
                             </div>
-                            
                             <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-size:10px; color:#e2b714;">REWARD: ${challenge.reward} [C]</span>
+                                <span style="font-size:10px; color:#e2b714;">REWARD: ${rewardText}</span>
                                 ${buttonHTML}
                             </div>
                         </div>
@@ -769,22 +793,32 @@
             });
         }
 
-        function claimChallenge(challengeId, rewardAmount) {
+        function claimChallenge(challengeId, mode) {
             const user = firebase.auth().currentUser;
             if (!user) return;
 
             const todayStr = new Date().toISOString().split('T')[0];
-            const claimKey = `${todayStr}_${challengeId}`;
+            const claimKey = mode === 'daily' ? `${todayStr}_${challengeId}` : challengeId;
             const userRef = db.collection("users").doc(user.uid);
-
-            // Give them the coins and log the claim key so they can't double-dip
-            userRef.update({
-                spendableCoins: firebase.firestore.FieldValue.increment(rewardAmount),
+            
+            let updatePayload = {
                 claimedChallenges: firebase.firestore.FieldValue.arrayUnion(claimKey)
-            }).then(() => {
-                playSound('coin');
-                alert(`Challenge Complete! +${rewardAmount} Coins added to your wallet.`);
-                openChallengesModal(); // Instantly refresh to show "CLAIMED"
+            };
+
+            if (mode === 'daily') {
+                const chal = DAILY_CHALLENGES.find(c => c.id === challengeId);
+                updatePayload.spendableCoins = firebase.firestore.FieldValue.increment(chal.reward);
+            } else {
+                const chal = CAREER_CHALLENGES.find(c => c.id === challengeId);
+                if (chal.rewardType === 'avatars') updatePayload.ownedAvatars = firebase.firestore.FieldValue.arrayUnion(chal.rewardId);
+                if (chal.rewardType === 'banners') updatePayload.ownedBanners = firebase.firestore.FieldValue.arrayUnion(chal.rewardId);
+                if (chal.rewardType === 'titles') updatePayload.unlockedTitles = firebase.firestore.FieldValue.arrayUnion(chal.rewardId);
+            }
+
+            userRef.update(updatePayload).then(() => {
+                playSound('win');
+                alert(mode === 'daily' ? "Challenge Complete! Coins added to your wallet." : "Career Milestone Reached! Exclusive reward added to your Locker.");
+                renderChallenges();
             }).catch(err => console.error("Error claiming reward:", err));
         }
 
@@ -810,6 +844,7 @@
 
             // 1. Paint the Avatars
             for (const [id, item] of Object.entries(SHOP_INVENTORY.avatars)) {
+                if (item.unbuyable) continue;
                 const isOwned = ownedAvatars.includes(id);
                 const isEquipped = eqAvatar === item.icon;
                 
@@ -833,6 +868,7 @@
 
             // 2. Paint the Banners
             for (const [id, item] of Object.entries(SHOP_INVENTORY.banners)) {
+                if (item.unbuyable) continue;
                 const isOwned = ownedBanners.includes(id);
                 const isEquipped = eqBanner === item.color;
                 
@@ -920,14 +956,31 @@
                 "AVATAR_ALIEN": { name: "Pixel Alien", icon: "👾", price: 150 },
                 "AVATAR_ROBOT": { name: "Mecha", icon: "🤖", price: 300 },
                 "AVATAR_SKULL": { name: "Game Over", icon: "💀", price: 500 },
-                "AVATAR_CROWN": { name: "High Roller", icon: "👑", price: 1000 }
+                "AVATAR_CROWN": { name: "High Roller", icon: "👑", price: 1000 },
+                // --- EXCLUSIVE CAREER REWARDS ---
+                "AVATAR_WIZARD": { name: "The Wizard", icon: "🧙‍♂️", unbuyable: true }
             },
             banners: {
                 "BANNER_BLUE": { name: "Grid Blue", color: "#1a2a3a", price: 200 },
                 "BANNER_RED": { name: "Arcade Red", color: "#3a1a1a", price: 200 },
-                "BANNER_GOLD": { name: "Gold Rush", color: "#2e251a", price: 1000 }
+                "BANNER_GOLD": { name: "Gold Rush", color: "#2e251a", price: 1000 },
+                // --- EXCLUSIVE CAREER REWARDS ---
+                "BANNER_NEON": { name: "Neon Nights", color: "#0f0f0f", unbuyable: true }
             }
         };
+
+        // --- CHALLENGE REGISTRIES ---
+        const DAILY_CHALLENGES = [
+            { id: "PLAY_3", desc: "Play 3 Full Games", type: "played", target: 3, reward: 100 },
+            { id: "WIN_RPG", desc: "Guess an RPG Correctly", type: "rpgWins", target: 1, reward: 200 },
+            { id: "FIRST_TRY", desc: "Win on the 1st Try", type: "firstTry", target: 1, reward: 500 }
+        ];
+
+        const CAREER_CHALLENGES = [
+            { id: "CAREER_PLAY_50", desc: "Play 50 Total Games", type: "played", target: 50, rewardType: "banners", rewardId: "BANNER_NEON", rewardDisplay: "Neon Banner" },
+            { id: "CAREER_WIN_25", desc: "Win 25 Games", type: "wins", target: 25, rewardType: "titles", rewardId: "Grid Veteran", rewardDisplay: "Veteran Title" },
+            { id: "CAREER_STREAK_10", desc: "Reach a 10-Win Streak", type: "maxStreak", target: 10, rewardType: "avatars", rewardId: "AVATAR_WIZARD", rewardDisplay: "Wizard Avatar" }
+        ];
         // --- CHALLENGE REGISTRY ---
         const DAILY_CHALLENGES = [
             { id: "PLAY_3", desc: "Play 3 Full Games", type: "played", target: 3, reward: 100 },
