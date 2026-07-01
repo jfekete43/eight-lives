@@ -1302,7 +1302,8 @@
                 if (!confirm("Are you sure you want to abandon this run? You will lose your un-cashed points!")) {
                     return;
                 }
-                localStats.runsCompleted++; // Penalize abandoned run
+                // Failsafe included
+                localStats.runsCompleted = (localStats.runsCompleted || 0) + 1; 
             }
 
             if (playAudio) playSound('coin');
@@ -1595,9 +1596,10 @@
                 const periods = getPeriods();
                 const paddedScore = localStats.arcadeScore.toString().padStart(9, '0');
                 const pointsToDeposit = localStats.arcadeScore;
-                // Tally the successful run locally for their stats page
-                localStats.runsCompleted++;
-                localStats.lifetimeBank += pointsToDeposit;
+
+                // Tally the successful run securely (forcing 0 if undefined from old saves)
+                localStats.runsCompleted = (localStats.runsCompleted || 0) + 1;
+                localStats.lifetimeBank = (localStats.lifetimeBank || 0) + pointsToDeposit;
 
                 db.collection("leaderboard").add({
                     name: cleanName,
@@ -1837,8 +1839,8 @@
                     }
                     
                 } else {
-                    // NEW: Total Wipeout counts as a 0 cash out run!
-                    localStats.runsCompleted++; 
+                    // NEW: Total Wipeout counts as a 0 cash out run! Failsafe included.
+                    localStats.runsCompleted = (localStats.runsCompleted || 0) + 1; 
                     
                     localStats.arcadeScore = 0;
                     localStats.continues = 2; 
@@ -1925,6 +1927,10 @@ function fallbackCopyTextToClipboard(text) {
         function isWinCheck() { return emojiHistory.length > 0 && emojiHistory[emojiHistory.length-1].includes('🟩🟩🟩🟩'); }
 
         function updateStatsUI() {
+            // Failsafe: if the old save file is missing these, force them to 0
+            localStats.lifetimeBank = localStats.lifetimeBank || 0;
+            localStats.runsCompleted = localStats.runsCompleted || 0;
+
             document.getElementById('stat-played').innerText = localStats.played;
             const winPct = localStats.played === 0 ? 0 : Math.round((localStats.wins / localStats.played) * 100);
             document.getElementById('stat-winpct').innerText = winPct;
@@ -1933,8 +1939,8 @@ function fallbackCopyTextToClipboard(text) {
             document.getElementById('stat-maxstreak').innerText = localStats.maxStreak;
 
             // New Career Bank & Average Cashout logic
-            document.getElementById('stat-career-bank').innerText = localStats.lifetimeBank || 0;
-            const avgCashout = localStats.runsCompleted === 0 ? 0 : Math.round((localStats.lifetimeBank || 0) / localStats.runsCompleted);
+            document.getElementById('stat-career-bank').innerText = localStats.lifetimeBank;
+            const avgCashout = localStats.runsCompleted === 0 ? 0 : Math.round(localStats.lifetimeBank / localStats.runsCompleted);
             document.getElementById('stat-avg-cashout').innerText = avgCashout;
 
             const distContainer = document.getElementById('distribution-container');
