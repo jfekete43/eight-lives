@@ -24,7 +24,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100dvh; /* Changed to dynamic viewport height */
+            overflow-x: hidden; /* Prevents side-to-side shifting */
         }
 
         /* CRT Effects */
@@ -351,13 +352,14 @@
         <div class="modal-content">
             <button class="close-btn" onclick="toggleModal('none')">&times;</button>
             <h2>Statistics</h2>
-            <div class="stats-grid">
-                <div class="stat-item"><div class="stat-num" id="stat-played">0</div><div class="stat-label">Played</div></div>
+            <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px 10px;">
+                <div class="stat-item"><div class="stat-num" id="stat-played">0</div><div class="stat-label">Games Played</div></div>
                 <div class="stat-item"><div class="stat-num" id="stat-winpct">0</div><div class="stat-label">Win %</div></div>
-                <div class="stat-item"><div class="stat-num" id="stat-losses">0</div><div class="stat-label">Losses</div></div>
-                <div class="stat-item"><div class="stat-num" id="stat-avg">0</div><div class="stat-label">Avg Guesses</div></div>
-                <div class="stat-item"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Current Streak</div></div>
                 <div class="stat-item"><div class="stat-num" id="stat-maxstreak">0</div><div class="stat-label">Max Streak</div></div>
+                
+                <div class="stat-item" style="color: #538d4e;"><div class="stat-num" id="stat-career-bank">0</div><div class="stat-label">Total Cashed Out</div></div>
+                <div class="stat-item" style="color: #e2b714;"><div class="stat-num" id="stat-avg-cashout">0</div><div class="stat-label">Avg Cashed Out</div></div>
             </div>
             <div class="guess-distribution">
                 <h3>Guess Distribution</h3>
@@ -1217,6 +1219,8 @@
                     if (parsed.arcadeScore === undefined) parsed.arcadeScore = 0;
                     if (parsed.highScore === undefined) parsed.highScore = 0;
                     if (parsed.continues === undefined) parsed.continues = 2;
+                    if (parsed.runsCompleted === undefined) parsed.runsCompleted = 0;
+                    if (parsed.lifetimeBank === undefined) parsed.lifetimeBank = 0;
                     
                     // --- NEW: Challenge Tracking ---
                     if (!parsed.challenges || parsed.challenges.date !== todayStr) {
@@ -1234,7 +1238,8 @@
                 played: 0, wins: 0, currentStreak: 0, maxStreak: 0,
                 guessDistribution: [0, 0, 0, 0, 0, 0],
                 arcadeScore: 0, highScore: 0, continues: 2,
-                challenges: defaultChallenges // Apply the new trackers
+                runsCompleted: 0, lifetimeBank: 0, // NEW STATS
+                challenges: defaultChallenges 
             };
         }
         // --- CLOUD SYNC ENGINE ---
@@ -1297,6 +1302,7 @@
                 if (!confirm("Are you sure you want to abandon this run? You will lose your un-cashed points!")) {
                     return;
                 }
+                localStats.runsCompleted++; // Penalize abandoned run
             }
 
             if (playAudio) playSound('coin');
@@ -1589,6 +1595,9 @@
                 const periods = getPeriods();
                 const paddedScore = localStats.arcadeScore.toString().padStart(9, '0');
                 const pointsToDeposit = localStats.arcadeScore;
+                // Tally the successful run locally for their stats page
+                localStats.runsCompleted++;
+                localStats.lifetimeBank += pointsToDeposit;
 
                 db.collection("leaderboard").add({
                     name: cleanName,
@@ -1828,6 +1837,9 @@
                     }
                     
                 } else {
+                    // NEW: Total Wipeout counts as a 0 cash out run!
+                    localStats.runsCompleted++; 
+                    
                     localStats.arcadeScore = 0;
                     localStats.continues = 2; 
                     
@@ -1857,23 +1869,31 @@
             document.getElementById('high-score').innerText = localStats.highScore;
         }
         function shareResults() {
-    // Grab the snapshot score we saved, or fallback to the active score
-    const finalScore = window.lastShareScore || localStats.arcadeScore; 
-    
-    const shareText = `Game Grid 🎮\nI cashed out with: ${finalScore} PTS!\n\nCan you beat my high score?\nhttps://playgamegrid.io`;
+            let shareText = "";
+            const finalScore = window.lastShareScore || localStats.arcadeScore; 
+            
+            // Check if they suffered a total wipeout (0 continues, 0 score, game over)
+            if (localStats.continues === 2 && localStats.arcadeScore === 0 && gameOver && !window.lastShareScore) {
+                shareText = `🕹️ THE GAME GRID 🕹️\n💀 TOTAL WIPEOUT 💀\nBankrupt! I lost it all to the Grid.\n\nCan you survive?\n🔗 https://playgamegrid.io`;
+            } else if (window.lastShareScore) {
+                // They successfully cashed out
+                shareText = `🕹️ THE GAME GRID 🕹️\n✅ CASHOUT SECURED ✅\n💰 Banked: ${finalScore} PTS\n\nCan you beat my score?\n🔗 https://playgamegrid.io`;
+            } else {
+                // Mid-run general share
+                shareText = `🕹️ THE GAME GRID 🕹️\n🔥 Active Bank: ${finalScore} PTS\n❤️ Continues: ${localStats.continues}\n\nCan you beat my high score?\n🔗 https://playgamegrid.io`;
+            }
 
-    // Try modern clipboard API first
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(shareText).then(() => {
-            alert("Score copied to clipboard! Paste it to your friends.");
-        }).catch(err => {
-            fallbackCopyTextToClipboard(shareText);
-        });
-    } else {
-        // Use bulletproof fallback if modern API is blocked
-        fallbackCopyTextToClipboard(shareText);
-    }
-}
+            // Try modern clipboard API first
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert("Score copied to clipboard! Paste it to your friends.");
+                }).catch(err => {
+                    fallbackCopyTextToClipboard(shareText);
+                });
+            } else {
+                fallbackCopyTextToClipboard(shareText);
+            }
+        }
 
 function fallbackCopyTextToClipboard(text) {
     var textArea = document.createElement("textarea");
@@ -1939,6 +1959,10 @@ function fallbackCopyTextToClipboard(text) {
                 if (count > 0) bar.style.backgroundColor = '#565758'; 
 
                 barContainer.appendChild(bar); row.appendChild(label); row.appendChild(barContainer); distContainer.appendChild(row);
+                // New Career Bank & Average Cashout logic
+            document.getElementById('stat-career-bank').innerText = localStats.lifetimeBank || 0;
+            const avgCashout = localStats.runsCompleted === 0 ? 0 : Math.round(localStats.lifetimeBank / localStats.runsCompleted);
+            document.getElementById('stat-avg-cashout').innerText = avgCashout;
             });
         }
 
@@ -1999,6 +2023,10 @@ function fallbackCopyTextToClipboard(text) {
             items[currentFocus].classList.add("active");
             items[currentFocus].scrollIntoView({ block: 'nearest' });
         }
+        // Force mobile browsers to start at the top of the page
+        window.addEventListener('load', () => {
+            setTimeout(() => window.scrollTo(0, 0), 10);
+        });
     </script>
 </body>
 </html>
