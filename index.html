@@ -1929,20 +1929,13 @@ function fallbackCopyTextToClipboard(text) {
             const winPct = localStats.played === 0 ? 0 : Math.round((localStats.wins / localStats.played) * 100);
             document.getElementById('stat-winpct').innerText = winPct;
             
-            const losses = localStats.played - localStats.wins;
-            document.getElementById('stat-losses').innerText = losses;
-
-            let totalScore = 0;
-            localStats.guessDistribution.forEach((count, index) => {
-                totalScore += (count * (index + 1));
-            });
-            totalScore += (losses * 7);
-            
-            const avg = localStats.played === 0 ? "0.0" : (totalScore / localStats.played).toFixed(1);
-            document.getElementById('stat-avg').innerText = avg;
-
             document.getElementById('stat-streak').innerText = localStats.currentStreak;
             document.getElementById('stat-maxstreak').innerText = localStats.maxStreak;
+
+            // New Career Bank & Average Cashout logic
+            document.getElementById('stat-career-bank').innerText = localStats.lifetimeBank || 0;
+            const avgCashout = localStats.runsCompleted === 0 ? 0 : Math.round((localStats.lifetimeBank || 0) / localStats.runsCompleted);
+            document.getElementById('stat-avg-cashout').innerText = avgCashout;
 
             const distContainer = document.getElementById('distribution-container');
             distContainer.innerHTML = ''; 
@@ -1959,10 +1952,6 @@ function fallbackCopyTextToClipboard(text) {
                 if (count > 0) bar.style.backgroundColor = '#565758'; 
 
                 barContainer.appendChild(bar); row.appendChild(label); row.appendChild(barContainer); distContainer.appendChild(row);
-                // New Career Bank & Average Cashout logic
-            document.getElementById('stat-career-bank').innerText = localStats.lifetimeBank || 0;
-            const avgCashout = localStats.runsCompleted === 0 ? 0 : Math.round(localStats.lifetimeBank / localStats.runsCompleted);
-            document.getElementById('stat-avg-cashout').innerText = avgCashout;
             });
         }
 
