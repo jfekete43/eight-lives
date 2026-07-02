@@ -631,6 +631,32 @@
         });
         // -------------------------------
 
+        document.getElementById('btn-email-signup').addEventListener('click', () => {
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    
+    if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+    }
+
+    // Example logic to link anonymous account to email/password
+    const credential = firebase.auth.EmailAuthProvider.credential(email, password);
+    const user = firebase.auth().currentUser;
+
+    if (user) {
+        user.linkWithCredential(credential)
+            .then((usercred) => {
+                console.log("Account successfully linked with Email:", usercred.user.email);
+                syncPlayerProfile(usercred.user);
+                closeAccountModal();
+            }).catch((error) => {
+                console.error("Error linking account:", error);
+                alert(error.message);
+            });
+    }
+});
+
         // --- MODAL SCREEN SWAP LOGIC ---
         function openAccountModal(fromScreen) {
             // Hide the active game end screen
@@ -1010,12 +1036,6 @@
             { id: "FIRST_TRY", desc: "Win on the 1st Try", type: "firstTry", target: 1, reward: 500 }
         ];
 
-        const CAREER_CHALLENGES = [
-            { id: "CAREER_PLAY_50", desc: "Play 50 Total Games", type: "played", target: 50, rewardType: "banners", rewardId: "BANNER_NEON", rewardDisplay: "Neon Banner" },
-            { id: "CAREER_WIN_25", desc: "Win 25 Games", type: "wins", target: 25, rewardType: "titles", rewardId: "Grid Veteran", rewardDisplay: "Veteran Title" },
-            { id: "CAREER_STREAK_10", desc: "Reach a 10-Win Streak", type: "maxStreak", target: 10, rewardType: "avatars", rewardId: "AVATAR_WIZARD", rewardDisplay: "Wizard Avatar" }
-        ];
-
         function getPrestigeData(points) {
             let currentRank = PRESTIGE_RANKS[0];
             let nextRank = null;
@@ -1241,21 +1261,26 @@
         };
 
         const CAREER_CHALLENGES = [
-            // MILESTONES
-            { id: "C_PLAY_100", desc: "Play 100 total games", type: "played", target: 100, reward: 250, rewardType: "coins" },
-            { id: "C_PLAY_500", desc: "Play 500 total games", type: "played", target: 500, reward: 500, rewardType: "coins" },
-            { id: "C_PLAY_1K", desc: "Play 1,000 total games", type: "played", target: 1000, reward: "👑", rewardType: "avatar" },
-            { id: "C_WIN_250", desc: "Win 250 games", type: "wins", target: 250, reward: 250, rewardType: "coins" },
-            { id: "C_WIN_500", desc: "Win 500 games", type: "wins", target: 500, reward: 500, rewardType: "coins" },
-            { id: "C_WIN_1K", desc: "Win 1,000 games", type: "wins", target: 1000, reward: "#e2b714", rewardType: "banner" },
-            { id: "C_STRK_10", desc: "Reach a 10 win streak", type: "maxStreak", target: 10, reward: 250, rewardType: "coins" },
-            { id: "C_STRK_25", desc: "Reach a 25 win streak", type: "maxStreak", target: 25, reward: 500, rewardType: "coins" },
-            { id: "C_STRK_50", desc: "Reach a 50 win streak", type: "maxStreak", target: 50, reward: "🔥", rewardType: "avatar" },
-            { id: "C_BANK_1K", desc: "Cash Out 1,000 coins", type: "lifetimeBank", target: 1000, reward: 250, rewardType: "coins" },
-            { id: "C_BANK_5K", desc: "Cash Out 5,000 coins", type: "lifetimeBank", target: 5000, reward: 500, rewardType: "coins" },
-            { id: "C_BANK_10K", desc: "Cash Out 10,000 coins", type: "lifetimeBank", target: 10000, reward: "💎", rewardType: "avatar" },
-            { id: "C_FIRST_1", desc: "Win on the first try", type: "careerFirstTry", target: 1, reward: "🎯", rewardType: "avatar" }
-        ];
+    // Original Challenges
+    { id: "CAREER_PLAY_50", desc: "Play 50 Total Games", type: "played", target: 50, rewardType: "banners", rewardId: "BANNER_NEON", rewardDisplay: "Neon Banner" },
+    { id: "CAREER_WIN_25", desc: "Win 25 Games", type: "wins", target: 25, rewardType: "titles", rewardId: "Grid Veteran", rewardDisplay: "Veteran Title" },
+    { id: "CAREER_STREAK_10", desc: "Reach a 10-Win Streak", type: "maxStreak", target: 10, rewardType: "avatars", rewardId: "AVATAR_WIZARD", rewardDisplay: "Wizard Avatar" },
+    
+    // Milestones
+    { id: "C_PLAY_100", desc: "Play 100 total games", type: "played", target: 100, reward: 250, rewardType: "coins" },
+    { id: "C_PLAY_500", desc: "Play 500 total games", type: "played", target: 500, reward: 500, rewardType: "coins" },
+    { id: "C_PLAY_1K", desc: "Play 1,000 total games", type: "played", target: 1000, reward: "👑", rewardType: "avatar" },
+    { id: "C_WIN_250", desc: "Win 250 games", type: "wins", target: 250, reward: 250, rewardType: "coins" },
+    { id: "C_WIN_500", desc: "Win 500 games", type: "wins", target: 500, reward: 500, rewardType: "coins" },
+    { id: "C_WIN_1K", desc: "Win 1,000 games", type: "wins", target: 1000, reward: "#e2b714", rewardType: "banner" },
+    { id: "C_STRK_10", desc: "Reach a 10 win streak", type: "maxStreak", target: 10, reward: 250, rewardType: "coins" },
+    { id: "C_STRK_25", desc: "Reach a 25 win streak", type: "maxStreak", target: 25, reward: 500, rewardType: "coins" },
+    { id: "C_STRK_50", desc: "Reach a 50 win streak", type: "maxStreak", target: 50, reward: "🔥", rewardType: "avatar" },
+    { id: "C_BANK_1K", desc: "Cash Out 1,000 coins", type: "lifetimeBank", target: 1000, reward: 250, rewardType: "coins" },
+    { id: "C_BANK_5K", desc: "Cash Out 5,000 coins", type: "lifetimeBank", target: 5000, reward: 500, rewardType: "coins" },
+    { id: "C_BANK_10K", desc: "Cash Out 10,000 coins", type: "lifetimeBank", target: 10000, reward: "💎", rewardType: "avatar" },
+    { id: "C_FIRST_1", desc: "Win on the first try", type: "careerFirstTry", target: 1, reward: "🎯", rewardType: "avatar" }
+];
 
         // GENRE MILESTONES (Generated dynamically to save you 40 lines of code)
         const genresList = ["RPG", "Shooter", "Action", "Platformer", "Sports", "Racing", "Puzzle", "Horror", "Arcade", "Strategy"];
