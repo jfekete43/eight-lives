@@ -740,16 +740,10 @@
 
         function setChallengeMode(mode) {
             currentChallengeMode = mode;
-            const btnDaily = document.getElementById('btn-chal-daily');
-            const btnCareer = document.getElementById('btn-chal-career');
-            
-            if (mode === 'daily') {
-                btnDaily.style.borderColor = '#e2b714'; btnDaily.style.color = '#e2b714';
-                btnCareer.style.borderColor = '#555'; btnCareer.style.color = '#555';
-            } else {
-                btnCareer.style.borderColor = '#e2b714'; btnCareer.style.color = '#e2b714';
-                btnDaily.style.borderColor = '#555'; btnDaily.style.color = '#555';
-            }
+            document.getElementById('btn-chal-daily').style.borderColor = mode === 'daily' ? '#e2b714' : '#555';
+            document.getElementById('btn-chal-daily').style.color = mode === 'daily' ? '#e2b714' : '#555';
+            document.getElementById('btn-chal-career').style.borderColor = mode === 'career' ? '#e2b714' : '#555';
+            document.getElementById('btn-chal-career').style.color = mode === 'career' ? '#e2b714' : '#555';
             renderChallenges();
         }
 
@@ -765,86 +759,97 @@
             setChallengeMode('daily'); // Default to daily when opening
         }
 
+        function getProgressValue(type) {
+            // Direct lookups
+            if (localStats[type] !== undefined) return localStats[type];
+            if (localStats.challenges[type] !== undefined) return localStats.challenges[type];
+            
+            // Dynamic genre lookups (e.g., "careerGenre_RPG" or "dailyGenre_Action")
+            if (type.startsWith('careerGenre_')) {
+                const genre = type.split('_')[1];
+                return localStats.careerGenres[genre] || 0;
+            }
+            if (type.startsWith('dailyGenre_')) {
+                const genre = type.split('_')[1];
+                return localStats.challenges.dailyGenres[genre] || 0;
+            }
+            return 0;
+        }
+
         function renderChallenges() {
             const container = document.getElementById('challenges-container');
-            container.innerHTML = '<span style="color:#538d4e; font-size:10px;">Syncing with Server...</span>';
-            const user = firebase.auth().currentUser;
-            if(!user) return;
+            container.innerHTML = '';
+            const list = currentChallengeMode === 'daily' ? localStats.challenges.activeDaily : CAREER_CHALLENGES;
 
-            db.collection("users").doc(user.uid).get().then((doc) => {
-                container.innerHTML = '';
-                const data = doc.exists ? doc.data() : {};
-                const claimedArray = data.claimedChallenges || [];
-                const todayStr = new Date().toISOString().split('T')[0];
+            list.forEach(chal => {
+                const isClaimed = localStats.challenges.claimed.includes(chal.id);
+                const currentProg = getProgressValue(chal.type);
+                const isComplete = currentProg >= chal.target;
+                
+                const percent = Math.min((currentProg / chal.target) * 100, 100);
+                
+                // Visual formatting for the reward label
+                let rewardDisplay = `+${chal.reward} [C]`;
+                if (chal.rewardType === 'avatar') rewardDisplay = `AVATAR: ${chal.reward}`;
+                if (chal.rewardType === 'banner') rewardDisplay = `NEW BANNER`;
 
-                const activeList = currentChallengeMode === 'daily' ? DAILY_CHALLENGES : CAREER_CHALLENGES;
-                const sourceStats = currentChallengeMode === 'daily' ? localStats.challenges : localStats;
+                const box = document.createElement('div');
+                box.style.border = `1px solid ${isClaimed ? '#538d4e' : '#333'}`;
+                box.style.padding = '15px';
+                box.style.borderRadius = '6px';
+                box.style.backgroundColor = isClaimed ? '#1a2b1a' : 'transparent';
+                box.style.textAlign = 'left';
 
-                activeList.forEach(challenge => {
-                    const currentProgress = sourceStats[challenge.type] || 0;
-                    const isComplete = currentProgress >= challenge.target;
-                    
-                    // Career challenges only get claimed once forever. Daily gets tagged with today's date.
-                    const claimKey = currentChallengeMode === 'daily' ? `${todayStr}_${challenge.id}` : challenge.id;
-                    const isClaimed = claimedArray.includes(claimKey);
-                    
-                    const percent = Math.min((currentProgress / challenge.target) * 100, 100);
-                    let rewardText = currentChallengeMode === 'daily' ? `${challenge.reward} [C]` : challenge.rewardDisplay;
-
-                    let buttonHTML = '';
-                    if (isClaimed) {
-                        buttonHTML = `<button disabled style="background:#272729; color:#555; border:1px solid #555; padding:8px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:8px;">CLAIMED</button>`;
-                    } else if (isComplete) {
-                        buttonHTML = `<button onclick="claimChallenge('${challenge.id}', '${currentChallengeMode}')" style="background:#e2b714; color:black; border:none; padding:8px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:8px; cursor:pointer; font-weight:bold;">CLAIM</button>`;
-                    } else {
-                        buttonHTML = `<div style="font-family:'Press Start 2P', monospace; font-size:10px; color:#888;">${currentProgress} / ${challenge.target}</div>`;
-                    }
-
-                    container.innerHTML += `
-                        <div style="background:#272729; border:1px solid #3a3a3c; border-radius:8px; padding:15px; text-align:left;">
-                            <div style="font-family:'Press Start 2P', monospace; font-size:10px; color:white; margin-bottom:10px; line-height:1.4;">${challenge.desc}</div>
-                            <div style="width:100%; background:#111; height:8px; border-radius:4px; margin-bottom:10px; overflow:hidden;">
-                                <div style="width:${percent}%; background:#538d4e; height:100%;"></div>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-size:10px; color:#e2b714;">REWARD: ${rewardText}</span>
-                                ${buttonHTML}
-                            </div>
+                box.innerHTML = `
+                    <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: ${isClaimed ? '#538d4e' : 'white'}; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span>${chal.desc}</span>
+                        <span style="color: #e2b714;">${isClaimed ? 'CLAIMED' : rewardDisplay}</span>
+                    </div>
+                    ${!isClaimed ? `
+                        <div style="width: 100%; background-color: #333; height: 6px; border-radius: 3px; margin-bottom: 10px; overflow: hidden;">
+                            <div style="width: ${percent}%; background-color: ${isComplete ? '#538d4e' : '#e2b714'}; height: 100%;"></div>
                         </div>
-                    `;
-                });
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888;">${currentProg} / ${chal.target}</span>
+                            <button class="arcade-btn" 
+                                onclick="claimChallenge('${chal.id}')" 
+                                ${!isComplete ? 'disabled' : ''}
+                                style="font-size: 8px; padding: 5px 10px; margin: 0; border-color: ${isComplete ? '#538d4e' : '#333'}; color: ${isComplete ? '#538d4e' : '#555'};">
+                                CLAIM
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(box);
             });
         }
 
-        function claimChallenge(challengeId, mode) {
-            const user = firebase.auth().currentUser;
-            if (!user) return;
+        function claimChallenge(id) {
+            const chal = [...localStats.challenges.activeDaily, ...CAREER_CHALLENGES].find(c => c.id === id);
+            if (!chal || localStats.challenges.claimed.includes(id)) return;
 
-            const todayStr = new Date().toISOString().split('T')[0];
-            const claimKey = mode === 'daily' ? `${todayStr}_${challengeId}` : challengeId;
-            const userRef = db.collection("users").doc(user.uid);
+            localStats.challenges.claimed.push(id);
             
-            let updatePayload = {
-                claimedChallenges: firebase.firestore.FieldValue.arrayUnion(claimKey)
-            };
-
-            if (mode === 'daily') {
-                const chal = DAILY_CHALLENGES.find(c => c.id === challengeId);
-                updatePayload.spendableCoins = firebase.firestore.FieldValue.increment(chal.reward);
+            // Distribute the correct reward type
+            if (chal.rewardType === 'avatar') {
+                if (!localStats.unlockedAvatars.includes(chal.reward)) {
+                    localStats.unlockedAvatars.push(chal.reward);
+                }
+                alert(`Challenge Complete! You unlocked a new Avatar! Check your locker.`);
+            } else if (chal.rewardType === 'banner') {
+                if (!localStats.unlockedBanners.includes(chal.reward)) {
+                    localStats.unlockedBanners.push(chal.reward);
+                }
+                alert(`Challenge Complete! You unlocked a new Banner! Check your locker.`);
             } else {
-                const chal = CAREER_CHALLENGES.find(c => c.id === challengeId);
-                if (chal.rewardType === 'avatars') updatePayload.ownedAvatars = firebase.firestore.FieldValue.arrayUnion(chal.rewardId);
-                if (chal.rewardType === 'banners') updatePayload.ownedBanners = firebase.firestore.FieldValue.arrayUnion(chal.rewardId);
-                if (chal.rewardType === 'titles') updatePayload.unlockedTitles = firebase.firestore.FieldValue.arrayUnion(chal.rewardId);
-            }
-
-            userRef.update(updatePayload).then(() => {
-                playSound('win');
-                alert(mode === 'daily' ? "Challenge Complete! Coins added to your wallet." : "Career Milestone Reached! Exclusive reward added to your Locker.");
-                renderChallenges();
-            }).catch(err => console.error("Error claiming reward:", err));
-        }
-
+                // Default Coin Reward
+                const user = firebase.auth().currentUser;
+                if (user && !user.isAnonymous) {
+                    db.collection("users").doc(user.uid).update({
+                        spendableCoins: firebase.firestore.FieldValue.increment(chal.reward)
+                    }).catch(err => console.error(err));
+                }
+                alert(
         function closeShopModal() {
             document.getElementById('shop-modal').style.display = 'none';
         }
@@ -1204,42 +1209,111 @@
         let emojiHistory = []; 
         let pastGuesses = new Set();
 
+        // --- MASTER CHALLENGE DATABASES ---
+        const DAILY_CHALLENGES_POOL = {
+            tier50: [
+                { id: "D_CASH_3", desc: "Cash Out 3 times", type: "dailyCashouts", target: 3, reward: 50, rewardType: "coins" },
+                { id: "D_STREAK_5", desc: "Reach a 5 win streak", type: "dailyMaxStreak", target: 5, reward: 50, rewardType: "coins" },
+                { id: "D_WIN_10", desc: "Win 10 games", type: "dailyWins", target: 10, reward: 50, rewardType: "coins" }
+            ],
+            tier100: [
+                { id: "D_RPG_1", desc: "Guess an RPG correctly", type: "dailyGenre_RPG", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_SHT_1", desc: "Guess a Shooter correctly", type: "dailyGenre_Shooter", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_SPR_1", desc: "Guess a Sports game correctly", type: "dailyGenre_Sports", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_ACT_1", desc: "Guess an Action game correctly", type: "dailyGenre_Action", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_PLT_1", desc: "Guess a Platformer correctly", type: "dailyGenre_Platformer", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_RAC_1", desc: "Guess a Racing game correctly", type: "dailyGenre_Racing", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_PUZ_1", desc: "Guess a Puzzle game correctly", type: "dailyGenre_Puzzle", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_HOR_1", desc: "Guess a Horror game correctly", type: "dailyGenre_Horror", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_ARC_1", desc: "Guess an Arcade game correctly", type: "dailyGenre_Arcade", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_STR_1", desc: "Guess a Strategy game correctly", type: "dailyGenre_Strategy", target: 1, reward: 100, rewardType: "coins" }
+            ],
+            tier200: [
+                { id: "D_CASH_10", desc: "Cash Out 10 times", type: "dailyCashouts", target: 10, reward: 200, rewardType: "coins" },
+                { id: "D_WIN_25", desc: "Win 25 games", type: "dailyWins", target: 25, reward: 200, rewardType: "coins" }
+            ]
+        };
+
+        const CAREER_CHALLENGES = [
+            // MILESTONES
+            { id: "C_PLAY_100", desc: "Play 100 total games", type: "played", target: 100, reward: 250, rewardType: "coins" },
+            { id: "C_PLAY_500", desc: "Play 500 total games", type: "played", target: 500, reward: 500, rewardType: "coins" },
+            { id: "C_PLAY_1K", desc: "Play 1,000 total games", type: "played", target: 1000, reward: "👑", rewardType: "avatar" },
+            { id: "C_WIN_250", desc: "Win 250 games", type: "wins", target: 250, reward: 250, rewardType: "coins" },
+            { id: "C_WIN_500", desc: "Win 500 games", type: "wins", target: 500, reward: 500, rewardType: "coins" },
+            { id: "C_WIN_1K", desc: "Win 1,000 games", type: "wins", target: 1000, reward: "#e2b714", rewardType: "banner" },
+            { id: "C_STRK_10", desc: "Reach a 10 win streak", type: "maxStreak", target: 10, reward: 250, rewardType: "coins" },
+            { id: "C_STRK_25", desc: "Reach a 25 win streak", type: "maxStreak", target: 25, reward: 500, rewardType: "coins" },
+            { id: "C_STRK_50", desc: "Reach a 50 win streak", type: "maxStreak", target: 50, reward: "🔥", rewardType: "avatar" },
+            { id: "C_BANK_1K", desc: "Cash Out 1,000 coins", type: "lifetimeBank", target: 1000, reward: 250, rewardType: "coins" },
+            { id: "C_BANK_5K", desc: "Cash Out 5,000 coins", type: "lifetimeBank", target: 5000, reward: 500, rewardType: "coins" },
+            { id: "C_BANK_10K", desc: "Cash Out 10,000 coins", type: "lifetimeBank", target: 10000, reward: "💎", rewardType: "avatar" },
+            { id: "C_FIRST_1", desc: "Win on the first try", type: "careerFirstTry", target: 1, reward: "🎯", rewardType: "avatar" }
+        ];
+
+        // GENRE MILESTONES (Generated dynamically to save you 40 lines of code)
+        const genresList = ["RPG", "Shooter", "Action", "Platformer", "Sports", "Racing", "Puzzle", "Horror", "Arcade", "Strategy"];
+        genresList.forEach(g => {
+            CAREER_CHALLENGES.push({ id: `C_${g}_10`, desc: `Guess 10 ${g} games`, type: `careerGenre_${g}`, target: 10, reward: 250, rewardType: "coins" });
+            CAREER_CHALLENGES.push({ id: `C_${g}_50`, desc: `Guess 50 ${g} games`, type: `careerGenre_${g}`, target: 50, reward: 500, rewardType: "coins" });
+            CAREER_CHALLENGES.push({ id: `C_${g}_100`, desc: `Guess 100 ${g} games`, type: `careerGenre_${g}`, target: 100, reward: "#538d4e", rewardType: "banner" });
+            CAREER_CHALLENGES.push({ id: `C_${g}_250`, desc: `Guess 250 ${g} games`, type: `careerGenre_${g}`, target: 250, reward: "🏆", rewardType: "avatar" });
+        });
+
         const POINTS_DISTRIBUTION = [100, 50, 25, 10, 5, 1];
         
         function loadStats() {
-            const todayStr = new Date().toISOString().split('T')[0]; // Gets "YYYY-MM-DD"
-            const defaultChallenges = { date: todayStr, played: 0, rpgWins: 0, firstTry: 0 };
-            
-            try {
-                let saved = localStorage.getItem('gamedleStats');
-                if (saved) {
-                    let parsed = JSON.parse(saved);
-                    // Safe fallbacks
-                    if (!parsed.guessDistribution) parsed.guessDistribution = [0,0,0,0,0,0];
-                    if (parsed.arcadeScore === undefined) parsed.arcadeScore = 0;
-                    if (parsed.highScore === undefined) parsed.highScore = 0;
-                    if (parsed.continues === undefined) parsed.continues = 2;
-                    if (parsed.runsCompleted === undefined) parsed.runsCompleted = 0;
-                    if (parsed.lifetimeBank === undefined) parsed.lifetimeBank = 0;
-                    
-                    // --- NEW: Challenge Tracking ---
-                    if (!parsed.challenges || parsed.challenges.date !== todayStr) {
-                        // If it's a new day, wipe their progress clean!
-                        parsed.challenges = defaultChallenges;
-                    }
-                    // -------------------------------
-                    
-                    return parsed;
+            const saved = localStorage.getItem('gamedleStats');
+            const todayStr = new Date().toDateString();
+
+            if (saved) {
+                let parsed = JSON.parse(saved);
+                // Ensure legacy saves get the new stats safely
+                if (parsed.runsCompleted === undefined) parsed.runsCompleted = 0;
+                if (parsed.lifetimeBank === undefined) parsed.lifetimeBank = 0;
+                if (parsed.careerFirstTry === undefined) parsed.careerFirstTry = 0;
+                if (!parsed.careerGenres) parsed.careerGenres = { RPG: 0, Shooter: 0, Sports: 0, Action: 0, Platformer: 0, Racing: 0, Puzzle: 0, Horror: 0, Arcade: 0, Strategy: 0 };
+                
+                // Ensure cosmetic arrays exist
+                if (!parsed.unlockedAvatars) parsed.unlockedAvatars = ["🕹️"];
+                if (!parsed.unlockedBanners) parsed.unlockedBanners = ["transparent"];
+
+                // DAILY CHALLENGE RANDOMIZER CHECK
+                if (!parsed.challenges || parsed.challenges.date !== todayStr) {
+                    const t50 = DAILY_CHALLENGES_POOL.tier50[Math.floor(Math.random() * DAILY_CHALLENGES_POOL.tier50.length)];
+                    const t100 = DAILY_CHALLENGES_POOL.tier100[Math.floor(Math.random() * DAILY_CHALLENGES_POOL.tier100.length)];
+                    const t200 = DAILY_CHALLENGES_POOL.tier200[Math.floor(Math.random() * DAILY_CHALLENGES_POOL.tier200.length)];
+
+                    parsed.challenges = {
+                        date: todayStr,
+                        activeDaily: [t50, t100, t200],
+                        dailyCashouts: 0, dailyWins: 0, dailyMaxStreak: 0,
+                        dailyGenres: { RPG: 0, Shooter: 0, Sports: 0, Action: 0, Platformer: 0, Racing: 0, Puzzle: 0, Horror: 0, Arcade: 0, Strategy: 0 },
+                        claimed: parsed.challenges?.claimed || [] // Keeps track of what they already cashed in
+                    };
                 }
-            } catch (e) {
-                console.error("Local storage was corrupted. Resetting data.");
+                return parsed;
             }
+
+            // Fresh save file for a brand new player
+            const t50 = DAILY_CHALLENGES_POOL.tier50[Math.floor(Math.random() * DAILY_CHALLENGES_POOL.tier50.length)];
+            const t100 = DAILY_CHALLENGES_POOL.tier100[Math.floor(Math.random() * DAILY_CHALLENGES_POOL.tier100.length)];
+            const t200 = DAILY_CHALLENGES_POOL.tier200[Math.floor(Math.random() * DAILY_CHALLENGES_POOL.tier200.length)];
+
             return {
                 played: 0, wins: 0, currentStreak: 0, maxStreak: 0,
                 guessDistribution: [0, 0, 0, 0, 0, 0],
                 arcadeScore: 0, highScore: 0, continues: 2,
-                runsCompleted: 0, lifetimeBank: 0, // NEW STATS
-                challenges: defaultChallenges 
+                runsCompleted: 0, lifetimeBank: 0, careerFirstTry: 0,
+                careerGenres: { RPG: 0, Shooter: 0, Sports: 0, Action: 0, Platformer: 0, Racing: 0, Puzzle: 0, Horror: 0, Arcade: 0, Strategy: 0 },
+                unlockedAvatars: ["🕹️"], unlockedBanners: ["transparent"],
+                challenges: {
+                    date: todayStr,
+                    activeDaily: [t50, t100, t200],
+                    dailyCashouts: 0, dailyWins: 0, dailyMaxStreak: 0,
+                    dailyGenres: { RPG: 0, Shooter: 0, Sports: 0, Action: 0, Platformer: 0, Racing: 0, Puzzle: 0, Horror: 0, Arcade: 0, Strategy: 0 },
+                    claimed: []
+                }
             };
         }
         // --- CLOUD SYNC ENGINE ---
@@ -1290,7 +1364,7 @@
         fetch('database.json')
             .then(res => res.json())
             .then(data => { 
-                database = data; 
+                database = data.slice(0, 525); // Capped at 525!
                 resetGame(false, false); 
             })
             .catch(err => console.error(err));
@@ -1600,6 +1674,7 @@
                 // Tally the successful run securely (forcing 0 if undefined from old saves)
                 localStats.runsCompleted = (localStats.runsCompleted || 0) + 1;
                 localStats.lifetimeBank = (localStats.lifetimeBank || 0) + pointsToDeposit;
+                localStats.challenges.dailyCashouts++; // NEW DAILY TRACKER
 
                 db.collection("leaderboard").add({
                     name: cleanName,
@@ -1779,6 +1854,19 @@
                 if (currentGuesses === 1) localStats.challenges.firstTry++;
                 
                 localStats.wins++;
+                // --- NEW CHALLENGE TRACKING LOGIC ---
+                localStats.challenges.dailyWins++;
+                if (currentGuesses === 1) localStats.careerFirstTry++;
+                
+                const g = targetGame.genre;
+                if (localStats.careerGenres[g] !== undefined) {
+                    localStats.careerGenres[g]++;
+                    localStats.challenges.dailyGenres[g]++;
+                }
+                if (localStats.currentStreak > localStats.challenges.dailyMaxStreak) {
+                    localStats.challenges.dailyMaxStreak = localStats.currentStreak;
+                }
+                // -------------------------------------
                 localStats.currentStreak++;
                 if (localStats.currentStreak > localStats.maxStreak) localStats.maxStreak = localStats.currentStreak;
                 localStats.guessDistribution[currentGuesses - 1]++;
@@ -2023,5 +2111,11 @@ function fallbackCopyTextToClipboard(text) {
             setTimeout(() => window.scrollTo(0, 0), 10);
         });
     </script>
+    <!-- AD BANNER PLACEHOLDER -->
+    <div style="width: 100%; position: fixed; bottom: 0; left: 0; background-color: #111; z-index: 9999; text-align: center; border-top: 1px solid #333;">
+        <!-- Paste your AdSense <ins> tag here later -->
+        <div style="color: #555; font-size: 10px; font-family: 'Press Start 2P', monospace; padding: 10px;">ADVERTISEMENT</div>
+    </div>
+    <!-- ADD THIS TO YOUR CSS body { ... } block: padding-bottom: 60px; (so the ad doesn't cover your game content) -->
 </body>
 </html>
