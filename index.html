@@ -849,7 +849,13 @@
                         spendableCoins: firebase.firestore.FieldValue.increment(chal.reward)
                     }).catch(err => console.error(err));
                 }
-                alert(
+                alert(`Challenge Complete! ${chal.reward} coins added to your bank!`);
+            }
+
+            localStorage.setItem('gamedleStats', JSON.stringify(localStats));
+            syncStatsToCloud();
+            renderChallenges();
+        }
         function closeShopModal() {
             document.getElementById('shop-modal').style.display = 'none';
         }
