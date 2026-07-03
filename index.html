@@ -808,6 +808,7 @@
             const list = currentChallengeMode === 'daily' ? localStats.challenges.activeDaily : CAREER_CHALLENGES;
 
             list.forEach(chal => {
+                if (!chal) return; // Failsafe against corrupted local saves
                 const isClaimed = localStats.challenges.claimed.includes(chal.id);
                 const currentProg = getProgressValue(chal.type);
                 const isComplete = currentProg >= chal.target;
@@ -1029,13 +1030,6 @@
             }
         };
 
-        // --- CHALLENGE REGISTRIES ---
-        const DAILY_CHALLENGES = [
-            { id: "PLAY_3", desc: "Play 3 Full Games", type: "played", target: 3, reward: 100 },
-            { id: "WIN_RPG", desc: "Guess an RPG Correctly", type: "rpgWins", target: 1, reward: 200 },
-            { id: "FIRST_TRY", desc: "Win on the 1st Try", type: "firstTry", target: 1, reward: 500 }
-        ];
-
         function getPrestigeData(points) {
             let currentRank = PRESTIGE_RANKS[0];
             let nextRank = null;
@@ -1235,62 +1229,6 @@
         let emojiHistory = []; 
         let pastGuesses = new Set();
 
-        // --- MASTER CHALLENGE DATABASES ---
-        const DAILY_CHALLENGES_POOL = {
-            tier50: [
-                { id: "D_CASH_3", desc: "Cash Out 3 times", type: "dailyCashouts", target: 3, reward: 50, rewardType: "coins" },
-                { id: "D_STREAK_5", desc: "Reach a 5 win streak", type: "dailyMaxStreak", target: 5, reward: 50, rewardType: "coins" },
-                { id: "D_WIN_10", desc: "Win 10 games", type: "dailyWins", target: 10, reward: 50, rewardType: "coins" }
-            ],
-            tier100: [
-                { id: "D_RPG_1", desc: "Guess an RPG correctly", type: "dailyGenre_RPG", target: 1, reward: 100, rewardType: "coins" },
-                { id: "D_SHT_1", desc: "Guess a Shooter correctly", type: "dailyGenre_Shooter", target: 1, reward: 100, rewardType: "coins" },
-                { id: "D_SPR_1", desc: "Guess a Sports game correctly", type: "dailyGenre_Sports", target: 1, reward: 100, rewardType: "coins" },
-                { id: "D_ACT_1", desc: "Guess an Action game correctly", type: "dailyGenre_Action", target: 1, reward: 100, rewardType: "coins" },
-                { id: "D_PLT_1", desc: "Guess a Platformer correctly", type: "dailyGenre_Platformer", target: 1, reward: 100, rewardType: "coins" },
-                { id: "D_RAC_1", desc: "Guess a Racing game correctly", type: "dailyGenre_Racing", target: 1, reward: 100, rewardType: "coins" },
-                { id: "D_PUZ_1", desc: "Guess a Puzzle game correctly", type: "dailyGenre_Puzzle", target: 1, reward: 100, rewardType: "coins" },
-                { id: "D_HOR_1", desc: "Guess a Horror game correctly", type: "dailyGenre_Horror", target: 1, reward: 100, rewardType: "coins" },
-                { id: "D_ARC_1", desc: "Guess an Arcade game correctly", type: "dailyGenre_Arcade", target: 1, reward: 100, rewardType: "coins" },
-                { id: "D_STR_1", desc: "Guess a Strategy game correctly", type: "dailyGenre_Strategy", target: 1, reward: 100, rewardType: "coins" }
-            ],
-            tier200: [
-                { id: "D_CASH_10", desc: "Cash Out 10 times", type: "dailyCashouts", target: 10, reward: 200, rewardType: "coins" },
-                { id: "D_WIN_25", desc: "Win 25 games", type: "dailyWins", target: 25, reward: 200, rewardType: "coins" }
-            ]
-        };
-
-        const CAREER_CHALLENGES = [
-    // Original Challenges
-    { id: "CAREER_PLAY_50", desc: "Play 50 Total Games", type: "played", target: 50, rewardType: "banners", rewardId: "BANNER_NEON", rewardDisplay: "Neon Banner" },
-    { id: "CAREER_WIN_25", desc: "Win 25 Games", type: "wins", target: 25, rewardType: "titles", rewardId: "Grid Veteran", rewardDisplay: "Veteran Title" },
-    { id: "CAREER_STREAK_10", desc: "Reach a 10-Win Streak", type: "maxStreak", target: 10, rewardType: "avatars", rewardId: "AVATAR_WIZARD", rewardDisplay: "Wizard Avatar" },
-    
-    // Milestones
-    { id: "C_PLAY_100", desc: "Play 100 total games", type: "played", target: 100, reward: 250, rewardType: "coins" },
-    { id: "C_PLAY_500", desc: "Play 500 total games", type: "played", target: 500, reward: 500, rewardType: "coins" },
-    { id: "C_PLAY_1K", desc: "Play 1,000 total games", type: "played", target: 1000, reward: "👑", rewardType: "avatar" },
-    { id: "C_WIN_250", desc: "Win 250 games", type: "wins", target: 250, reward: 250, rewardType: "coins" },
-    { id: "C_WIN_500", desc: "Win 500 games", type: "wins", target: 500, reward: 500, rewardType: "coins" },
-    { id: "C_WIN_1K", desc: "Win 1,000 games", type: "wins", target: 1000, reward: "#e2b714", rewardType: "banner" },
-    { id: "C_STRK_10", desc: "Reach a 10 win streak", type: "maxStreak", target: 10, reward: 250, rewardType: "coins" },
-    { id: "C_STRK_25", desc: "Reach a 25 win streak", type: "maxStreak", target: 25, reward: 500, rewardType: "coins" },
-    { id: "C_STRK_50", desc: "Reach a 50 win streak", type: "maxStreak", target: 50, reward: "🔥", rewardType: "avatar" },
-    { id: "C_BANK_1K", desc: "Cash Out 1,000 coins", type: "lifetimeBank", target: 1000, reward: 250, rewardType: "coins" },
-    { id: "C_BANK_5K", desc: "Cash Out 5,000 coins", type: "lifetimeBank", target: 5000, reward: 500, rewardType: "coins" },
-    { id: "C_BANK_10K", desc: "Cash Out 10,000 coins", type: "lifetimeBank", target: 10000, reward: "💎", rewardType: "avatar" },
-    { id: "C_FIRST_1", desc: "Win on the first try", type: "careerFirstTry", target: 1, reward: "🎯", rewardType: "avatar" }
-];
-
-        // GENRE MILESTONES (Generated dynamically to save you 40 lines of code)
-        const genresList = ["RPG", "Shooter", "Action", "Platformer", "Sports", "Racing", "Puzzle", "Horror", "Arcade", "Strategy"];
-        genresList.forEach(g => {
-            CAREER_CHALLENGES.push({ id: `C_${g}_10`, desc: `Guess 10 ${g} games`, type: `careerGenre_${g}`, target: 10, reward: 250, rewardType: "coins" });
-            CAREER_CHALLENGES.push({ id: `C_${g}_50`, desc: `Guess 50 ${g} games`, type: `careerGenre_${g}`, target: 50, reward: 500, rewardType: "coins" });
-            CAREER_CHALLENGES.push({ id: `C_${g}_100`, desc: `Guess 100 ${g} games`, type: `careerGenre_${g}`, target: 100, reward: "#538d4e", rewardType: "banner" });
-            CAREER_CHALLENGES.push({ id: `C_${g}_250`, desc: `Guess 250 ${g} games`, type: `careerGenre_${g}`, target: 250, reward: "🏆", rewardType: "avatar" });
-        });
-
         const POINTS_DISTRIBUTION = [100, 50, 25, 10, 5, 1];
         
         function loadStats() {
@@ -1380,22 +1318,78 @@
                         document.getElementById('current-score').innerText = localStats.arcadeScore;
                         document.getElementById('continues-left').innerText = localStats.continues;
                         document.getElementById('high-score').innerText = localStats.highScore;
-                        console.log("Cloud stats successfully downloaded and applied!");
                     } else if (localStats.played > cloudStats.played) {
-                        // If they played as a guest and THEN logged in, upload their new progress!
                         syncStatsToCloud();
                     }
                 }
             });
         }
-        
+
+        // 👇 MOVED DATABASES UP HERE 👇
+
+        // --- MASTER CHALLENGE DATABASES ---
+        const DAILY_CHALLENGES_POOL = {
+            tier50: [
+                { id: "D_CASH_3", desc: "Cash Out 3 times", type: "dailyCashouts", target: 3, reward: 50, rewardType: "coins" },
+                { id: "D_STREAK_5", desc: "Reach a 5 win streak", type: "dailyMaxStreak", target: 5, reward: 50, rewardType: "coins" },
+                { id: "D_WIN_10", desc: "Win 10 games", type: "dailyWins", target: 10, reward: 50, rewardType: "coins" }
+            ],
+            tier100: [
+                { id: "D_RPG_1", desc: "Guess an RPG correctly", type: "dailyGenre_RPG", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_SHT_1", desc: "Guess a Shooter correctly", type: "dailyGenre_Shooter", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_SPR_1", desc: "Guess a Sports game correctly", type: "dailyGenre_Sports", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_ACT_1", desc: "Guess an Action game correctly", type: "dailyGenre_Action", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_PLT_1", desc: "Guess a Platformer correctly", type: "dailyGenre_Platformer", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_RAC_1", desc: "Guess a Racing game correctly", type: "dailyGenre_Racing", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_PUZ_1", desc: "Guess a Puzzle game correctly", type: "dailyGenre_Puzzle", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_HOR_1", desc: "Guess a Horror game correctly", type: "dailyGenre_Horror", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_ARC_1", desc: "Guess an Arcade game correctly", type: "dailyGenre_Arcade", target: 1, reward: 100, rewardType: "coins" },
+                { id: "D_STR_1", desc: "Guess a Strategy game correctly", type: "dailyGenre_Strategy", target: 1, reward: 100, rewardType: "coins" }
+            ],
+            tier200: [
+                { id: "D_CASH_10", desc: "Cash Out 10 times", type: "dailyCashouts", target: 10, reward: 200, rewardType: "coins" },
+                { id: "D_WIN_25", desc: "Win 25 games", type: "dailyWins", target: 25, reward: 200, rewardType: "coins" }
+            ]
+        };
+
+        const CAREER_CHALLENGES = [
+            // Original Challenges (Fixed Property Names!)
+            { id: "CAREER_PLAY_50", desc: "Play 50 Total Games", type: "played", target: 50, rewardType: "banner", reward: "BANNER_NEON" },
+            { id: "CAREER_WIN_25", desc: "Win 25 Games", type: "wins", target: 25, rewardType: "coins", reward: 1000 },
+            { id: "CAREER_STREAK_10", desc: "Reach a 10-Win Streak", type: "maxStreak", target: 10, rewardType: "avatar", reward: "AVATAR_WIZARD" },
+            
+            // Milestones
+            { id: "C_PLAY_100", desc: "Play 100 total games", type: "played", target: 100, reward: 250, rewardType: "coins" },
+            { id: "C_PLAY_500", desc: "Play 500 total games", type: "played", target: 500, reward: 500, rewardType: "coins" },
+            { id: "C_PLAY_1K", desc: "Play 1,000 total games", type: "played", target: 1000, reward: "👑", rewardType: "avatar" },
+            { id: "C_WIN_250", desc: "Win 250 games", type: "wins", target: 250, reward: 250, rewardType: "coins" },
+            { id: "C_WIN_500", desc: "Win 500 games", type: "wins", target: 500, reward: 500, rewardType: "coins" },
+            { id: "C_WIN_1K", desc: "Win 1,000 games", type: "wins", target: 1000, reward: "#e2b714", rewardType: "banner" },
+            { id: "C_STRK_10", desc: "Reach a 10 win streak", type: "maxStreak", target: 10, reward: 250, rewardType: "coins" },
+            { id: "C_STRK_25", desc: "Reach a 25 win streak", type: "maxStreak", target: 25, reward: 500, rewardType: "coins" },
+            { id: "C_STRK_50", desc: "Reach a 50 win streak", type: "maxStreak", target: 50, reward: "🔥", rewardType: "avatar" },
+            { id: "C_BANK_1K", desc: "Cash Out 1,000 coins", type: "lifetimeBank", target: 1000, reward: 250, rewardType: "coins" },
+            { id: "C_BANK_5K", desc: "Cash Out 5,000 coins", type: "lifetimeBank", target: 5000, reward: 500, rewardType: "coins" },
+            { id: "C_BANK_10K", desc: "Cash Out 10,000 coins", type: "lifetimeBank", target: 10000, reward: "💎", rewardType: "avatar" },
+            { id: "C_FIRST_1", desc: "Win on the first try", type: "careerFirstTry", target: 1, reward: "🎯", rewardType: "avatar" }
+        ];
+
+        const genresList = ["RPG", "Shooter", "Action", "Platformer", "Sports", "Racing", "Puzzle", "Horror", "Arcade", "Strategy"];
+        genresList.forEach(g => {
+            CAREER_CHALLENGES.push({ id: `C_${g}_10`, desc: `Guess 10 ${g} games`, type: `careerGenre_${g}`, target: 10, reward: 250, rewardType: "coins" });
+            CAREER_CHALLENGES.push({ id: `C_${g}_50`, desc: `Guess 50 ${g} games`, type: `careerGenre_${g}`, target: 50, reward: 500, rewardType: "coins" });
+            CAREER_CHALLENGES.push({ id: `C_${g}_100`, desc: `Guess 100 ${g} games`, type: `careerGenre_${g}`, target: 100, reward: "#538d4e", rewardType: "banner" });
+            CAREER_CHALLENGES.push({ id: `C_${g}_250`, desc: `Guess 250 ${g} games`, type: `careerGenre_${g}`, target: 250, reward: "🏆", rewardType: "avatar" });
+        });
+
+        // 👇 LOAD STATS NOW SUCCEEDS BECAUSE DATABASES ARE READY 👇
         let localStats = loadStats();
         let knownConsole = null, knownGenre = null, eliminatedConsoles = new Set(), eliminatedGenres = new Set(), minYear = -Infinity, maxYear = Infinity;
 
         fetch('database.json')
             .then(res => res.json())
             .then(data => { 
-                database = data.slice(0, 525); // Capped at 525!
+                database = data.slice(0, 525); 
                 resetGame(false, false); 
             })
             .catch(err => console.error(err));
