@@ -786,6 +786,12 @@
         }
 
         function getProgressValue(type) {
+            // --- FAILSAFES: Prevent crashes from outdated save files ---
+            if (!localStats.careerGenres) localStats.careerGenres = {};
+            if (!localStats.challenges) localStats.challenges = {};
+            if (!localStats.challenges.dailyGenres) localStats.challenges.dailyGenres = {};
+            // -----------------------------------------------------------
+
             // Direct lookups
             if (localStats[type] !== undefined) return localStats[type];
             if (localStats.challenges[type] !== undefined) return localStats.challenges[type];
