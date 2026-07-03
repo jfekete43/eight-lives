@@ -857,20 +857,36 @@
 
             localStats.challenges.claimed.push(id);
             
+            // Grab the user once at the top so we can use it for all 3 reward types
+            const user = firebase.auth().currentUser;
+
             // Distribute the correct reward type
             if (chal.rewardType === 'avatar') {
                 if (!localStats.unlockedAvatars.includes(chal.reward)) {
                     localStats.unlockedAvatars.push(chal.reward);
                 }
+                // NEW: Push the avatar to Firebase so the Locker sees it!
+                if (user && !user.isAnonymous) {
+                    db.collection("users").doc(user.uid).update({
+                        ownedAvatars: firebase.firestore.FieldValue.arrayUnion(chal.reward)
+                    }).catch(err => console.error(err));
+                }
                 alert(`Challenge Complete! You unlocked a new Avatar! Check your locker.`);
+                
             } else if (chal.rewardType === 'banner') {
                 if (!localStats.unlockedBanners.includes(chal.reward)) {
                     localStats.unlockedBanners.push(chal.reward);
                 }
+                // NEW: Push the banner to Firebase so the Locker sees it!
+                if (user && !user.isAnonymous) {
+                    db.collection("users").doc(user.uid).update({
+                        ownedBanners: firebase.firestore.FieldValue.arrayUnion(chal.reward)
+                    }).catch(err => console.error(err));
+                }
                 alert(`Challenge Complete! You unlocked a new Banner! Check your locker.`);
+                
             } else {
                 // Default Coin Reward
-                const user = firebase.auth().currentUser;
                 if (user && !user.isAnonymous) {
                     db.collection("users").doc(user.uid).update({
                         spendableCoins: firebase.firestore.FieldValue.increment(chal.reward)
@@ -879,6 +895,7 @@
                 alert(`Challenge Complete! ${chal.reward} coins added to your bank!`);
             }
 
+            // Save and refresh the screen instantly
             localStorage.setItem('gamedleStats', JSON.stringify(localStats));
             syncStatsToCloud();
             renderChallenges();
