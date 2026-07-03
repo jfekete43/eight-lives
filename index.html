@@ -1248,7 +1248,7 @@
                 if (!parsed.unlockedBanners) parsed.unlockedBanners = ["transparent"];
 
                 // DAILY CHALLENGE RANDOMIZER CHECK
-                if (!parsed.challenges || parsed.challenges.date !== todayStr) {
+                if (!parsed.challenges || parsed.challenges.date !== todayStr || !parsed.challenges.activeDaily) {
                     const t50 = DAILY_CHALLENGES_POOL.tier50[Math.floor(Math.random() * DAILY_CHALLENGES_POOL.tier50.length)];
                     const t100 = DAILY_CHALLENGES_POOL.tier100[Math.floor(Math.random() * DAILY_CHALLENGES_POOL.tier100.length)];
                     const t200 = DAILY_CHALLENGES_POOL.tier200[Math.floor(Math.random() * DAILY_CHALLENGES_POOL.tier200.length)];
@@ -1303,10 +1303,9 @@
                 if (doc.exists && doc.data().stats) {
                     let cloudStats = doc.data().stats;
                     
-                    // 1. Verify Daily Challenges aren't expired from an old session
-                    const todayStr = new Date().toISOString().split('T')[0];
-                    if (!cloudStats.challenges || cloudStats.challenges.date !== todayStr) {
-                        cloudStats.challenges = { date: todayStr, played: 0, rpgWins: 0, firstTry: 0 };
+                    // 1. Safely merge challenges to prevent missing data crashes
+                    if (!cloudStats.challenges || !cloudStats.challenges.activeDaily) {
+                        cloudStats.challenges = localStats.challenges;
                     }
 
                     // 2. Only overwrite local if the Cloud has more (or equal) games played.
