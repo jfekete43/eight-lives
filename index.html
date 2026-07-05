@@ -786,24 +786,18 @@
         }
 
         function getProgressValue(type) {
-            // --- FAILSAFES: Prevent crashes from outdated save files ---
-            if (!localStats.careerGenres) localStats.careerGenres = {};
-            if (!localStats.challenges) localStats.challenges = {};
-            if (!localStats.challenges.dailyGenres) localStats.challenges.dailyGenres = {};
-            // -----------------------------------------------------------
-
-            // Direct lookups
+            // Direct lookups (Safe checks)
             if (localStats[type] !== undefined) return localStats[type];
-            if (localStats.challenges[type] !== undefined) return localStats.challenges[type];
+            if (localStats?.challenges?.[type] !== undefined) return localStats.challenges[type];
             
-            // Dynamic genre lookups (e.g., "careerGenre_RPG" or "dailyGenre_Action")
+            // Dynamic genre lookups using Optional Chaining (?.) to prevent crashes
             if (type.startsWith('careerGenre_')) {
                 const genre = type.split('_')[1];
-                return localStats.careerGenres[genre] || 0;
+                return localStats?.careerGenres?.[genre] || 0;
             }
             if (type.startsWith('dailyGenre_')) {
                 const genre = type.split('_')[1];
-                return localStats.challenges.dailyGenres[genre] || 0;
+                return localStats?.challenges?.dailyGenres?.[genre] || 0;
             }
             return 0;
         }
