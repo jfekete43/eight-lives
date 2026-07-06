@@ -1893,10 +1893,18 @@
                 if (currentGuesses === 1) localStats.careerFirstTry++;
                 
                 const g = targetGame.genre;
-                if (localStats.careerGenres[g] !== undefined) {
-                    localStats.careerGenres[g]++;
-                    localStats.challenges.dailyGenres[g]++;
-                }
+                
+                // 1. FAILSAFE: Build the tracking folders if the save file is too old to have them
+                if (!localStats.careerGenres) localStats.careerGenres = {};
+                if (!localStats.challenges.dailyGenres) localStats.challenges.dailyGenres = {};
+                
+                // 2. FAILSAFE: Make sure the specific genre starts at 0 if it's missing
+                if (localStats.careerGenres[g] === undefined) localStats.careerGenres[g] = 0;
+                if (localStats.challenges.dailyGenres[g] === undefined) localStats.challenges.dailyGenres[g] = 0;
+
+                // 3. Add the points!
+                localStats.careerGenres[g]++;
+                localStats.challenges.dailyGenres[g]++;
                 if (localStats.currentStreak > localStats.challenges.dailyMaxStreak) {
                     localStats.challenges.dailyMaxStreak = localStats.currentStreak;
                 }
