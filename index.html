@@ -926,7 +926,11 @@
             for (const [id, item] of Object.entries(SHOP_INVENTORY.avatars)) {
                 if (item.unbuyable) continue;
                 const isOwned = ownedAvatars.includes(id);
-                const isEquipped = eqAvatar === item.icon;
+                
+                // NEW: Determine if it's an image or an emoji
+                const avatarValue = item.src || item.icon;
+                const isEquipped = eqAvatar === avatarValue;
+                const displayVisual = item.src ? `<img src="${item.src}" style="width: 32px; height: 32px; image-rendering: pixelated;">` : item.icon;
                 
                 let btnLogic = "";
                 if (isEquipped) {
@@ -939,7 +943,7 @@
 
                 avatarsDiv.innerHTML += `
                     <div style="background: #272729; border: 2px solid ${isEquipped ? '#538d4e' : '#3a3a3c'}; border-radius: 8px; padding: 10px; width: 100px; text-align: center; display: flex; flex-direction: column; align-items: center;">
-                        <div style="font-size: 32px; margin-bottom: 5px;">${item.icon}</div>
+                        <div style="font-size: 32px; margin-bottom: 5px; display: flex; justify-content: center; align-items: center; height: 32px;">${displayVisual}</div>
                         <div style="font-size: 8px; color: white; margin-bottom: 15px; flex-grow: 1; line-height:1.4;">${item.name}</div>
                         ${btnLogic}
                     </div>
@@ -987,7 +991,7 @@
                 const coins = data.spendableCoins || 0;
                 const owned = data[category === 'avatars' ? 'ownedAvatars' : 'ownedBanners'] || [];
                 const equippedField = category === 'avatars' ? 'equippedAvatar' : 'equippedBanner';
-                const itemValue = category === 'avatars' ? itemDef.icon : itemDef.color;
+                const itemValue = category === 'avatars' ? (itemDef.src || itemDef.icon) : itemDef.color;
 
                 if (owned.includes(itemId)) {
                     // ACTION: EQUIP OWNED ITEM
@@ -1032,13 +1036,21 @@
         // --- SHOP INVENTORY ---
         const SHOP_INVENTORY = {
             avatars: {
+                // Legacy Emoji Items
                 "AVATAR_GHOST": { name: "Retro Ghost", icon: "👻", price: 50 },
                 "AVATAR_ALIEN": { name: "Pixel Alien", icon: "👾", price: 150 },
                 "AVATAR_ROBOT": { name: "Mecha", icon: "🤖", price: 300 },
                 "AVATAR_SKULL": { name: "Game Over", icon: "💀", price: 500 },
-                "AVATAR_WIZARD": { name: "The Wizard", icon: "🧙‍♂️", price: 750 },
-                "AVATAR_CROWN": { name: "High Roller", icon: "👑", price: 1000 }
+                "AVATAR_WIZARD": { name: "The Wizard", src: "assets/wizard.png", price: 750 },
+                "AVATAR_CROWN": { name: "High Roller", icon: "👑", price: 1000 },
+                
+                // NEW CUSTOM IMAGE AVATARS
+                "AVATAR_CYBERNINJA": { name: "Cyber Ninja", src: "assets/cyberninja.png", price: 1000 },
+                "AVATAR_HACKER": { name: "Hacker", src: "assets/futuristichacker.png", price: 1500 },
+                "AVATAR_GREENHELMET": { name: "Green Warrior Helmet", src: "assets/greenwarriorhelmet.png", price: 1250 },
+                "AVATAR_REDDRAGON": { name: "Red Dragon", src: "assets/reddragon.png", price: 2500 }
             },
+            // Keep your banners object exactly the same down here...
             banners: {
                 "BANNER_BLUE": { name: "Grid Blue", color: "#1a2a3a", price: 200 },
                 "BANNER_RED": { name: "Arcade Red", color: "#3a1a1a", price: 200 },
@@ -1069,7 +1081,10 @@
                 }).then(() => {
                     // Instantly update the Live Preview Card!
                     if (field === 'equippedTitle') document.getElementById('locker-preview-title').innerText = value;
-                    if (field === 'equippedAvatar') document.getElementById('locker-preview-avatar').innerText = value;
+                    if (field === 'equippedAvatar') {
+    const isImage = value.includes('assets/');
+    document.getElementById('locker-preview-avatar').innerHTML = isImage ? `<img src="${value}" style="width:32px; height:32px; vertical-align:middle;">` : value;
+}
                     if (field === 'equippedBanner') {
                         const previewCard = document.getElementById('locker-preview-card');
                         previewCard.style.backgroundColor = value;
@@ -1100,7 +1115,8 @@
                         // 1. UPDATE LIVE PREVIEW CARD
                         document.getElementById('locker-preview-name').innerText = data.arcadeTag;
                         document.getElementById('locker-preview-title').innerText = eqTitle;
-                        document.getElementById('locker-preview-avatar').innerText = eqAvatar;
+                        const isImg = eqAvatar.includes('assets/');
+document.getElementById('locker-preview-avatar').innerHTML = isImg ? `<img src="${eqAvatar}" style="width:32px; height:32px; vertical-align:middle;">` : eqAvatar;
                         const previewCard = document.getElementById('locker-preview-card');
                         previewCard.style.backgroundColor = eqBanner;
                         previewCard.style.border = eqBanner !== "transparent" ? "1px solid #444" : "1px solid #3a3a3c";
