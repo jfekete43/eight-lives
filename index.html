@@ -958,9 +958,9 @@
                 const bannerValue = item.src || item.color;
                 const isEquipped = eqBanner === bannerValue;
                 
-                // Render image background if src exists, otherwise use fallback color
+                // Render image background with a dark wash overlay if src exists
                 const previewStyle = item.src 
-                    ? `background-image: url('${item.src}'); background-size: cover; background-position: center;` 
+                    ? `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('${item.src}'); background-size: cover; background-position: center;` 
                     : `background-color: ${item.color};`;
                 
                 let btnLogic = "";
@@ -1103,7 +1103,7 @@
                     if (field === 'equippedBanner') {
                         const previewCard = document.getElementById('locker-preview-card');
                         if (value.includes('assets/')) {
-                            previewCard.style.backgroundImage = `url('${value}')`;
+                            previewCard.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('${value}')`;
                             previewCard.style.backgroundSize = 'cover';
                             previewCard.style.backgroundPosition = 'center';
                         } else {
@@ -1145,7 +1145,7 @@
                         
                         // NEW: Checks if the banner is an image file or a flat hex color
                         if (eqBanner.includes('assets/')) {
-                            previewCard.style.backgroundImage = `url('${eqBanner}')`;
+                            previewCard.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('${eqBanner}')`;
                             previewCard.style.backgroundSize = 'cover';
                             previewCard.style.backgroundPosition = 'center';
                             previewCard.style.backgroundColor = 'transparent'; 
@@ -1600,7 +1600,7 @@
                         row.style.alignItems = 'center'; 
                         row.style.marginBottom = '8px';
                         if (liveBanner.includes('assets/')) {
-                            row.style.backgroundImage = `url('${liveBanner}')`;
+                            row.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('${liveBanner}')`;
                             row.style.backgroundSize = 'cover';
                             row.style.backgroundPosition = 'center';
                         } else {
@@ -1703,7 +1703,7 @@
                         row.style.display = 'flex'; row.style.justifyContent = 'space-between';
                         row.style.alignItems = 'center'; row.style.marginBottom = '8px';
                         if (liveBanner.includes('assets/')) {
-                            row.style.backgroundImage = `url('${liveBanner}')`;
+                            row.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('${liveBanner}')`;
                             row.style.backgroundSize = 'cover';
                             row.style.backgroundPosition = 'center';
                         } else {
