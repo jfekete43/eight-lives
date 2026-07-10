@@ -1141,11 +1141,18 @@ document.getElementById('locker-preview-avatar').innerHTML = isImg ? `<img src="
                         const ownedAvatars = data.ownedAvatars || [];
                         const avatarSelect = document.getElementById('locker-avatar-select');
                         avatarSelect.innerHTML = '<option value="🕹️">🕹️ Default Player</option>';
+                        
                         ownedAvatars.forEach(id => {
                             if (SHOP_INVENTORY.avatars[id]) {
                                 const item = SHOP_INVENTORY.avatars[id];
                                 const opt = document.createElement('option');
-                                opt.value = item.icon; opt.innerText = `${item.icon} ${item.name}`;
+                                
+                                // NEW: Grab the correct value, and set a fallback emoji for the text list
+                                const itemValue = item.src || item.icon;
+                                const listEmoji = item.src ? "🖼️" : item.icon; 
+                                
+                                opt.value = itemValue; 
+                                opt.innerText = `${listEmoji} ${item.name}`;
                                 avatarSelect.appendChild(opt);
                             }
                         });
