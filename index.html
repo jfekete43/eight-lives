@@ -1547,7 +1547,9 @@ document.getElementById('locker-preview-avatar').innerHTML = isImg ? `<img src="
                         rankCount++;
 
                         const liveTitle = data.equippedTitle || "Insert Coin";
-                        const liveAvatar = data.equippedAvatar || "🕹️";
+                        let liveAvatar = data.equippedAvatar || "🕹️";
+                        const displayAvatar = liveAvatar.includes('assets/') ? `<img src="${liveAvatar}" style="width: 20px; height: 20px; image-rendering: pixelated;">` : liveAvatar;
+
                         const liveBanner = data.equippedBanner || "transparent";
 
                         const row = document.createElement('div');
@@ -1569,7 +1571,7 @@ document.getElementById('locker-preview-avatar').innerHTML = isImg ? `<img src="
                         const nameSpan = `
                             <div style="display: flex; flex-direction: column; line-height: 1.4;">
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 16px;">${liveAvatar}</span>
+                                    <span style="font-size: 16px; display: flex; align-items: center;">${displayAvatar}</span>
                                     <span style="color: ${nameColor};">${rankCount}. ${data.arcadeTag}${crown}</span>
                                 </div>
                                 <span style="color: #bbb; font-size: 8px; text-transform: uppercase; margin-top: 3px;">${liveTitle}</span>
@@ -1638,6 +1640,9 @@ document.getElementById('locker-preview-avatar').innerHTML = isImg ? `<img src="
                             } catch (err) { console.error("Could not fetch live profile"); }
                         }
                         
+                        // NEW CHECK FOR SINGLE RUN LEADERBOARD
+                        const displayAvatar = liveAvatar.includes('assets/') ? `<img src="${liveAvatar}" style="width: 20px; height: 20px; image-rendering: pixelated;">` : liveAvatar;
+
                         let tooltipParams = ""; let cursorStyle = "default";
                         if (filter === 'all' && data.timestamp) {
                             const d = data.timestamp.toDate();
@@ -1662,7 +1667,7 @@ document.getElementById('locker-preview-avatar').innerHTML = isImg ? `<img src="
                         const nameSpan = `
                             <div ${tooltipParams} style="display: flex; flex-direction: column; line-height: 1.4; cursor: ${cursorStyle};">
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 16px;">${liveAvatar}</span>
+                                    <span style="font-size: 16px; display: flex; align-items: center;">${displayAvatar}</span>
                                     <span style="color: ${nameColor};">${rankCount}. ${data.name}${crown}</span>
                                 </div>
                                 <span style="color: #bbb; font-size: 8px; text-transform: uppercase; margin-top: 3px;">${liveTitle}</span>
