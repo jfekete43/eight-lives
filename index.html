@@ -1065,26 +1065,26 @@
             // Keep your banners object exactly the same down here...
             banners: {
                 // Legacy Flat Colors
-                "BANNER_BLUE": { name: "Grid Blue", color: "#1a2a3a", price: 100 },
-                "BANNER_RED": { name: "Arcade Red", color: "#3a1a1a", price: 100 },
-                "BANNER_GREEN": { name: "Matrix Green", color: "#152e18", price: 100 },
-                "BANNER_PURPLE": { name: "Synthwave Purple", color: "#221236", price: 100 },
-                "BANNER_CYAN": { name: "Arcade Cyan", color: "#122e36", price: 150 },
-                "BANNER_ORANGE": { name: "Sunset Orange", color: "#361e12", price: 150 },
-                "BANNER_PINK": { name: "Cyber Pink", color: "#361226", price: 150 },
-                "BANNER_GOLD": { name: "Gold Rush", color: "#2e251a", price: 200 },
+                "BANNER_BLUE": { name: "Grid Blue", color: "#1a2a3a", icon: "🟦", price: 100 },
+                "BANNER_RED": { name: "Arcade Red", color: "#3a1a1a", icon: "🟥", price: 100 },
+                "BANNER_GREEN": { name: "Matrix Green", color: "#152e18", icon: "🟩", price: 100 },
+                "BANNER_PURPLE": { name: "Synthwave Purple", color: "#221236", icon: "🟪", price: 100 },
+                "BANNER_CYAN": { name: "Arcade Cyan", color: "#122e36", icon: "🔷", price: 150 },
+                "BANNER_ORANGE": { name: "Sunset Orange", color: "#361e12", icon: "🔸", price: 150 },
+                "BANNER_PINK": { name: "Cyber Pink", color: "#361226", icon: "🎀", price: 150 },
+                "BANNER_GOLD": { name: "Gold Rush", color: "#2e251a", icon: "🟨", price: 200 },
                 
                 // NEW CUSTOM IMAGE BANNERS
-                "BANNER_SPACE": { name: "Space", src: "assets/banner-space.jpg", price: 1000 },
-                "BANNER_FIGHT": { name: "Fight", src: "assets/banner-fight.jpg", price: 1000 },
-                "BANNER_RPG": { name: "RPG", src: "assets/banner-RPG.jpg", price: 1000 },
-                "BANNER_RACER": { name: "Racer", src: "assets/banner-racer.jpg", price: 1000 },
-                "BANNER_BASEBALL": { name: "Baseball", src: "assets/banner-Baseball.jpg", price: 1000 },
-                "BANNER_PLATFORM": { name: "Platformer", src: "assets/banner-platformer.jpg", price: 1000 },
-                "BANNER_STADIUM": { name: "Stadium", src: "assets/banner-stadium.jpg", price: 1500 },
-                "BANNER_CITY": { name: "City", src: "assets/banner-City.jpg", price: 1500 },
-                "BANNER_GRID": { name: "Neon Grid", src: "assets/banner-grid.jpg", price: 1500 },
-                "BANNER_SUNSET": { name: "Sunset", src: "assets/banner-Sunset.jpg", price: 2000 }
+                "BANNER_SPACE": { name: "Space", src: "assets/banner-space.jpg", icon: "🚀", price: 1000 },
+                "BANNER_FIGHT": { name: "Fight", src: "assets/banner-fight.jpg", icon: "🥊", price: 1000 },
+                "BANNER_RPG": { name: "RPG", src: "assets/banner-RPG.jpg", icon: "🛡️", price: 1000 },
+                "BANNER_RACER": { name: "Racer", src: "assets/banner-racer.jpg", icon: "🏎️", price: 1000 },
+                "BANNER_BASEBALL": { name: "Baseball", src: "assets/banner-Baseball.jpg", icon: "⚾", price: 1000 },
+                "BANNER_PLATFORM": { name: "Platformer", src: "assets/banner-platformer.jpg", icon: "🍄", price: 1000 },
+                "BANNER_STADIUM": { name: "Stadium", src: "assets/banner-stadium.jpg", icon: "🏟️", price: 1500 },
+                "BANNER_CITY": { name: "City", src: "assets/banner-City.jpg", icon: "🏙️", price: 1500 },
+                "BANNER_GRID": { name: "Neon Grid", src: "assets/banner-grid.jpg", icon: "🌐", price: 1500 },
+                "BANNER_SUNSET": { name: "Sunset", src: "assets/banner-Sunset.jpg", icon: "🌇", price: 2000 }
             }
         };
 
@@ -1210,12 +1210,18 @@
                         const ownedBanners = data.ownedBanners || [];
                         const bannerSelect = document.getElementById('locker-banner-select');
                         bannerSelect.innerHTML = '<option value="transparent">⬛ Default Grid</option>';
+                        
                         ownedBanners.forEach(id => {
                             if (SHOP_INVENTORY.banners[id]) {
                                 const item = SHOP_INVENTORY.banners[id];
                                 const opt = document.createElement('option');
                                 const itemValue = item.src || item.color;
-                                opt.value = itemValue; opt.innerText = `🎨 ${item.name}`;
+                                
+                                // NEW: Dynamically grab the item's custom emoji icon property
+                                const listEmoji = item.icon || "🎨";
+                                
+                                opt.value = itemValue; 
+                                opt.innerText = `${listEmoji} ${item.name}`;
                                 bannerSelect.appendChild(opt);
                             }
                         });
