@@ -1962,12 +1962,19 @@
             
             // 1. Reset Buttons for a fresh end screen
             ['win', 'lose'].forEach(state => {
-                const btn = document.getElementById(`btn-submit-${state}`);
-                if(btn) {
-                    btn.innerText = "Cash Out";
-                    btn.disabled = false;
-                    btn.style.borderColor = "#e2b714";
-                    btn.style.color = "#e2b714";
+                const btnSubmit = document.getElementById(`btn-submit-${state}`);
+                if(btnSubmit) {
+                    btnSubmit.innerText = "Cash Out";
+                    btnSubmit.disabled = false;
+                    btnSubmit.style.borderColor = "#e2b714";
+                    btnSubmit.style.color = "#e2b714";
+                }
+                
+                // NEW FIX: Un-stick the Next Round button so it progresses correctly!
+                const btnRetry = document.getElementById(`btn-retry-${state}`);
+                if (btnRetry && state === 'win') {
+                    btnRetry.innerText = "Next Round";
+                    btnRetry.onclick = () => resetGame(true, false);
                 }
             });
             document.getElementById('btn-share-win').style.display = 'none';
