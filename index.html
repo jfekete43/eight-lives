@@ -2290,5 +2290,30 @@ function fallbackCopyTextToClipboard(text) {
             &copy; 2026 The Game Grid. All rights reserved.
         </div>
     </div>
+    <!-- COOKIE CONSENT BANNER -->
+    <div id="cookie-banner" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: #1a1a1a; color: #d7dadc; text-align: center; padding: 15px 20px; border-top: 2px solid #e2b714; z-index: 100000; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; box-shadow: 0 -4px 10px rgba(0,0,0,0.8);">
+        <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <div style="font-size: 12px; line-height: 1.5;">
+                <strong>INSERT COIN TO CONTINUE:</strong> We use cookies to save your high scores, personalize content, and analyze site traffic. By continuing to use The Game Grid, you consent to our use of cookies. 
+                <a href="privacy.html" style="color: #4285F4; text-decoration: none; font-weight: bold;">[ Privacy Policy ]</a>
+            </div>
+            <button onclick="acceptCookies()" class="arcade-btn" style="border-color: #538d4e; color: #538d4e; padding: 10px 20px; font-size: 12px; margin-top: 0;">ACCEPT & PLAY</button>
+        </div>
+    </div>
+
+    <script>
+        // Check local storage on load to see if they already accepted
+        window.addEventListener('load', () => {
+            if (!localStorage.getItem('gameGridCookiesAccepted')) {
+                document.getElementById('cookie-banner').style.display = 'block';
+            }
+        });
+
+        // Save consent and hide the banner
+        function acceptCookies() {
+            localStorage.setItem('gameGridCookiesAccepted', 'true');
+            document.getElementById('cookie-banner').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
