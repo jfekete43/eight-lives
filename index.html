@@ -307,24 +307,6 @@
         <div>HIGH: <span id="high-score">0</span></div>
     </div>
 
-    <div class="instructions">
-        <div class="instructions-header" onclick="toggleInstructions()">
-            <p>How To Play</p>
-            <button class="toggle-btn" id="instructions-btn">[ + ]</button>
-        </div>
-        <div class="instructions-content" id="instructions-content">
-            <ul>
-                <li style="color: #e2b714; font-size: 15px;">🎯 <strong>Goal: Guess the hidden retro or modern video game!</strong></li>
-                <li>🟩 <strong>Green box</strong> means an exact match.</li>
-                <li>⬛ <strong>Gray box</strong> means incorrect.</li>
-                <li>⬆️ ⬇️ <strong>Arrows</strong> indicate if the target game's release year is newer or older.</li>
-                <li>🧠 <strong>Smart Filter:</strong> Ineligible games will be automatically removed from the suggestion box as you play.</li>
-                <li>🏆 <strong>Arcade Scoring:</strong> Points decrease each guess (100, 50, 25, 10, 5, 1).</li>
-                <li>⚠️ <strong>Press Your Luck:</strong> You have 2 Continues per run. Failing a round burns a Continue. If you fail with 0 Continues left, you lose all your un-cashed points!</li>
-            </ul>
-        </div>
-    </div>
-
     <!-- HUD Cleanup: Hearts and Continues combined into one row -->
     <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 20px; margin-bottom: 20px; width: 100%; max-width: 600px; position: relative; z-index: 10;">
         <div class="lives-left" id="lives-display" style="margin-bottom: 0; font-size: clamp(16px, 5vw, 22px); letter-spacing: 2px;"></div>
@@ -470,6 +452,10 @@
                 <button class="arcade-btn" onclick="closeMainMenu(); toggleLeaderboard('flex')">LEADERBOARD</button>
                 <button class="arcade-btn" id="nav-shop-btn" onclick="openShopModal()" style="border-color: #e2b714; color: #e2b714;">ITEM SHOP</button>
                 <button class="arcade-btn" onclick="openChallengesModal()" style="border-color: #538d4e; color: #538d4e;">CHALLENGES</button>
+                
+                <!-- NEW ADSENSE PAGES -->
+                <a href="how-to-play.html" class="arcade-btn" style="border-color: #888; color: #888; text-decoration: none; display: flex; justify-content: center;">HOW TO PLAY</a>
+                <a href="about.html" class="arcade-btn" style="border-color: #888; color: #888; text-decoration: none; display: flex; justify-content: center;">ABOUT / UPDATES</a>
                 
                 <div style="height: 2px; background-color: #333; margin: 10px 0;"></div>
                 
@@ -1910,14 +1896,6 @@
             }
         }
         // ----------------------------------
-
-        function toggleInstructions() {
-            const content = document.getElementById('instructions-content');
-            const btn = document.getElementById('instructions-btn');
-            if (content.style.display === 'none' || content.style.display === '') {
-                content.style.display = 'block'; btn.innerText = '[ - ]';
-            } else { content.style.display = 'none'; btn.innerText = '[ + ]'; }
-        }
         
         function toggleModal(displayState) {
             if (displayState === 'flex') updateStatsUI();
@@ -2300,6 +2278,8 @@ function fallbackCopyTextToClipboard(text) {
         <div style="color: #555; font-size: 10px; font-family: 'Press Start 2P', monospace; margin-bottom: 10px;">ADVERTISEMENT</div>
         
         <div style="font-size: 12px; color: #888;">
+            <a href="how-to-play.html" style="color: #888; text-decoration: none; margin: 0 10px;">How to Play</a> | 
+            <a href="about.html" style="color: #888; text-decoration: none; margin: 0 10px;">About</a> | 
             <a href="privacy.html" style="color: #888; text-decoration: none; margin: 0 10px;">Privacy Policy</a> | 
             <a href="terms.html" style="color: #888; text-decoration: none; margin: 0 10px;">Terms of Service</a> | 
             <a href="mailto:slizzfire@yahoo.com.com" style="color: #888; text-decoration: none; margin: 0 10px;">Contact</a>
