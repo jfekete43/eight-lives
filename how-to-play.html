@@ -1,1 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Play - Game Grid</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&display=swap');
 
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #121213;
+            color: #d7dadc;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #1a1a1a;
+            border: 2px solid #538d4e;
+            border-radius: 8px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        h1 { 
+            margin-top: 0; 
+            text-align: center;
+            font-family: 'Bungee', sans-serif; 
+            font-size: clamp(24px, 5vw, 40px);
+            color: #ffffff; 
+            text-shadow: 3px 3px 0px #e23636, 6px 6px 0px #111112;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 14px;
+            color: #e2b714;
+            margin-top: 40px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        p { font-size: 16px; margin-bottom: 20px; }
+        
+        .highlight-green { color: #538d4e; font-weight: bold; }
+        .highlight-gold { color: #e2b714; font-weight: bold; }
+
+        .arcade-btn { 
+            display: inline-block;
+            padding: 15px 30px; 
+            margin-top: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 18px; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            text-decoration: none;
+            background-color: transparent; 
+            color: white; 
+            border: 2px solid white; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            text-align: center;
+        }
+        .arcade-btn:hover { background-color: white; color: black; }
+
+        .example-box {
+            background-color: #272729;
+            border: 1px solid #3a3a3c;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>HOW TO PLAY</h1>
+        
+        <p>Welcome to The Game Grid. Your objective is simple but challenging: identify the hidden video game from our extensive database of retro and modern titles using context clues, logic, and your knowledge of gaming history. You have a limited number of guesses, and the clues provided will guide you closer to the correct answer with every attempt.</p>
+
+        <h2>The Core Mechanics</h2>
+        <p>At the start of each round, a target game is randomly selected by the system. When you type a video game into the search bar and submit your guess, the system will compare your selection to the hidden target across four distinct categories: <strong>Name, Console, Genre, and Release Year</strong>.</p>
+        <p>After each submission, the tiles associated with your guess will change color to provide instant visual feedback on your accuracy.</p>
+
+        <h2>Understanding the Visual Clues</h2>
+        <p>We utilize a strict color-coding system to communicate your progress:</p>
+        <ul>
+            <li><span class="highlight-green">Green Tiles (Exact Match):</span> If a category tile turns green, it means your guess perfectly matches the target game's data for that specific category. For example, if you guess "Super Mario 64" and the Console tile turns green for "N64", you know the hidden game was also released on the Nintendo 64.</li>
+            <li><strong>Gray Tiles (Incorrect):</strong> If a category tile remains dark gray, there is no match. You must adjust your strategy and choose a different console or genre for your next guess.</li>
+            <li><strong>Directional Arrows (Release Year):</strong> The Release Year category provides additional hints. If your guessed year is incorrect, an arrow will appear. An <span class="highlight-gold">Up Arrow (⬆️)</span> indicates the target game was released <em>after</em> your guess. A <span class="highlight-gold">Down Arrow (⬇️)</span> indicates the target game was released <em>before</em> your guess.</li>
+        </ul>
+
+        <h2>The Smart Filter System</h2>
+        <p>To assist you in your run, The Game Grid features a built-in Smart Filter. As you make guesses and receive feedback, our dynamic autocomplete system automatically removes ineligible games from the drop-down menu. If you establish that the target game is an RPG on the PlayStation 1, the search bar will visually isolate those parameters, allowing you to focus purely on the remaining possibilities rather than fighting the UI.</p>
+
+        <h2>Arcade Scoring and Continues</h2>
+        <p>Unlike standard daily puzzles, The Game Grid operates on an aggressive, high-stakes arcade scoring model designed to reward efficiency.</p>
+        <p>Every guess you make reduces your potential point payout. Guessing the game on the first try awards maximum points, while needing all six attempts drastically reduces your reward. You are provided with <strong>2 Continues</strong> per run. If you fail to guess the game within the allotted attempts, you burn a Continue. If you fail a round with zero Continues remaining, you suffer a Total Wipeout and lose all un-cashed points. You must choose when to cash out your bank to secure your place on the Global Leaderboard.</p>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="index.html" class="arcade-btn">Return to the Grid</a>
+        </div>
+    </div>
+
+</body>
+</html>
