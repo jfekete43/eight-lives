@@ -371,24 +371,23 @@
         <button id="guess-button" class="guess-btn" onclick="makeGuess()">Guess</button>
     </div>
 
+    <!-- NEW WELCOME MESSAGE AD INSERT -->
+    <div id="welcome-message-container" class="welcome-box">
+        <h3>Welcome to the Game Grid</h3>
+        <p>
+            Test your knowledge of classic arcade hits, nostalgic console favorites, and hidden gems from the PS3 era and earlier in this daily retro video game trivia challenge. 
+        </p>
+        <p>
+            <strong>How to Play:</strong> Type the name of a classic video game into the search bar and submit your guess. Use the clues provided by the console, genre, and release year to narrow down the correct answer before you run out of continues!
+        </p>
+        <button id="dismiss-welcome-btn" class="dismiss-btn">Dismiss ✕</button>
+    </div>
+    <!-- END WELCOME MESSAGE -->
+
     <div class="grid" id="guess-grid">
         <div class="row header-row">
             <div>Game</div><div>Console</div><div>Genre</div><div>Year</div>
         </div>
-        
-        <!-- NEW WELCOME MESSAGE AD INSERT -->
-        <div id="welcome-message-container" class="welcome-box">
-            <h3>Welcome to the Game Grid</h3>
-            <p>
-                Test your knowledge of classic arcade hits, nostalgic console favorites, and hidden gems from the PS3 era and earlier in this daily retro video game trivia challenge. 
-            </p>
-            <p>
-                <strong>How to Play:</strong> Type the name of a classic video game into the search bar and submit your guess. Use the clues provided by the console, genre, and release year to narrow down the correct answer before you run out of continues!
-            </p>
-            <button id="dismiss-welcome-btn" class="dismiss-btn">Dismiss ✕</button>
-        </div>
-        <!-- END WELCOME MESSAGE -->
-
     </div>
 
     <div id="leaderboard-modal" class="modal">
@@ -1974,6 +1973,11 @@
 
         function makeGuess() {
             if (gameOver) return;
+            
+            // Hide welcome box on first guess
+            const welcomeBox = document.getElementById('welcome-message-container');
+            if (welcomeBox) welcomeBox.style.display = 'none';
+            
             const inputEl = document.getElementById('guess-input');
             const guessName = inputEl.value;
             const guessedGame = database.find(g => g.name.toLowerCase() === guessName.toLowerCase());
