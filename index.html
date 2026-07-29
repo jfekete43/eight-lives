@@ -174,6 +174,54 @@
         .box { background-color: #3a3a3c; padding: 15px 10px; display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 4px; font-weight: bold; font-size: 14px; transition: background-color 0.3s; }
         .box.match { background-color: #538d4e; } 
         .box.wrong { background-color: #3a3a3c; } 
+
+        /* --- WELCOME MESSAGE / ADSENSE TEXT --- */
+        .welcome-box {
+            background-color: #1a1a1a;
+            border: 1px solid #3a3a3c;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 15px auto;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            color: #cccccc;
+            font-family: monospace;
+            position: relative;
+            z-index: 10;
+        }
+
+        .welcome-box h3 {
+            color: #ffffff;
+            margin-top: 0;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .welcome-box p {
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .dismiss-btn {
+            background-color: transparent;
+            color: #888;
+            border: 1px solid #555;
+            padding: 8px 15px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+
+        .dismiss-btn:hover {
+            background-color: #333;
+            color: #fff;
+        }
         
         .modal {
             display: none; 
@@ -327,6 +375,20 @@
         <div class="row header-row">
             <div>Game</div><div>Console</div><div>Genre</div><div>Year</div>
         </div>
+        
+        <!-- NEW WELCOME MESSAGE AD INSERT -->
+        <div id="welcome-message-container" class="welcome-box">
+            <h3>Welcome to the Game Grid</h3>
+            <p>
+                Test your knowledge of classic arcade hits, nostalgic console favorites, and hidden gems from the PS3 era and earlier in this daily retro video game trivia challenge. 
+            </p>
+            <p>
+                <strong>How to Play:</strong> Type the name of a classic video game into the search bar and submit your guess. Use the clues provided by the console, genre, and release year to narrow down the correct answer before you run out of continues!
+            </p>
+            <button id="dismiss-welcome-btn" class="dismiss-btn">Dismiss ✕</button>
+        </div>
+        <!-- END WELCOME MESSAGE -->
+
     </div>
 
     <div id="leaderboard-modal" class="modal">
@@ -2269,6 +2331,13 @@ function fallbackCopyTextToClipboard(text) {
             items[currentFocus].classList.add("active");
             items[currentFocus].scrollIntoView({ block: 'nearest' });
         }
+        // --- MANUAL DISMISS FOR WELCOME MESSAGE ---
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'dismiss-welcome-btn') {
+                const welcomeBox = document.getElementById('welcome-message-container');
+                if (welcomeBox) welcomeBox.style.display = 'none';
+            }
+        });
         // Force mobile browsers to start at the top of the page
         window.addEventListener('load', () => {
             setTimeout(() => window.scrollTo(0, 0), 10);
